@@ -17,9 +17,9 @@ class ContentServices extends Client
     }
 
     /**
-     * 
+     *
      * @param \Acquia\ContentServicesClient\Entity $entity
-     * 
+     *
      * @return ContentServicesException
      */
     public function createEntity(Entity $entity)
@@ -28,31 +28,33 @@ class ContentServices extends Client
             $request = $this->createRequest('POST', '/entities', ['json' => (array) $entity]);
             $response = $this->send($request);
             $entity->exchangeArray($response->json());
+
             return $response;
         } catch (RequestException $ex) {
             $this->throwException($ex);
         }
     }
-    
+
     /**
      * @param string $uuid
-     * 
+     *
      * @return ContentServicesException
      */
     public function readEntity($uuid)
     {
         try {
             $response = $this->get('entities/'.$uuid);
+
             return new Entity($response->json());
         } catch (Exception $ex) {
             $this->throwException($ex);
         }
     }
-    
+
     /**
      * @param \Acquia\ContentServicesClient\Entity $entity
-     * @param string $uuid
-     * 
+     * @param string                               $uuid
+     *
      * @return ContentServicesException
      */
     public function updateEntity(Entity $entity, $uuid)
@@ -61,15 +63,16 @@ class ContentServices extends Client
             $request = $this->createRequest('PUT', '/entities/'.$uuid, ['json' => (array) $entity]);
             $response = $this->send($request);
             $entity->exchangeArray($response->json());
+
             return $response;
         } catch (RequestException $ex) {
             $this->throwException($ex);
         }
     }
-    
+
     /**
      * @param string $uuid
-     * 
+     *
      * @return ContentServicesException
      */
     public function deleteEntity($uuid)
@@ -80,9 +83,9 @@ class ContentServices extends Client
             $this->throwException($ex);
         }
     }
-    
+
     /**
-     * @param RequestException $ex
+     * @param  RequestException         $ex
      * @throws ContentServicesException
      */
     public function throwException(RequestException $ex)

@@ -2,7 +2,6 @@
 
 namespace Acquia\ContentServicesClient;
 
-
 class Entity extends \ArrayObject
 {
 
@@ -22,6 +21,7 @@ class Entity extends \ArrayObject
     public function setUuid($uuid)
     {
         $this['uuid'] = $uuid;
+
         return $this;
     }
 
@@ -42,6 +42,7 @@ class Entity extends \ArrayObject
     public function setType($type)
     {
         $this['type'] = $type;
+
         return $this;
     }
 
@@ -62,6 +63,7 @@ class Entity extends \ArrayObject
     public function setCreated($created)
     {
         $this['created'] = $created;
+
         return $this;
     }
 
@@ -82,6 +84,7 @@ class Entity extends \ArrayObject
     public function setModified($modified)
     {
         $this['modified'] = $modified;
+
         return $this;
     }
 
@@ -100,8 +103,9 @@ class Entity extends \ArrayObject
      * @return \Acquia\ContentServicesClient\Entity
      */
     public function setAssets($assets)
-    {        
+    {
         $this['assets'] = $assets;
+
         return $this;
     }
 
@@ -122,9 +126,10 @@ class Entity extends \ArrayObject
     public function setAttributes($attributes)
     {
         $this['attributes'] = $attributes;
+
         return $this;
     }
-    
+
     /**
      * Gets the attributes associated with the Entity
      *
@@ -134,7 +139,7 @@ class Entity extends \ArrayObject
     {
         return $this->getValue('attributes', []);
     }
-    
+
     /**
      *
      * @param string $key

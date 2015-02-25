@@ -4,7 +4,16 @@ A PHP Client for consuming the [Content Services API](https://github.com/acquia/
 
 ## Installation
 
-Content Services Client can be installed with Composer by adding it as a dependency to your project's composer.json file.
+Content Services Client Library can be installed with Composer by adding it as a dependency to your project's composer.json file. To start using composer follow these steps:
+
+### Install Composer
+
+```sh
+ $ curl -sS https://getcomposer.org/installer | php
+ $ mv ./composer.phar ~/bin/composer # or /usr/local/bin/composer
+```
+
+### Create composer.json file on root of your project and copy this code:
 
 ```json
 {
@@ -18,6 +27,11 @@ Content Services Client can be installed with Composer by adding it as a depende
         "acquia/content-service-client-php": "*"
     }
 }
+```
+
+### Install the package:
+```sh
+ $ composer install
 ```
 
 ## Usage

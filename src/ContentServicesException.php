@@ -13,7 +13,7 @@ class ContentServicesException extends \RuntimeException
     protected $problem;
 
     /**
-     * @param ApiProblem      $problem
+     * @param ApiProblem       $problem
      * @param RequestException $previous
      */
     public function __construct(ApiProblem $problem, RequestException $previous)
