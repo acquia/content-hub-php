@@ -89,7 +89,6 @@ class Entity extends \ArrayObject
     }
 
     /**
-     *
      * @return string
      */
     public function getModified()
