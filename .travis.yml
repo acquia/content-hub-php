@@ -10,4 +10,4 @@ before_script:
   - composer install
 
 script:
-  - phpunit
+  - vendor/bin/ocular code-coverage:upload --format=php-clover build/logs/clover.xml
