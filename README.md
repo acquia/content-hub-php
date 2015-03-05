@@ -1,5 +1,7 @@
 # Content Services Client for PHP
 
+[![Build Status](https://magnum.travis-ci.com/acquia/content-service-client-php.svg?token=tQVH72tCyUzVKvoJJqMz)](https://magnum.travis-ci.com/acquia/content-service-client-php)
+
 A PHP Client for consuming the [Content Services API](https://github.com/acquia/content-service-api)
 
 ## Installation
