@@ -9,5 +9,5 @@ php:
 before_script:
   - composer install
 
-script:
+after_script:
   - vendor/bin/ocular code-coverage:upload --format=php-clover build/logs/clover.xml
