@@ -1,5 +1,5 @@
 {
-    "name": "Content Services Client for PHP",
+    "name": "acquia/content-service-client-php",
     "type": "library",
     "description": "A PHP Client library for consuming the Content Services API.",
     "homepage": "https://github.com/acquia/content-service-client-php",
