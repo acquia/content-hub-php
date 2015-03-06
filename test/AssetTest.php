@@ -14,6 +14,6 @@ class AssetTest extends \PHPUnit_Framework_TestCase
         $asset->setUrl($url);
         $asset->setReplaceToken($replaceToken);
         $this->assertEquals($url, $asset->getUrl());
-        $this->assertEquals($replaceToken, $asset->getReplaceToken());       
+        $this->assertEquals($replaceToken, $asset->getReplaceToken());
     }
 }

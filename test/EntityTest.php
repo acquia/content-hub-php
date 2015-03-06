@@ -26,11 +26,11 @@ class EntityTest extends \PHPUnit_Framework_TestCase
             "assets" => [
                 [
                     "url" => "http://acquia.com/sites/default/files/foo.png",
-                    "replacetoken" => "[acquia-logo]",
+                    "replace-token" => "[acquia-logo]",
                 ],
                 [
                     "url" => "http://acquia.com/sites/default/files/bar.png",
-                    "replacetoken" => "[acquia-thumb]",
+                    "replace-token" => "[acquia-thumb]",
                 ],
             ],
         ];

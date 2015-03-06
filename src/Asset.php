@@ -32,7 +32,7 @@ class Asset extends \ArrayObject
      */
     public function setReplaceToken($replaceToken)
     {
-        $this['replaceToken'] = $replaceToken;
+        $this['replace-token'] = $replaceToken;
 
         return $this;
     }
@@ -52,7 +52,7 @@ class Asset extends \ArrayObject
      */
     public function getReplaceToken()
     {
-        return $this->getValue('replaceToken', '');
+        return $this->getValue('replace-token', '');
     }
 
     /**
