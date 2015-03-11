@@ -141,6 +141,27 @@ class Entity extends \ArrayObject
 
     /**
      *
+     * @param type $url
+     * @return \Acquia\ContentServicesClient\Entity
+     */
+    public function setResource($url)
+    {
+        $this->resource = $url;
+
+        return $this;
+    }
+
+    /**
+     *
+     * @return type
+     */
+    public function getResource()
+    {
+        return $this->resource;
+    }
+
+    /**
+     *
      * @param string $key
      * @param string $default
      *
