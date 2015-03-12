@@ -146,7 +146,7 @@ class Entity extends \ArrayObject
      */
     public function setResource($url)
     {
-        $this->resource = $url;
+        $this['resource'] = $url;
 
         return $this;
     }
@@ -157,7 +157,7 @@ class Entity extends \ArrayObject
      */
     public function getResource()
     {
-        return $this->resource;
+        return $this['resource'];
     }
 
     /**
