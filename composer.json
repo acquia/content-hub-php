@@ -42,5 +42,7 @@
     	"psr-4": {
             "Acquia\\ContentServicesClient\\": "test/"
     	}
-    }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }
