@@ -16,8 +16,7 @@
     "require": {
         "php": ">=5.4.0",
         "crell/api-problem": "~1.0",
-        "guzzlehttp/guzzle": "~5.0",
-        "acquia/http-hmac-php": "dev-master"
+        "guzzlehttp/guzzle": "~5.0"
     },
     "require-dev": {
         "pdepend/pdepend": "~1.0",
@@ -25,7 +24,8 @@
         "phpmd/phpmd": "~1.0",
         "phpunit/phpunit": "~3.0",
         "scrutinizer/ocular": "~1.0",
-        "sebastian/phpcpd": "~2.0"
+        "sebastian/phpcpd": "~2.0",
+        "acquia/http-hmac-php": "dev-master"
     },
     "autoload": {
     	"psr-4": {
