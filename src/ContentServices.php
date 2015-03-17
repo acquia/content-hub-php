@@ -5,6 +5,8 @@ namespace Acquia\ContentServicesClient;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use Crell\ApiProblem\ApiProblem;
+use Acquia\Hmac\Guzzle3\HmacAuthPlugin;
+use Acquia\Hmac\RequestSigner;
 
 class ContentServices extends Client
 {
@@ -21,6 +23,24 @@ class ContentServices extends Client
         );
 
         parent::__construct($config);
+    }
+
+    /**
+     * @param array $config
+     * @return static
+     */
+    public static function factory($config = array())
+    {
+        $apikey = $config['defaults']['auth']['username'];
+        $secretkey = $config['defaults']['auth']['password'];
+
+        $requestSigner = new RequestSigner();
+        $plugin = new HmacAuthPlugin($requestSigner, $apikey, $secretkey);
+
+        $client = new static($config);
+        $client->addSubscriber($plugin);
+
+        return $client;
     }
 
     /**

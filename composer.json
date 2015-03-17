@@ -16,7 +16,8 @@
     "require": {
         "php": ">=5.4.0",
         "crell/api-problem": "~1.0",
-        "guzzlehttp/guzzle": "~5.0"
+        "guzzlehttp/guzzle": "~5.0",
+        "acquia/http-hmac-php": "*"
     },
     "require-dev": {
         "pdepend/pdepend": "~1.0",
