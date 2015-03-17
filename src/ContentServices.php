@@ -9,10 +9,17 @@ use Crell\ApiProblem\ApiProblem;
 class ContentServices extends Client
 {
     /**
-     * Overrides \GuzzleHttp\Client::_construct()
+     * Overrides \GuzzleHttp\Client::__construct()
      */
-    public function _construct(array $config = [])
+    public function __construct(array $config = [])
     {
+        if (!isset($config['defaults'])) {
+            $config['defaults'] = [];
+        }
+        $config['defaults'] += array(
+            'headers' => ['Content-Type' => 'application/json'],
+        );
+
         parent::__construct($config);
     }
 
