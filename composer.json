@@ -13,10 +13,17 @@
     "support": {
         "issues": "https://github.com/acquia/content-service-client-php/issues"
     },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/acquia/http-hmac-php"
+        }
+    ],
     "require": {
         "php": ">=5.4.0",
         "crell/api-problem": "~1.0",
-        "guzzlehttp/guzzle": "~5.0"
+        "guzzlehttp/guzzle": "~5.0",
+        "acquia/http-hmac-php": "dev-master"
     },
     "require-dev": {
         "pdepend/pdepend": "~1.0",
@@ -24,8 +31,7 @@
         "phpmd/phpmd": "~1.0",
         "phpunit/phpunit": "~3.0",
         "scrutinizer/ocular": "~1.0",
-        "sebastian/phpcpd": "~2.0",
-        "acquia/http-hmac-php": "dev-master"
+        "sebastian/phpcpd": "~2.0"
     },
     "autoload": {
     	"psr-4": {
