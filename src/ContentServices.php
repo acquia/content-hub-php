@@ -37,7 +37,7 @@ class ContentServices extends Client
         $requestSigner = new RequestSigner();
         $plugin = new HmacAuthPlugin($requestSigner, $apikey, $secretkey);
 
-        $client = new Client($config);
+        $client = new static($config);
         $client->getEmitter()->attach($plugin);
 
         return $client;
