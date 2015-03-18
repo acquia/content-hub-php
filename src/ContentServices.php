@@ -31,8 +31,8 @@ class ContentServices extends Client
      */
     public static function factory($config = array())
     {
-        $apikey = $config['defaults']['auth']['username'];
-        $secretkey = $config['defaults']['auth']['password'];
+        $apikey = $config['defaults']['auth'][0];
+        $secretkey = $config['defaults']['auth'][1];
 
         $requestSigner = new RequestSigner();
         $plugin = new HmacAuthPlugin($requestSigner, $apikey, $secretkey);
