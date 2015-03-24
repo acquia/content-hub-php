@@ -2,6 +2,7 @@
 
 namespace Acquia\ContentServicesClient;
 
+use Acquia\Hmac\Digest\Version1;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use Crell\ApiProblem\ApiProblem;
@@ -34,7 +35,10 @@ class ContentServices extends Client
         $apikey = $config['defaults']['auth'][0];
         $secretkey = $config['defaults']['auth'][1];
 
-        $requestSigner = new RequestSigner();
+        // Using sha256 algorithm by default.
+        $digest = new \Acquia\Hmac\Digest\Version1("sha256");
+
+        $requestSigner = new RequestSigner($digest);
         $plugin = new HmacAuthPlugin($requestSigner, $apikey, $secretkey);
 
         $client = new static($config);
