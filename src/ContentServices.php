@@ -19,8 +19,16 @@ class ContentServices extends Client
         if (!isset($config['defaults'])) {
             $config['defaults'] = [];
         }
+
+        // Setting up the headers.
+        $headers = ['Content-Type' => 'application/json'];
+        if (isset($config['origin'])) {
+          $headers['x-acquia-plexus-client-id'] = $config['origin'];
+        }
+
+        // Setting up the defaults.
         $config['defaults'] += array(
-            'headers' => ['Content-Type' => 'application/json'],
+            'headers' => $headers,
         );
 
         parent::__construct($config);
@@ -43,7 +51,6 @@ class ContentServices extends Client
 
         $client = new static($config);
         $client->getEmitter()->attach($plugin);
-
         return $client;
     }
 
