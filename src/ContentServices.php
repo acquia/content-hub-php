@@ -23,7 +23,7 @@ class ContentServices extends Client
         // Setting up the headers.
         $headers = ['Content-Type' => 'application/json'];
         if (isset($config['origin'])) {
-          $headers['x-acquia-plexus-client-id'] = $config['origin'];
+          $headers['X-Acquia-Plexus-Client-Id'] = $config['origin'];
         }
 
         // Setting up the defaults.
