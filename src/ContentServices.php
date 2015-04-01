@@ -123,6 +123,25 @@ class ContentServices extends Client
     }
 
     /**
+     * @param $search_term
+     * @param $index
+     * @return mixed
+     */
+    public function searchEntity($search_term, $index, $query)
+    {
+        $url = '/elastic/'.$index.'/_search';
+
+        try {
+            $request = $this->createRequest('POST', $url, ['json' => (array) $query]);
+            $response = $this->send($request);
+            $json = $response->json();
+            return $json;
+        } catch (RequestException $ex) {
+            $this->throwException($ex);
+        }
+    }
+
+    /**
      * @param  RequestException         $ex
      * @throws ContentServicesException
      */
