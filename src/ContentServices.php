@@ -133,7 +133,7 @@ class ContentServices extends Client
      * @param $index
      * @return mixed
      */
-    public function searchEntity($search_term, $index, $query)
+    public function searchEntity($index, $query)
     {
         $url = '/elastic/'.$index.'/_search';
 
