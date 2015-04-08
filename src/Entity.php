@@ -89,6 +89,26 @@ class Entity extends \ArrayObject
     }
 
     /**
+     * Returns the Success
+     *
+     * @return mixed
+     */
+    public function isSuccessful()
+    {
+      return $this['success'];
+    }
+
+    /**
+     * Returns the Error code and message.
+     *
+     * @return mixed
+     */
+    public function getError()
+    {
+          return isset($this['error']) ? $this['error'] : NULL;
+    }
+
+    /**
      * @return string
      */
     public function getModified()

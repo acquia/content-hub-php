@@ -82,10 +82,16 @@ class ContentServices extends Client
     {
         try {
             $response = $this->get('entities/'.$uuid);
-
             return new Entity($response->json());
-        } catch (Exception $ex) {
-            $this->throwException($ex);
+        }
+        catch (\GuzzleHttp\Exception\ClientException $ex) {
+            return new Entity($ex->getResponse()->json());
+        }
+        catch (\GuzzleHttp\Exception\ServerErrorResponseException $ex) {
+          return new Entity($ex->getResponse()->json());
+        }
+        catch (\GuzzleHttp\Exception\BadResponseException $ex) {
+          return new Entity($ex->getResponse()->json());
         }
     }
 
