@@ -10,6 +10,14 @@ use GuzzleHttp\Stream\Stream;
 
 class ContentServicesTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @return \Acquia\ContentServicesClient\ContentServices
+     */
+    private function getClient()
+    {
+        return new ContentServices('public', 'secret', 'origin');
+    }
+
     private function setData()
     {
         return [
@@ -43,7 +51,7 @@ class ContentServicesTest extends \PHPUnit_Framework_TestCase
     public function testCreateEntity()
     {
         $data = $this->setData();
-        $client = new ContentServices(['base_url' => 'http://example.com']);
+        $client = $this->getClient();
 
         $mock = new Mock();
 
@@ -64,7 +72,7 @@ class ContentServicesTest extends \PHPUnit_Framework_TestCase
     public function testReadEntity()
     {
         $data = $this->setData();
-        $client = new ContentServices(['base_url' => 'http://example.com']);
+        $client = $this->getClient();
 
         $mock = new Mock();
 
@@ -106,7 +114,7 @@ class ContentServicesTest extends \PHPUnit_Framework_TestCase
                 ],
             ],
         ];
-        $client = new ContentServices(['base_url' => 'http://example.com']);
+        $client = $this->getClient();
 
         $mock = new Mock();
 
@@ -125,7 +133,7 @@ class ContentServicesTest extends \PHPUnit_Framework_TestCase
 
     public function testDeleteEntity()
     {
-        $client = new ContentServices(['base_url' => 'http://example.com']);
+        $client = $this->getClient();
 
         $mock = new Mock();
 
