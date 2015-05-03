@@ -1,6 +1,6 @@
 bootstrap.php
-/build
-/vendor
-/composer.lock
+build
+vendor
+composer.lock
 
-/nbproject
+nbproject
