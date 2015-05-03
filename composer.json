@@ -23,7 +23,7 @@
         "php": ">=5.4.0",
         "crell/api-problem": "~1.0",
         "guzzlehttp/guzzle": "~5.0",
-        "acquia/http-hmac-php": "dev-master"
+        "acquia/http-hmac-php": "~1.0"
     },
     "require-dev": {
         "pdepend/pdepend": "~1.0",
@@ -42,7 +42,5 @@
     	"psr-4": {
             "Acquia\\ContentServicesClient\\": "test/"
     	}
-    },
-    "minimum-stability": "dev",
-    "prefer-stable": true
+    }
 }
