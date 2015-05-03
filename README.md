@@ -1,12 +1,14 @@
-# Content Services Client for PHP
+# Plexus Client for PHP
 
 [![Build Status](https://magnum.travis-ci.com/acquia/content-service-client-php.svg?token=PH71WkhMufTnsVvCU5rV)](https://magnum.travis-ci.com/acquia/content-service-client-php)
 
-A PHP Client for consuming the [Content Services API](https://github.com/acquia/content-service-api)
+A PHP Client for [Plexus](https://github.com/acquia/plexus)
 
 ## Installation
 
-Content Services Client Library can be installed with Composer by adding it as a dependency to your project's composer.json file. To start using composer follow these steps:
+Plexus Client for PHP can be installed with Composer by adding it as a
+dependency to your project's composer.json file. To start using composer follow
+these steps:
 
 #### Install Composer:
 
