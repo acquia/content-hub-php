@@ -11,46 +11,51 @@ class ContentServices extends Client
 {
     /**
      * Overrides \GuzzleHttp\Client::__construct()
+     *
+     * @param string $apiKey
+     * @param string $secretKey
+     * @param string $origin
+     * @param array  $config
      */
-    public function __construct(array $config = [])
+    public function __construct($apiKey, $secretKey, $origin, array $config = [])
     {
         if (!isset($config['defaults'])) {
             $config['defaults'] = [];
         }
 
-        // Setting up the headers.
-        $headers = ['Content-Type' => 'application/json'];
-        if (isset($config['origin'])) {
-            $headers['X-Acquia-Plexus-Client-Id'] = $config['origin'];
+        if (!isset($config['defaults']['headers'])) {
+            $config['defaults']['headers'] = [];
         }
 
-        // Setting up the defaults.
-        $config['defaults'] += array(
-            'headers' => $headers,
-        );
+        // Setting up the headers.
+        $config['defaults']['headers'] += [
+            'Content-Type' => 'application/json',
+            'X-Acquia-Plexus-Client-Id' => $origin,
+        ];
 
         parent::__construct($config);
+
+        // Add the authentication plugin
+        // @see https://github.com/acquia/http-hmac-spec
+        $requestSigner = new RequestSigner(new Digest\Version1('sha256'));
+        $plugin = new HmacAuthPlugin($requestSigner, $apiKey, $secretKey);
+        $this->getEmitter()->attach($plugin);
     }
 
     /**
      * @param  array                                         $config
      *
      * @return \Acquia\ContentServicesClient\ContentServices
+     *
+     * @deprecated 0.2.0
      */
     public static function factory($config = array())
     {
         $apikey = $config['defaults']['auth'][0];
         $secretkey = $config['defaults']['auth'][1];
+        $origin = $config['origin'];
 
-        // Using sha256 algorithm by default.
-        $digest = new Digest\Version1('sha256');
-
-        $requestSigner = new RequestSigner($digest);
-        $plugin = new HmacAuthPlugin($requestSigner, $apikey, $secretkey);
-
-        $client = new static($config);
-        $client->getEmitter()->attach($plugin);
-        return $client;
+        return new static($apikey, $secretkey, $origin, $config);
     }
 
     /**
