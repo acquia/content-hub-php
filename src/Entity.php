@@ -95,7 +95,7 @@ class Entity extends \ArrayObject
      */
     public function isSuccessful()
     {
-      return $this['success'];
+        return $this['success'];
     }
 
     /**
@@ -105,7 +105,7 @@ class Entity extends \ArrayObject
      */
     public function getError()
     {
-          return isset($this['error']) ? $this['error'] : NULL;
+        return isset($this['error']) ? $this['error'] : null;
     }
 
     /**

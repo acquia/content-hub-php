@@ -26,6 +26,7 @@
         "acquia/http-hmac-php": "~1.0"
     },
     "require-dev": {
+        "fabpot/php-cs-fixer": "~1.0",
         "pdepend/pdepend": "~1.0",
         "phploc/phploc": "~2.0",
         "phpmd/phpmd": "~1.0",
