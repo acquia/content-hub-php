@@ -73,7 +73,7 @@ class ContentServices extends Client
     }
 
     /**
-     * Sends entity creation request to Plexus.
+     * Sends request to asynchronously create an entity.
      *
      * @param  \Acquia\ContentServicesClient\Entity   $entity
      *
@@ -105,7 +105,7 @@ class ContentServices extends Client
     }
 
     /**
-     * Updates the passed entity.
+     * Updates an entity.
      *
      * @param  \Acquia\ContentServicesClient\Entity   $entity
      * @param  string                                 $uuid
@@ -137,7 +137,7 @@ class ContentServices extends Client
     }
 
     /**
-     * Search for entities.
+     * Searches for entities.
      *
      * @param  string                                 $index
      * @param  array                                  $query
