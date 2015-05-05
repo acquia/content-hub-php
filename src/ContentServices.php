@@ -92,9 +92,9 @@ class ContentServices extends Client
             $json = (array) $resource;
         }
         else {
-            $json = array(
+            $json = [
                 'resource' => $resource,
-            );
+            ];
         }
         $request = $this->createRequest('POST', '/entities', ['json' => $json]);
         $response = $this->send($request);
@@ -121,14 +121,15 @@ class ContentServices extends Client
      *
      * @param  \Acquia\ContentServicesClient\Entity   $entity
      * @param  string                                 $uuid
+     *   This parameter is obsolete. Do not use.
      *
      * @return \GuzzleHttp\Message\Response
      *
      * @throws \GuzzleHttp\Exception\RequestException
      */
-    public function updateEntity(Entity $entity, $uuid)
+    public function updateEntity(Entity $entity, $uuid = NULL)
     {
-        $request = $this->createRequest('PUT', '/entities/'.$uuid, ['json' => (array) $entity]);
+        $request = $this->createRequest('PUT', '/entities/'. $entity->getUuid(), ['json' => (array) $entity]);
         $response = $this->send($request);
         $entity->exchangeArray($response->json());
         return $response;
