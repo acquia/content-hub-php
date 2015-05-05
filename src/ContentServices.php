@@ -120,14 +120,14 @@ class ContentServices extends Client
      * Updates an entity.
      *
      * @param  \Acquia\ContentServicesClient\Entity   $entity
-     * @param string                                  $uuid
+     * @param  string                                 $uuid
      *   This parameter is obsolete. Do not use.
      *
      * @return \GuzzleHttp\Message\Response
      *
      * @throws \GuzzleHttp\Exception\RequestException
      */
-    public function updateEntity(Entity $entity, $uuid)
+    public function updateEntity(Entity $entity, $uuid = NULL)
     {
         $request = $this->createRequest('PUT', '/entities/'. $entity->getUuid(), ['json' => (array) $entity]);
         $response = $this->send($request);
