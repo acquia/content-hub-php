@@ -75,17 +75,29 @@ class ContentServices extends Client
     /**
      * Sends request to asynchronously create an entity.
      *
-     * @param  \Acquia\ContentServicesClient\Entity   $entity
+     * The entity does not need to be passed to this method, but only the resource URL.
+     * An Entity is still accepted for backwards compatibility.
+     *
+     * @param  string $resource
+     *   This string should contain the URL where Plexus can read the entity's CDF.
      *
      * @return \GuzzleHttp\Message\Response
      *
      * @throws \GuzzleHttp\Exception\RequestException
      */
-    public function createEntity(Entity $entity)
+    public function createEntity($resource)
     {
-        $request = $this->createRequest('POST', '/entities', ['json' => (array) $entity]);
+        if (is_object($resource)) {
+            // Kept only for backwards compatibility.
+            $json = (array) $resource;
+        }
+        else {
+            $json = array(
+                'resource' => $resource,
+            );
+        }
+        $request = $this->createRequest('POST', '/entities', ['json' => $json]);
         $response = $this->send($request);
-        $entity->exchangeArray($response->json());
         return $response;
     }
 
