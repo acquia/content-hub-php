@@ -113,7 +113,8 @@ class ContentServices extends Client
     public function readEntity($uuid)
     {
         $response = $this->get('entities/' . $uuid);
-        return new Entity($response->json());
+        $data = $response->json();
+        return new Entity($data['data']['Data']);
     }
 
     /**
