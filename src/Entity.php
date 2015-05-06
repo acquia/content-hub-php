@@ -135,7 +135,7 @@ class Entity extends \ArrayObject
      */
     public function getAssets()
     {
-        return $this->getValue('assets', []);
+        return $this->getValue('asset', []);
     }
 
     /**
