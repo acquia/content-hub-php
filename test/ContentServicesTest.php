@@ -21,28 +21,34 @@ class ContentServicesTest extends \PHPUnit_Framework_TestCase
     private function setData()
     {
         return [
-            'uuid' => '00000000-0000-0000-0000-000000000000',
-            "type" => "product",
-            "created" => "2014-12-21T20:12:11+00:00Z",
-            "modified" => "2014-12-21T20:12:11+00:00Z",
-            "attributes" => [
-                "title" => [
-                    "type" => "string",
-                    "value" => [
-                        "en" => "A",
-                        "hu" => "B",
-                        "und" => "C",
+            'data' => [
+                'uuid' => '00000000-0000-0000-0000-000000000000',
+                'origin' => '11111111-0000-0000-0000-000000000000',
+                'Data' => [
+                    'uuid' => '00000000-0000-0000-0000-000000000000',
+                    "type" => "product",
+                    "created" => "2014-12-21T20:12:11+00:00Z",
+                    "modified" => "2014-12-21T20:12:11+00:00Z",
+                    "attributes" => [
+                        "title" => [
+                            "type" => "string",
+                            "value" => [
+                                "en" => "A",
+                                "hu" => "B",
+                                "und" => "C",
+                            ],
+                        ],
                     ],
-                ],
-            ],
-            "assets" => [
-                [
-                    "url" => "http://acquia.com/sites/default/files/foo.png",
-                    "replace-token" => "[acquia-logo]",
-                ],
-                [
-                    "url" => "http://acquia.com/sites/default/files/bar.png",
-                    "replace-token" => "[acquia-thumb]",
+                    "asset" => [
+                        [
+                            "url" => "http://acquia.com/sites/default/files/foo.png",
+                            "replace-token" => "[acquia-logo]",
+                        ],
+                        [
+                            "url" => "http://acquia.com/sites/default/files/bar.png",
+                            "replace-token" => "[acquia-thumb]",
+                        ],
+                    ],
                 ],
             ],
         ];
@@ -50,7 +56,10 @@ class ContentServicesTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateEntity()
     {
-        $data = $this->setData();
+        $data = [
+            'success' => true,
+        ];
+        $resource = 'http://acquia.com/content_services/node/00000000-0000-0000-0000-000000000000';
         $client = $this->getClient();
 
         $mock = new Mock();
@@ -61,10 +70,7 @@ class ContentServicesTest extends \PHPUnit_Framework_TestCase
         $client->getEmitter()->attach($mock);
 
         // Create an Entity
-        $entity = new Entity();
-        $entity->setUuid($data['uuid']);
-        $entity->setType($data['type']);
-        $response = $client->createEntity($entity);
+        $response = $client->createEntity($resource);
         $this->assertEquals($mockResponse->json(), $response->json());
         $this->assertEquals($mockResponse, $response);
     }
@@ -84,36 +90,15 @@ class ContentServicesTest extends \PHPUnit_Framework_TestCase
         // Read an Entity
         $entity = $client->readEntity('00000000-0000-0000-0000-000000000000');
         $this->assertEquals(6, count($entity));
+        $this->assertEquals($data['data']['Data'], (array) $entity);
     }
 
     public function testUpdateEntity()
     {
         $data = [
-            'uuid' => '00000000-0000-0000-0000-000000000000',
-            "type" => "blog",
-            "created" => "2014-12-21T20:12:11+00:00Z",
-            "modified" => "2014-12-21T20:12:11+00:00Z",
-            "attributes" => [
-                "title" => [
-                    "type" => "string",
-                    "value" => [
-                        "en" => "A",
-                        "hu" => "B",
-                        "und" => "C",
-                    ],
-                ],
-            ],
-            "assets" => [
-                [
-                    "url" => "http://acquia.com/sites/default/files/foo.png",
-                    "replace-token" => "[acquia-logo]",
-                ],
-                [
-                    "url" => "http://acquia.com/sites/default/files/bar.png",
-                    "replace-token" => "[acquia-thumb]",
-                ],
-            ],
+            'success' => true,
         ];
+        $resource = 'http://acquia.com/content_services/node/00000000-0000-0000-0000-000000000000';
         $client = $this->getClient();
 
         $mock = new Mock();
@@ -124,9 +109,7 @@ class ContentServicesTest extends \PHPUnit_Framework_TestCase
         $client->getEmitter()->attach($mock);
 
         // Update an Entity
-        $entity = new Entity();
-        $entity->setType('blog');
-        $response = $client->updateEntity($entity, '00000000-0000-0000-0000-000000000000');
+        $response = $client->updateEntity($resource, '00000000-0000-0000-0000-000000000000');
         $this->assertEquals($mockResponse->json(), $response->json());
         $this->assertEquals($mockResponse, $response);
     }
