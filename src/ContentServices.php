@@ -118,21 +118,32 @@ class ContentServices extends Client
     }
 
     /**
-     * Updates an entity.
+     * Updates an entity asynchronously.
      *
-     * @param  \Acquia\ContentServicesClient\Entity   $entity
-     * @param  string                                 $uuid
-     *   This parameter is obsolete. Do not use.
+     * The entity does not need to be passed to this method, but only the resource URL.
+     * An Entity is still accepted for backwards compatibility.
+     * If an entity is passed, it only needs to have the 'resource' parameter set.
+     *
+     * @param  string $resource
+     * @param  string $uuid
      *
      * @return \GuzzleHttp\Message\Response
      *
      * @throws \GuzzleHttp\Exception\RequestException
      */
-    public function updateEntity(Entity $entity, $uuid = NULL)
+    public function updateEntity($resource, $uuid)
     {
-        $request = $this->createRequest('PUT', '/entities/'. $entity->getUuid(), ['json' => (array) $entity]);
+        if (is_object($resource)) {
+            // Kept only for backwards compatibility.
+            $json = (array) $resource;
+        }
+        else {
+            $json = [
+                'resource' => $resource,
+            ];
+        }
+        $request = $this->createRequest('PUT', '/entities/'. $uuid, ['json' => $json]);
         $response = $this->send($request);
-        $entity->exchangeArray($response->json());
         return $response;
     }
 
