@@ -123,7 +123,7 @@ class Entity extends \ArrayObject
      */
     public function setAssets($assets)
     {
-        $this['assets'] = $assets;
+        $this['asset'] = $assets;
 
         return $this;
     }
@@ -139,6 +139,7 @@ class Entity extends \ArrayObject
     }
 
     /**
+     * Sets the attributes associated with the entity.
      *
      * @param Attribute[] $attributes
      */

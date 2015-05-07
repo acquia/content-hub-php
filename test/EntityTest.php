@@ -9,7 +9,7 @@ class EntityTest extends \PHPUnit_Framework_TestCase
     private function getData()
     {
         return [
-            'uuid' => '00000000-0000-0000-0000-000000000000',
+            "uuid" => "00000000-0000-0000-0000-000000000000",
             "type" => "product",
             "created" => "2014-12-21T20:12:11+00:00Z",
             "modified" => "2014-12-21T20:12:11+00:00Z",
