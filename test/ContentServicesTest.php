@@ -90,6 +90,7 @@ class ContentServicesTest extends \PHPUnit_Framework_TestCase
         // Read an Entity
         $entity = $client->readEntity('00000000-0000-0000-0000-000000000000');
         $this->assertEquals(6, count($entity));
+        $this->assertEquals($data['data']['Data'], (array) $entity);
     }
 
     public function testUpdateEntity()
