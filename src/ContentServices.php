@@ -125,6 +125,7 @@ class ContentServices extends Client
      * If an entity is passed, it only needs to have the 'resource' parameter set.
      *
      * @param  string $resource
+     *   This string should contain the URL where Plexus can read the entity's CDF.
      * @param  string $uuid
      *
      * @return \GuzzleHttp\Message\Response
