@@ -102,7 +102,8 @@ class Attribute extends \ArrayObject
      *    The language of the attribute.
      * @return mixed
      */
-    public function getValue($lang = self::LANGUAGE_DEFAULT) {
+    public function getValue($lang = self::LANGUAGE_DEFAULT)
+    {
       if (isset($this->getVal('value')[$lang])) {
           return $this->getVal('value')[$lang];
       }
@@ -137,7 +138,8 @@ class Attribute extends \ArrayObject
      * @param TypeHandler $typeHandler
      * @return $this
      */
-    public function setTypeHandler(TypeHandler $typeHandler) {
+    public function setTypeHandler(TypeHandler $typeHandler)
+    {
         $handlerName = $typeHandler->getType();
         $this->handlers[$handlerName] = $typeHandler;
         return $this;
@@ -158,7 +160,8 @@ class Attribute extends \ArrayObject
      *
      * @return array
      */
-    public function getTypeHandlers() {
+    public function getTypeHandlers()
+    {
         return array_keys($this->handlers);
     }
 

@@ -40,7 +40,7 @@ class TypeHandler {
      */
     public function getType()
     {
-      return $this->type;
+        return $this->type;
     }
 
     /**
@@ -48,8 +48,9 @@ class TypeHandler {
      *
      * @return string
      */
-    public function getCast() {
-      return $this->cast;
+    public function getCast()
+    {
+        return $this->cast;
     }
 
     /**
