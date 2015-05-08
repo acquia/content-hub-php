@@ -16,7 +16,7 @@ class Entity extends \ArrayObject
     /**
      * @param string $uuid
      *
-     * @return \Acquia\ContentServicesApi\Entity
+     * @return \Acquia\ContentServicesClient\Entity
      */
     public function setUuid($uuid)
     {
@@ -37,7 +37,7 @@ class Entity extends \ArrayObject
     /**
      * @param string $type
      *
-     * @return \Acquia\ContentServicesApi\Entity
+     * @return \Acquia\ContentServicesClient\Entity
      */
     public function setType($type)
     {
@@ -58,7 +58,7 @@ class Entity extends \ArrayObject
     /**
      * @param string $created
      *
-     * @return \Acquia\ContentServicesApi\Entity
+     * @return \Acquia\ContentServicesClient\Entity
      */
     public function setCreated($created)
     {
@@ -79,7 +79,7 @@ class Entity extends \ArrayObject
     /**
      * @param string $modified
      *
-     * @return \Acquia\ContentServicesApi\Entity
+     * @return \Acquia\ContentServicesClient\Entity
      */
     public function setModified($modified)
     {
@@ -142,6 +142,8 @@ class Entity extends \ArrayObject
      * Sets the attributes associated with the entity.
      *
      * @param Attribute[] $attributes
+     *
+     * @return \Acquia\ContentServicesClient\Entity
      */
     public function setAttributes($attributes)
     {
