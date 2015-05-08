@@ -146,7 +146,7 @@ class Attribute extends \ArrayObject
     /**
      * Returns the Type Handler.
      *
-     * @return FieldInterface
+     * @return TypeHandler
      */
     public function getTypeHandler()
     {
