@@ -3,6 +3,8 @@
 namespace Acquia\ContentServicesClient\test;
 
 use Acquia\ContentServicesClient\Entity;
+use Acquia\ContentServicesClient\Asset;
+use Acquia\ContentServicesClient\Attribute;
 
 class EntityTest extends \PHPUnit_Framework_TestCase
 {
@@ -47,15 +49,64 @@ class EntityTest extends \PHPUnit_Framework_TestCase
         $entity->setCreated($data['created']);
         $entity->setOrigin($data['origin']);
         $entity->setModified($data['modified']);
-        $entity->setAssets($data['asset']);
-        $entity->setAttributes($data['attributes']);
         $this->assertEquals($data['uuid'], $entity->getUuid());
         $this->assertEquals($data['type'], $entity->getType());
         $this->assertEquals($data['created'], $entity->getCreated());
         $this->assertEquals($data['origin'], $entity->getOrigin());
         $this->assertEquals($data['modified'], $entity->getModified());
-        $this->assertEquals($data['asset'], $entity->getAssets());
+
+        // Adding Assets
+        $assets = [
+          new Asset($data['asset'][0]),
+          new Asset($data['asset'][1])
+        ];
+        $entity->setAssets($assets);
+
+        // Adding Attributes
+        $attribute = new Attribute($data['attributes']['title']['type']);
+        $attribute->setValues($data['attributes']['title']['value']);
+        $attributes = [
+          'title' => $attribute
+        ];
+        $entity->setAttributes($attributes);
+
+        // Checks
+        $this->assertEquals($assets, $entity->getAssets());
         $this->assertEquals("http://acquia.com/sites/default/files/foo.png", $entity->getAssets()[0]['url']);
-        $this->assertEquals($data['attributes'], $entity->getAttributes());
+        $this->assertEquals($attributes, $entity->getAttributes());
+
+        // Adding / Removing Assets
+        $asset_array = [
+            'url' => 'http://acquia.com/sites/default/files/foo-bar.png',
+            'replace-token' => '[acquia-foobar]'
+        ];
+
+        $asset = new Asset($asset_array);
+        $entity->addAsset($asset);
+        $myasset = $entity->getAsset($asset_array['replace-token']);
+        $this->assertEquals($asset_array['url'], $myasset->getUrl());
+        $this->assertEquals($asset_array['replace-token'], $myasset->getReplaceToken());
+        $entity->removeAsset($asset_array['replace-token']);
+        $this->assertFalse($entity->getAsset($asset_array['replace-token']));
+
+        // Adding / Removing Attributes
+        $attribute_value = [
+          'my_attribute' => [
+              'type' => 'integer',
+              'value' => [
+                  'en' => '4',
+                  'es' => '3',
+                  'und' => 0
+                ]
+           ]
+        ];
+        $attribute = new Attribute(Attribute::TYPE_INTEGER);
+        $attribute->setValues($attribute_value['my_attribute']['value']);
+        $name = array_keys($attribute_value);
+        $name = reset($name);
+        $entity->addAttribute($name, $attribute);
+        $this->assertEquals((array) $attribute, (array) $entity->getAttribute($name));
+        $entity->removeAttribute($name);
+        $this->assertEquals($attributes, $entity->getAttributes());
     }
 }
