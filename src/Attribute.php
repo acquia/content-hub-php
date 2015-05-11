@@ -136,10 +136,12 @@ class Attribute extends \ArrayObject
      * Removes a value for a specific language.
      *
      * @param string $lang
+     * @return \Acquia\ContentServicesClient\Attribute
      */
     public function removeValue($lang = self::LANGUAGE_DEFAULT)
     {
         unset($this['value'][$lang]);
+        return $this;
     }
 
     /**
