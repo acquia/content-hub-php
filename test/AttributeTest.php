@@ -10,26 +10,85 @@ class AttributeTest extends \PHPUnit_Framework_TestCase
     {
         return [
             "attributes" => [
+                "num_array" => [
+                    "type" => "array<number>",
+                    "value" => [
+                        "en" => [
+                            6.66,
+                            3.23
+                        ],
+                        "hu" => [
+                            4.66,
+                            4.23
+                        ],
+                        "und" => [
+                            1.22,
+                            1.11
+                        ],
+                    ],
+                ],
+                "num" => [
+                    "type" => "number",
+                    "value" => [
+                        'en' => 13.45,
+                        'es' => 1.43,
+                        'und' => 1.23
+                    ]
+                ],
                 "title" => [
                     "type" => "string",
                     "value" => [
-                        "en" => "A",
-                        "hu" => "B",
-                        "und" => "C",
-                    ],
-                ],
+                      "en" => "nothing",
+                      "es" => "nada",
+                      "und" => "niente"
+                    ]
+                ]
             ],
         ];
     }
 
     public function testCreateAttribute()
     {
-        $data = $this->setAttributeData();
-        $attribute = new Attribute();
-        $attribute->setValue($data['attributes']['title']['value']);
-        $attribute->setType($data['attributes']['title']['type']);
+        $data = $this->setAttributeData()['attributes']['title'];
+
+        // Testing attribute with default type = string.
+        $attribute = new Attribute(Attribute::TYPE_STRING);
         $this->assertEquals('string', $attribute->getType());
-        $this->assertEquals('A', $attribute->getValue()['en']);
-        $this->assertFalse(isset($attribute->getValue()['unknown']));
+        $attribute->setValues($data['value']);
+        $this->assertEquals($data['value']['en'], $attribute->getValue('en'));
+        $this->assertEquals($data['value']['es'], $attribute->getValue('es'));
+        $this->assertEquals($data['value']['und'], $attribute->getValue());
+
+        // Testing type 'number'
+        $data = $this->setAttributeData()['attributes']['num'];
+        $attribute = new Attribute(Attribute::TYPE_NUMBER);
+        $this->assertEquals('number', $attribute->getType());
+        $attribute->setValue($data['value']['en'], 'en');
+        $this->assertEquals($data['value']['en'], $attribute->getValue('en'));
+        $attribute->setValue((string) $data['value']['es'], 'es');
+        $this->assertEquals($data['value']['es'], $attribute->getValue('es'));
+        $attribute->setValue((string) $data['value']['und']);
+        $this->assertEquals($data['value']['und'], $attribute->getValue());
+        $this->assertEquals($data['value'], $attribute->getValues());
+
+        // Testing 'array<number>'
+        $data = $this->setAttributeData()['attributes']['num_array'];
+        $attribute = new Attribute(Attribute::TYPE_ARRAY_NUMBER);
+        $this->assertEquals('array<number>', $attribute->getType());
+        $attribute->setValues($data['value']);
+        $this->assertEquals($data['value']['en'], $attribute->getValue('en'));
+        $this->assertEquals($data['value']['hu'], $attribute->getValue('hu'));
+        $this->assertEquals($data['value']['und'], $attribute->getValue());
+        $data_it = [
+            '2.34',
+            '3.23'
+        ];
+        $data['value']['it'] = [
+            2.34,
+            3.23
+        ];
+        $attribute->setValue($data_it, 'it');
+        $this->assertEquals($data['value']['it'], $attribute->getValue('it'));
+
     }
 }
