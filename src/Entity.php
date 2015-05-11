@@ -252,6 +252,22 @@ class Entity extends \ArrayObject
     }
 
     /**
+     * Sets the Value for an Attribute in a particular language.
+     *
+     * @param $name
+     * @param $value
+     * @param string $lang
+     *
+     * @return $this
+     */
+    public function setAttributeValue($name, $value, $lang = Attribute::LANGUAGE_DEFAULT) {
+        if ($this->getAttribute($name)) {
+            $this['attributes'][$name]->setValue($value, $lang);
+        }
+        return $this;
+    }
+
+    /**
      *
      * @param type $url
      *

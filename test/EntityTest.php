@@ -106,6 +106,11 @@ class EntityTest extends \PHPUnit_Framework_TestCase
         $name = reset($name);
         $entity->addAttribute($name, $attribute);
         $this->assertEquals((array) $attribute, (array) $entity->getAttribute($name));
+
+        $attribute_value['my_attribute']['value']['it'] = 400;
+        $entity->setAttributeValue($name, $attribute_value['my_attribute']['value']['it'], 'it');
+        $this->assertEquals($attribute_value['my_attribute']['value']['it'], $entity->getAttribute($name)->getValue('it'));
+
         $entity->removeAttribute($name);
         $this->assertEquals($attributes, $entity->getAttributes());
     }
