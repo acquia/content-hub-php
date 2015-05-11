@@ -90,5 +90,10 @@ class AttributeTest extends \PHPUnit_Framework_TestCase
         $attribute->setValue($data_it, 'it');
         $this->assertEquals($data['value']['it'], $attribute->getValue('it'));
 
+        unset($data['value']['it']);
+        $attribute->removeValue('it');
+        $this->assertEquals($data['value'], $attribute->getValues());
+
+
     }
 }

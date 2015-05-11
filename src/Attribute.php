@@ -123,12 +123,23 @@ class Attribute extends \ArrayObject
     }
 
     /**
+     * Returns the whole value array.
      *
      * @return array
      */
     public function getValues()
     {
         return $this->getVal('value', []);
+    }
+
+    /**
+     * Removes a value for a specific language.
+     *
+     * @param string $lang
+     */
+    public function removeValue($lang = self::LANGUAGE_DEFAULT)
+    {
+        unset($this['value'][$lang]);
     }
 
     /**
