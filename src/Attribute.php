@@ -7,7 +7,21 @@ class Attribute extends \ArrayObject
     /**
      * Default language when no language is given.
      */
-    const LANGUAGE_DEFAULT = 'und';
+    const LANGUAGE_DEFAULT     = 'und';
+
+    /**
+     *  Attribute's data types.
+     */
+    const TYPE_INTEGER         = 'integer';
+    const TYPE_STRING          = 'string';
+    const TYPE_BOOLEAN         = 'boolean';
+    const TYPE_NUMBER          = 'number';
+    const TYPE_REFERENCE       = 'reference';
+    const TYPE_ARRAY_INTEGER   = 'array<integer>';
+    const TYPE_ARRAY_STRING    = 'array<string>';
+    const TYPE_ARRAY_BOOLEAN   = 'array<boolean>';
+    const TYPE_ARRAY_NUMBER    = 'array<number>';
+    const TYPE_ARRAY_REFERENCE = 'array<reference>';
 
     /**
      * @var \Acquia\ContentServicesClient\TypeHandler[]
@@ -17,23 +31,21 @@ class Attribute extends \ArrayObject
     /**
      * Attribute's Constructor.
      *
-     * If no type is set, a default type of 'string' is assumed.
-     *
      * @param string $type
      * @throws \Exception
      */
-    public function __construct($type = 'string')
+    public function __construct($type)
     {
-        $this->setTypeHandler(new TypeHandler('integer', 'integer'))
-             ->setTypeHandler(new TypeHandler('string', 'string'))
-             ->setTypeHandler(new TypeHandler('boolean', 'boolean'))
-             ->setTypeHandler(new TypeHandler('number', 'float'))
-             ->setTypeHandler(new TypeHandler('reference', 'string'))
-             ->setTypeHandler(new TypeHandler('array<integer>', 'integer'))
-             ->setTypeHandler(new TypeHandler('array<string>', 'string'))
-             ->setTypeHandler(new TypeHandler('array<boolean>', 'boolean'))
-             ->setTypeHandler(new TypeHandler('array<number>', 'float'))
-             ->setTypeHandler(new TypeHandler('array<reference>', 'string'))
+        $this->setTypeHandler(new TypeHandler(self::TYPE_INTEGER, 'integer'))
+             ->setTypeHandler(new TypeHandler(self::TYPE_STRING, 'string'))
+             ->setTypeHandler(new TypeHandler(self::TYPE_BOOLEAN, 'boolean'))
+             ->setTypeHandler(new TypeHandler(self::TYPE_NUMBER, 'float'))
+             ->setTypeHandler(new TypeHandler(self::TYPE_REFERENCE, 'string'))
+             ->setTypeHandler(new TypeHandler(self::TYPE_ARRAY_INTEGER, 'integer'))
+             ->setTypeHandler(new TypeHandler(self::TYPE_ARRAY_STRING, 'string'))
+             ->setTypeHandler(new TypeHandler(self::TYPE_ARRAY_BOOLEAN, 'boolean'))
+             ->setTypeHandler(new TypeHandler(self::TYPE_ARRAY_NUMBER, 'float'))
+             ->setTypeHandler(new TypeHandler(self::TYPE_ARRAY_STRING, 'string'))
         ;
 
         // Validate that this attribute type can be handled.
@@ -46,8 +58,6 @@ class Attribute extends \ArrayObject
         ];
         parent::__construct($array);
     }
-
-
 
     /**
      * @param string $type

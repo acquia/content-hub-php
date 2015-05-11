@@ -52,7 +52,7 @@ class AttributeTest extends \PHPUnit_Framework_TestCase
         $data = $this->setAttributeData()['attributes']['title'];
 
         // Testing attribute with default type = string.
-        $attribute = new Attribute();
+        $attribute = new Attribute(Attribute::TYPE_STRING);
         $this->assertEquals('string', $attribute->getType());
         $attribute->setValues($data['value']);
         $this->assertEquals($data['value']['en'], $attribute->getValue('en'));
@@ -61,7 +61,7 @@ class AttributeTest extends \PHPUnit_Framework_TestCase
 
         // Testing type 'number'
         $data = $this->setAttributeData()['attributes']['num'];
-        $attribute = new Attribute('number');
+        $attribute = new Attribute(Attribute::TYPE_NUMBER);
         $this->assertEquals('number', $attribute->getType());
         $attribute->setValue($data['value']['en'], 'en');
         $this->assertEquals($data['value']['en'], $attribute->getValue('en'));
@@ -73,7 +73,7 @@ class AttributeTest extends \PHPUnit_Framework_TestCase
 
         // Testing 'array<number>'
         $data = $this->setAttributeData()['attributes']['num_array'];
-        $attribute = new Attribute('array<number>');
+        $attribute = new Attribute(Attribute::TYPE_ARRAY_NUMBER);
         $this->assertEquals('array<number>', $attribute->getType());
         $attribute->setValues($data['value']);
         $this->assertEquals($data['value']['en'], $attribute->getValue('en'));
