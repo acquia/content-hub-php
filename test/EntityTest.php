@@ -10,6 +10,7 @@ class EntityTest extends \PHPUnit_Framework_TestCase
     {
         return [
             "uuid" => "00000000-0000-0000-0000-000000000000",
+            "origin" => "11111111-0000-0000-0000-000000000000",
             "type" => "product",
             "created" => "2014-12-21T20:12:11+00:00Z",
             "modified" => "2014-12-21T20:12:11+00:00Z",
@@ -44,12 +45,14 @@ class EntityTest extends \PHPUnit_Framework_TestCase
         $entity->setUuid($data['uuid']);
         $entity->setType($data['type']);
         $entity->setCreated($data['created']);
+        $entity->setOrigin($data['origin']);
         $entity->setModified($data['modified']);
         $entity->setAssets($data['asset']);
         $entity->setAttributes($data['attributes']);
         $this->assertEquals($data['uuid'], $entity->getUuid());
         $this->assertEquals($data['type'], $entity->getType());
         $this->assertEquals($data['created'], $entity->getCreated());
+        $this->assertEquals($data['origin'], $entity->getOrigin());
         $this->assertEquals($data['modified'], $entity->getModified());
         $this->assertEquals($data['asset'], $entity->getAssets());
         $this->assertEquals("http://acquia.com/sites/default/files/foo.png", $entity->getAssets()[0]['url']);

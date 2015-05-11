@@ -14,6 +14,8 @@ class Entity extends \ArrayObject
     }
 
     /**
+     * Sets the 'uuid' parameter.
+     *
      * @param string $uuid
      *
      * @return \Acquia\ContentServicesClient\Entity
@@ -26,6 +28,7 @@ class Entity extends \ArrayObject
     }
 
     /**
+     * Gets the 'uuid' parameter.
      *
      * @return string
      */
@@ -35,6 +38,8 @@ class Entity extends \ArrayObject
     }
 
     /**
+     * Sets the 'type' parameter.
+     *
      * @param string $type
      *
      * @return \Acquia\ContentServicesClient\Entity
@@ -47,6 +52,7 @@ class Entity extends \ArrayObject
     }
 
     /**
+     * Returns the 'type' parameter.
      *
      * @return string
      */
@@ -56,6 +62,8 @@ class Entity extends \ArrayObject
     }
 
     /**
+     * Sets the 'created' parameter.
+     *
      * @param string $created
      *
      * @return \Acquia\ContentServicesClient\Entity
@@ -68,6 +76,7 @@ class Entity extends \ArrayObject
     }
 
     /**
+     * Returns the 'created' parameter.
      *
      * @return string
      */
@@ -77,6 +86,8 @@ class Entity extends \ArrayObject
     }
 
     /**
+     * Sets the 'modified' parameter.
+     *
      * @param string $modified
      *
      * @return \Acquia\ContentServicesClient\Entity
@@ -89,26 +100,8 @@ class Entity extends \ArrayObject
     }
 
     /**
-     * Returns the Success
+     * Returns the 'modified' parameter.
      *
-     * @return mixed
-     */
-    public function isSuccessful()
-    {
-        return $this['success'];
-    }
-
-    /**
-     * Returns the Error code and message.
-     *
-     * @return mixed
-     */
-    public function getError()
-    {
-        return isset($this['error']) ? $this['error'] : null;
-    }
-
-    /**
      * @return string
      */
     public function getModified()
@@ -165,6 +158,7 @@ class Entity extends \ArrayObject
     /**
      *
      * @param type $url
+     *
      * @return \Acquia\ContentServicesClient\Entity
      */
     public function setResource($url)
@@ -180,7 +174,30 @@ class Entity extends \ArrayObject
      */
     public function getResource()
     {
-        return $this['resource'];
+        return $this->getValue('resource', '');
+    }
+
+    /**
+     * Sets the origin.
+     *
+     * @param string $origin
+     * @return \Acquia\ContentServicesClient\Entity
+     */
+    public function setOrigin($origin)
+    {
+        $this['origin'] = $origin;
+
+        return $this;
+    }
+
+    /**
+     * Returns the Origin's UUID.
+     *
+     * @return string
+     */
+    public function getOrigin()
+    {
+        return $this->getValue('origin', '');
     }
 
     /**
