@@ -98,6 +98,7 @@ class Attribute extends \ArrayObject
      */
     public function setValues(array $value)
     {
+        $this['value'] = [];
         foreach ($value as $lang => $val) {
             $this->setValue($val, $lang);
         }
@@ -140,7 +141,9 @@ class Attribute extends \ArrayObject
      */
     public function removeValue($lang = self::LANGUAGE_DEFAULT)
     {
-        unset($this['value'][$lang]);
+        $value = $this->getValues();
+        unset($value[$lang]);
+        $this->setValues($value);
         return $this;
     }
 
