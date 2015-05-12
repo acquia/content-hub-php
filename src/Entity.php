@@ -132,6 +132,60 @@ class Entity extends \ArrayObject
     }
 
     /**
+     * Adds an Asset to the Entity.
+     *
+     * @param Asset $asset
+     * @return $this
+     */
+    public function addAsset(Asset $asset)
+    {
+        $assets = $this->getAssets();
+        foreach ($assets as $myasset) {
+            if ($myasset->getReplaceToken() == $asset->getReplaceToken()) {
+                // Make sure not to add an asset with the same token.
+                return $this;
+            }
+        }
+        $this['asset'][] = $asset;
+        return $this;
+    }
+
+    /**
+     * Returns an Asset, given a replaceToken.
+     *
+     * @param $replaceToken
+     * @return Asset|bool
+     */
+    public function getAsset($replaceToken)
+    {
+        $assets = $this->getAssets();
+        foreach ($assets as $asset) {
+            if ($asset->getReplaceToken() == $replaceToken) {
+                return $asset;
+            }
+        }
+        return FALSE;
+    }
+
+    /**
+     * Removes an Asset from the Entity.
+     *
+     * @param $replaceToken
+     * @return $this
+     */
+    public function removeAsset($replaceToken) {
+        $assets = $this->getAssets();
+        foreach ($assets as $key => $asset) {
+            if ($asset->getReplaceToken() == $replaceToken) {
+                unset($assets[$key]);
+                $this->setAssets($assets);
+                continue;
+            }
+        }
+        return $this;
+    }
+
+    /**
      * Sets the attributes associated with the entity.
      *
      * @param Attribute[] $attributes
@@ -155,26 +209,62 @@ class Entity extends \ArrayObject
         return $this->getValue('attributes', []);
     }
 
+
     /**
+     * Adds an Attribute.
      *
-     * @param type $url
+     * @param string    $name
+     * @param Attribute $attribute
      *
      * @return \Acquia\ContentServicesClient\Entity
      */
-    public function setResource($url)
+    public function addAttribute($name, Attribute $attribute)
     {
-        $this['resource'] = $url;
+        $this['attributes'][$name] = $attribute;
 
         return $this;
     }
 
     /**
+     * Returns an Attribute, given the name.
      *
-     * @return type
+     * @param $name
+     * @return \Acquia\ContentServicesClient\Attribute|bool
      */
-    public function getResource()
+    public function getAttribute($name)
     {
-        return $this->getValue('resource', '');
+      return isset($this['attributes'][$name]) ? $this['attributes'][$name] : FALSE;
+    }
+
+    /**
+     * Removes an Attribute from the array.
+     *
+     * @param $name
+     *
+     * @return \Acquia\ContentServicesClient\Entity
+     */
+    public function removeAttribute($name)
+    {
+        $attributes = $this->getAttributes();
+        unset($attributes[$name]);
+        $this->setAttributes($attributes);
+        return $this;
+    }
+
+    /**
+     * Sets the Value for an Attribute in a particular language.
+     *
+     * @param $name
+     * @param $value
+     * @param string $lang
+     *
+     * @return $this
+     */
+    public function setAttributeValue($name, $value, $lang = Attribute::LANGUAGE_DEFAULT) {
+        if ($this->getAttribute($name)) {
+            $this['attributes'][$name]->setValue($value, $lang);
+        }
+        return $this;
     }
 
     /**
