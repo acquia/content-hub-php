@@ -8,7 +8,7 @@ class Asset extends \ArrayObject
      *
      * @param array $array
      */
-    public function _construct(array $array = [])
+    public function __construct(array $array = [])
     {
         parent::__construct($array);
     }
