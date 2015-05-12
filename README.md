@@ -44,19 +44,83 @@ these steps:
 
 ```php
 use Acquia\ContentServicesClient\Entity;
+use Acquia\ContentServicesClient\Attribute;
+use Acquia\ContentServicesClient\Asset;
 use Acquia\ContentServicesClient\ContentServices;
 
-$client = new ContentServices(['base_url' => 'http://localhost:5000']);
+$api = 'OZKUIBGFZPJIEQJIHPIR';
+$secret = 'ncXtPb8JDQBvjeMGhrGPLv44L4E0KN6jnQazgUFv';
+$origin = '29a3acf1-ada7-4f4b-b529-9ca2f5b22ea8';
 
-// Create an Entity
+$client = new ContentServices($api, $secret, $origin, ['base_url' => 'http://localhost:5000']);
+
+// Create a Plexus Entity Object
 $entity = new Entity();
 $entity->setUuid('00000000-0000-0000-0000-000000000000');
 $entity->setType('product');
-$client->createEntity($entity);
+$entity->setOrigin($origin);
+$entity->setCreated('2014-12-21T20:12:11+00:00Z');
+$entity->setModified('2014-12-21T20:12:11+00:00Z');
+
+// Adding Attributes
+$attribute = new Attribute(Attribute::TYPE_STRING);
+$attribute->setValue('nothing', 'en');
+$attribute->setValue('nada', 'es');
+$attribute->setValue('nothing');
+$entity->addAttribute('name', $attribute);
+
+$attribute = new Attribute(Attribute::TYPE_INTEGER);
+$attribute->setValue(4);
+$entity->addAttribute('age', $attribute);
+
+$attribute = new Attribute(Attribute::TYPE_STRING);
+$attribute->setValue('[asset-1]');
+$entity->addAttribute('image', $attribute);
+
+// Adding Assets
+$asset = new Asset();
+$asset->setUrl('http://placehold.it/100');
+$asset->setReplaceToken('[asset-1]');
+$entity->addAsset($asset);
+
+// Print entity
+$entity->getArray();
+$entity->json();
+
+// Create an Entity in Plexus.
+// The variable $resource_url should contain a link to the Plexus Entity in json format.
+$resource_url = 'http://plexus.acquia.com/entity/00000000-0000-0000-0000-000000000000';
+$client->createEntity($resource_url);
+
+// Update an Entity in Plexus.
+// The variable $resource_url should contain a link to the Plexus Entity in json format.
+$resource_url = 'http://plexus.acquia.com/entity/00000000-0000-0000-0000-000000000000';
+$uuid = '00000000-0000-0000-0000-000000000000';
+$client->updateEntity($resource_url, $uuid);
+
+// Delete an Entity in Plexus
+$client->deleteEntity($uuid);
+
+// Read an Entity
+$entity = $client->readEntity($uuid);
 
 // Get Entity's Uuid
 $uuid = $entity->getUuid();
 
-// Read an Enity
-$entity = $client->readEntity($uuid);
+// Get Assets
+$assets = $entity->getAssets();
+
+// Get Attributes
+$attributes = $entity->getAttributes();
+
+// Get a particular attribute
+$attribute = $entity->getAttribute('name');
+
+// Get the URL of the image attribute, as set above.
+$token = $entity->getAttribute('image')->getValue();
+$url = $entity->getAsset($token)->getUrl();
+
+// Get the attribute name in spanish.
+$name = $entity->getAttribute('name')->getValue('es');
+
 ```

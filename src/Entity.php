@@ -290,6 +290,37 @@ class Entity extends \ArrayObject
         return $this->getValue('origin', '');
     }
 
+
+    /**
+     * Returns the Array representation of the current object.
+     *
+     * @return array
+     */
+    public function getArray()
+    {
+        $json = (array) $this;
+        foreach ($json['attributes'] as &$attribute) {
+            $attribute = (array) $attribute;
+        }
+        foreach ($json['asset'] as &$asset) {
+            $asset = (array) $asset;
+        }
+        return $json;
+    }
+
+    /**
+     * Returns the json representation of the current object.
+     *
+     * @param boolean $pretty_print
+     * @return string
+     */
+    public function json($pretty_print = false)
+    {
+        $pretty_print = $pretty_print ? JSON_PRETTY_PRINT : 0;
+        $encode_options = JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | $pretty_print;
+        return json_encode($this->getArray(), $encode_options);
+    }
+
     /**
      *
      * @param string $key
