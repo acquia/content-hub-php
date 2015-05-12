@@ -298,14 +298,14 @@ class Entity extends \ArrayObject
      */
     public function getArray()
     {
-        $json = (array) $this;
-        foreach ($json['attributes'] as &$attribute) {
+        $entity_array = (array) $this;
+        foreach ($entity_array['attributes'] as &$attribute) {
             $attribute = (array) $attribute;
         }
-        foreach ($json['asset'] as &$asset) {
+        foreach ($entity_array['asset'] as &$asset) {
             $asset = (array) $asset;
         }
-        return $json;
+        return $entity_array;
     }
 
     /**
