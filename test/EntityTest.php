@@ -104,7 +104,7 @@ class EntityTest extends \PHPUnit_Framework_TestCase
         $attribute->setValues($attribute_value['my_attribute']['value']);
         $name = array_keys($attribute_value);
         $name = reset($name);
-        $entity->addAttribute($name, $attribute);
+        $entity->setAttribute($name, $attribute);
         $this->assertEquals((array) $attribute, (array) $entity->getAttribute($name));
 
         $attribute_value['my_attribute']['value']['it'] = 400;
@@ -113,5 +113,18 @@ class EntityTest extends \PHPUnit_Framework_TestCase
 
         $entity->removeAttribute($name);
         $this->assertEquals($attributes, $entity->getAttributes());
+
+        // Handling NULL Attributes.
+        $attribute = new Attribute(Attribute::TYPE_BOOLEAN);
+        $attribute->setValue(NULL);
+        $entity->setAttribute('empty1', $attribute);
+        $this->assertEquals($attributes, $entity->getAttributes());
+
+        $attribute = new Attribute(Attribute::TYPE_ARRAY_NUMBER);
+        $entity->setAttribute('empty2', $attribute);
+        $this->assertEquals($attributes, $entity->getAttributes());
+
+        $json = json_encode($data, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT);
+        $this->assertJson($json, $entity->json());
     }
 }

@@ -48,8 +48,8 @@ use Acquia\ContentServicesClient\Attribute;
 use Acquia\ContentServicesClient\Asset;
 use Acquia\ContentServicesClient\ContentServices;
 
-$api = 'OZKUIBGFZPJIEQJIHPIR';
-$secret = 'ncXtPb8JDQBvjeMGhrGPLv44L4E0KN6jnQazgUFv';
+$api = 'AAAAAAAAAAAAAAAAAAAA';
+$secret = 'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB';
 $origin = '29a3acf1-ada7-4f4b-b529-9ca2f5b22ea8';
 
 $client = new ContentServices($api, $secret, $origin, ['base_url' => 'http://localhost:5000']);
@@ -83,8 +83,7 @@ $asset->setUrl('http://placehold.it/100');
 $asset->setReplaceToken('[asset-1]');
 $entity->addAsset($asset);
 
-// Print entity
-$entity->getArray();
+// Get Json representation of the entity
 $entity->json();
 
 // Create an Entity in Plexus.

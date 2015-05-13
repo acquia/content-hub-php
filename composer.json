@@ -31,7 +31,8 @@
         "phpmd/phpmd": "~1.0",
         "phpunit/phpunit": "~3.0",
         "scrutinizer/ocular": "~1.0",
-        "sebastian/phpcpd": "~2.0"
+        "sebastian/phpcpd": "~2.0",
+        "symfony/serializer": "~2.6"
     },
     "autoload": {
     	"psr-4": {

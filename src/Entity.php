@@ -2,6 +2,10 @@
 
 namespace Acquia\ContentServicesClient;
 
+use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\CustomNormalizer;
+
 class Entity extends \ArrayObject
 {
 
@@ -211,16 +215,20 @@ class Entity extends \ArrayObject
 
 
     /**
-     * Adds an Attribute.
+     * Sets an Attribute.
+     *
+     * Only accepts the attribute if it has values, otherwise it is ignored.
      *
      * @param string    $name
      * @param Attribute $attribute
      *
      * @return \Acquia\ContentServicesClient\Entity
      */
-    public function addAttribute($name, Attribute $attribute)
+    public function setAttribute($name, Attribute $attribute)
     {
-        $this['attributes'][$name] = $attribute;
+        if ($attribute->hasValues()) {
+            $this['attributes'][$name] = $attribute;
+        }
 
         return $this;
     }
@@ -290,35 +298,17 @@ class Entity extends \ArrayObject
         return $this->getValue('origin', '');
     }
 
-
-    /**
-     * Returns the Array representation of the current object.
-     *
-     * @return array
-     */
-    public function getArray()
-    {
-        $entity_array = (array) $this;
-        foreach ($entity_array['attributes'] as &$attribute) {
-            $attribute = (array) $attribute;
-        }
-        foreach ($entity_array['asset'] as &$asset) {
-            $asset = (array) $asset;
-        }
-        return $entity_array;
-    }
-
     /**
      * Returns the json representation of the current object.
      *
-     * @param boolean $pretty_print
      * @return string
      */
-    public function json($pretty_print = false)
+    public function json()
     {
-        $pretty_print = $pretty_print ? JSON_PRETTY_PRINT : 0;
-        $encode_options = JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | $pretty_print;
-        return json_encode($this->getArray(), $encode_options);
+        $encoders = array(new JsonEncoder());
+        $normalizers = array(new CustomNormalizer());
+        $serializer = new Serializer($normalizers, $encoders);
+        return $serializer->serialize($this, 'json');
     }
 
     /**
