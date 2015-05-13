@@ -67,15 +67,15 @@ $attribute = new Attribute(Attribute::TYPE_STRING);
 $attribute->setValue('nothing', 'en');
 $attribute->setValue('nada', 'es');
 $attribute->setValue('nothing');
-$entity->addAttribute('name', $attribute);
+$entity->setAttribute('name', $attribute);
 
 $attribute = new Attribute(Attribute::TYPE_INTEGER);
 $attribute->setValue(4);
-$entity->addAttribute('age', $attribute);
+$entity->setAttribute('age', $attribute);
 
 $attribute = new Attribute(Attribute::TYPE_STRING);
 $attribute->setValue('[asset-1]');
-$entity->addAttribute('image', $attribute);
+$entity->setAttribute('image', $attribute);
 
 // Adding Assets
 $asset = new Asset();
