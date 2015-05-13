@@ -50,7 +50,7 @@ use Acquia\ContentServicesClient\ContentServices;
 
 $api = 'AAAAAAAAAAAAAAAAAAAA';
 $secret = 'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB';
-$origin = '29a3acf1-ada7-4f4b-b529-9ca2f5b22ea8';
+$origin = '11111111-0000-0000-0000-000000000000';
 
 $client = new ContentServices($api, $secret, $origin, ['base_url' => 'http://localhost:5000']);
 
