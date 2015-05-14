@@ -43,6 +43,7 @@ these steps:
 #### CRUD Operations
 
 ```php
+use Acquia\ContentServicesClient\Entities;
 use Acquia\ContentServicesClient\Entity;
 use Acquia\ContentServicesClient\Attribute;
 use Acquia\ContentServicesClient\Asset;
@@ -85,6 +86,13 @@ $entity->addAsset($asset);
 
 // Get Json representation of the entity
 $entity->json();
+
+// Group Entities
+$entities = new Entities();
+$entities->addEntity($entity);
+
+// Get Json
+$entities->json();
 
 // Create an Entity in Plexus.
 // The variable $resource_url should contain a link to the Plexus Entity in json format.
