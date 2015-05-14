@@ -58,6 +58,32 @@ class Entities extends \ArrayObject {
     }
 
     /**
+     * Removes an Entity from the list, given the UUID.
+     *
+     * @param $uuid
+     * @return $this
+     */
+    public function removeEntity($uuid)
+    {
+        foreach ($this['entities'] as $key => $entity) {
+            if ($entity->getUuid() == $uuid) {
+                unset($this['entities'][$key]);
+                continue;
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * Returns the list of Entities.
+     *
+     * @return \Acquia\ContentServicesClient\Entity[]
+     */
+    public function getEntities() {
+        return $this['entities'];
+    }
+
+    /**
      * Returns the json representation of the current object.
      *
      * @return string

@@ -131,6 +131,20 @@ class EntitiesTest extends \PHPUnit_Framework_TestCase
       $entities->addEntity($entity);
       $this->assertEquals($entity, $entities->getEntity($entity->getUuid()));
 
+      $uuid = '66666666-0000-0000-0000-000000000000';
+      $this->assertFalse($entities->getEntity($uuid));
+
+      $entity->setUuid($uuid);
+      $entities->addEntity($entity);
+      $this->assertEquals($entity, $entities->getEntity($uuid));
+
+      $entities->removeEntity($uuid);
+      $this->assertFalse($entities->getEntity($uuid));
+
+      foreach ($entities->getEntities() as $entity) {
+          $this->assertInstanceOf('Acquia\ContentServicesClient\Entity', $entity);
+      }
+
       $data = $this->getData();
       $json = json_encode($data, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT);
       $this->assertJson($json, $entities->json());
