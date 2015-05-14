@@ -87,7 +87,9 @@ class Attribute extends \ArrayObject
      */
     public function setValue($value, $lang = self::LANGUAGE_DEFAULT)
     {
-        $this['value'][$lang] = $this->getTypeHandler()->set($value);
+        if ($value !== NULL) {
+            $this['value'][$lang] = $this->getTypeHandler()->set($value);
+        }
         return $this;
     }
 
@@ -156,6 +158,16 @@ class Attribute extends \ArrayObject
     protected  function getVal($key, $default = NULL)
     {
         return isset($this[$key]) ? $this[$key] : $default;
+    }
+
+    /**
+     * Returns TRUE if the current attribute has values.
+     *
+     * @return bool
+     */
+    public function hasValues()
+    {
+        return (bool) count($this->getValues());
     }
 
     /**

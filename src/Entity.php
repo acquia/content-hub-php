@@ -2,6 +2,10 @@
 
 namespace Acquia\ContentServicesClient;
 
+use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\CustomNormalizer;
+
 class Entity extends \ArrayObject
 {
 
@@ -211,16 +215,20 @@ class Entity extends \ArrayObject
 
 
     /**
-     * Adds an Attribute.
+     * Sets an Attribute.
+     *
+     * Only accepts the attribute if it has values, otherwise it is ignored.
      *
      * @param string    $name
      * @param Attribute $attribute
      *
      * @return \Acquia\ContentServicesClient\Entity
      */
-    public function addAttribute($name, Attribute $attribute)
+    public function setAttribute($name, Attribute $attribute)
     {
-        $this['attributes'][$name] = $attribute;
+        if ($attribute->hasValues()) {
+            $this['attributes'][$name] = $attribute;
+        }
 
         return $this;
     }
@@ -288,6 +296,19 @@ class Entity extends \ArrayObject
     public function getOrigin()
     {
         return $this->getValue('origin', '');
+    }
+
+    /**
+     * Returns the json representation of the current object.
+     *
+     * @return string
+     */
+    public function json()
+    {
+        $encoders = array(new JsonEncoder());
+        $normalizers = array(new CustomNormalizer());
+        $serializer = new Serializer($normalizers, $encoders);
+        return $serializer->serialize($this, 'json');
     }
 
     /**

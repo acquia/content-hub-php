@@ -67,7 +67,9 @@ class TypeHandler {
             }
         }
         else {
-            settype($value, $this->getCast());
+            if ($value !== $value) {
+                settype($value, $this->getCast());
+            }
         }
         return $value;
     }
