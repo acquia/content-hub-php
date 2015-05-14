@@ -12,7 +12,7 @@ use Symfony\Component\Serializer\Normalizer\CustomNormalizer;
 
 class Entities extends \ArrayObject {
     /**
-     * @param array $array
+     * @param \Acquia\ContentServicesClient\Entity[] $array
      */
     public function __construct(array $array = [])
     {
@@ -27,8 +27,8 @@ class Entities extends \ArrayObject {
      *
      * It overwrites the entity, if it has the same UUID.
      *
-     * @param \Acquia\ContentServicesClient\Entity $new_entity
-     * @return $this
+     * @param \Acquia\ContentServicesClient\Entity    $new_entity
+     * @return \Acquia\ContentServicesClient\Entities $this
      */
     public function addEntity(Entity $new_entity)
     {
@@ -55,6 +55,48 @@ class Entities extends \ArrayObject {
             }
         }
         return FALSE;
+    }
+
+    /**
+     * Removes an Entity from the list, given the UUID.
+     *
+     * @param $uuid
+     * @return \Acquia\ContentServicesClient\Entities $this
+     */
+    public function removeEntity($uuid)
+    {
+        $entities = $this->getEntities();
+        foreach ($entities as $key => $entity) {
+            if ($entity->getUuid() == $uuid) {
+                unset($entities[$key]);
+                $this->setEntities($entities);
+                continue;
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * Returns the list of Entities.
+     *
+     * @return \Acquia\ContentServicesClient\Entity[]
+     */
+    public function getEntities() {
+        return $this['entities'];
+    }
+
+    /**
+     * Bulk setting of Entities
+     *
+     * @param \Acquia\ContentServicesClient\Entity[]  $entities
+     * @return \Acquia\ContentServicesClient\Entities $this
+     */
+    public function setEntities($entities = [])
+    {
+        if (is_array($entities)) {
+            $this['entities'] = $entities;
+        }
+        return $this;
     }
 
     /**
