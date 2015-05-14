@@ -17,7 +17,7 @@ class Entities extends \ArrayObject {
     public function __construct(array $array = [])
     {
         $array += [
-          'entities' => []
+            'entities' => []
         ];
         parent::__construct($array);
     }
