@@ -179,4 +179,29 @@ class ContentServices extends Client
         $response = $this->send($request);
         return $response->json();
     }
+
+    /**
+     * Discoverability of the API
+     *
+     * @param string $endpoint
+     *
+     * @return Api
+     */
+    public function api($endpoint = '')
+    {
+        $response = $this->options($endpoint);
+        return (array) $response->json();
+    }
+
+    /**
+     * Gets a Plexus User.
+     *
+     * @return User
+     */
+    public function getUser()
+    {
+        $response = $this->get('user');
+        $data = $response->json();
+        return new User($data);
+    }
 }

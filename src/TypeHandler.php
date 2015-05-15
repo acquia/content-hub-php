@@ -7,7 +7,8 @@
 namespace Acquia\ContentServicesClient;
 
 
-class TypeHandler {
+class TypeHandler
+{
 
     /**
      * The type
