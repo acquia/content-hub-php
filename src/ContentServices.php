@@ -179,4 +179,34 @@ class ContentServices extends Client
         $response = $this->send($request);
         return $response->json();
     }
+
+    /**
+     * Discoverability of the API
+     *
+     * @param string $endpoint
+     *
+     * @return Api
+     */
+    public function definition($endpoint = '')
+    {
+        $response = $this->options($endpoint);
+        return $response->json();
+    }
+
+    /**
+     * Gets a Plexus User.
+     *
+     * This has to be updated according to this ticket:
+     * https://backlog.acquia.com/browse/COM-646
+     *
+     * @deprecated
+     *
+     * @return User
+     */
+    public function getUser()
+    {
+        $response = $this->get('user');
+        $data = $response->json();
+        return new User($data);
+    }
 }
