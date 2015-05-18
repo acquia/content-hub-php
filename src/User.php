@@ -6,7 +6,15 @@
 
 namespace Acquia\ContentServicesClient;
 
-
+/**
+ * This class is deprecated and will have to be changed according to the following:
+ * https://backlog.acquia.com/browse/COM-646
+ *
+ * @deprecated
+ *
+ * Class User
+ * @package Acquia\ContentServicesClient
+ */
 class User extends \ArrayObject
 {
 
