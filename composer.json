@@ -22,7 +22,7 @@
     "require": {
         "php": ">=5.4.0",
         "guzzlehttp/guzzle": "~5.0",
-        "acquia/http-hmac-php": "~1.0"
+        "acquia/http-hmac-php": "~1.0",
         "symfony/serializer": "~2.6"
     },
     "require-dev": {
@@ -32,7 +32,7 @@
         "phpmd/phpmd": "~1.0",
         "phpunit/phpunit": "~3.0",
         "scrutinizer/ocular": "~1.0",
-        "sebastian/phpcpd": "~2.0",
+        "sebastian/phpcpd": "~2.0"
     },
     "autoload": {
     	"psr-4": {
