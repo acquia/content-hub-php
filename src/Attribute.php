@@ -45,7 +45,7 @@ class Attribute extends \ArrayObject
              ->setTypeHandler(new TypeHandler(self::TYPE_ARRAY_STRING, 'string'))
              ->setTypeHandler(new TypeHandler(self::TYPE_ARRAY_BOOLEAN, 'boolean'))
              ->setTypeHandler(new TypeHandler(self::TYPE_ARRAY_NUMBER, 'float'))
-             ->setTypeHandler(new TypeHandler(self::TYPE_ARRAY_STRING, 'string'))
+             ->setTypeHandler(new TypeHandler(self::TYPE_ARRAY_REFERENCE, 'string'))
         ;
 
         // Validate that this attribute type can be handled.
