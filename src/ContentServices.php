@@ -73,10 +73,37 @@ class ContentServices extends Client
     }
 
     /**
+     * Registers a new client for the active subscription.
+     *
+     * This method also returns the UUID for the new client being registered.
+     *
+     * @param string $name
+     *   The human-readable name for the client.
+     *
+     * @return array
+     *   An array of the following format, as an example:
+     *    [
+     *        'name' => $name,
+     *        'uuid' => '11111111-1111-1111-1111-111111111111'
+     *    ]
+     *
+     * @throws \GuzzleHttp\Exception\RequestException
+     */
+    public function register($name)
+    {
+        $json = [
+            'name' => $name,
+        ];
+        $request = $this->createRequest('POST', '/register', ['json' => $json]);
+        $response = $this->send($request);
+        return $response->json();
+    }
+
+
+    /**
      * Sends request to asynchronously create an entity.
      *
      * The entity does not need to be passed to this method, but only the resource URL.
-     * An Entity is still accepted for backwards compatibility.
      *
      * @param  string $resource
      *   This string should contain the URL where Plexus can read the entity's CDF.
@@ -87,15 +114,9 @@ class ContentServices extends Client
      */
     public function createEntity($resource)
     {
-        if (is_object($resource)) {
-            // Kept only for backwards compatibility.
-            $json = (array) $resource;
-        }
-        else {
-            $json = [
-                'resource' => $resource,
-            ];
-        }
+        $json = [
+            'resource' => $resource,
+        ];
         $request = $this->createRequest('POST', '/entities', ['json' => $json]);
         $response = $this->send($request);
         return $response;
@@ -121,8 +142,6 @@ class ContentServices extends Client
      * Updates an entity asynchronously.
      *
      * The entity does not need to be passed to this method, but only the resource URL.
-     * An Entity is still accepted for backwards compatibility.
-     * If an entity is passed, it only needs to have the 'resource' parameter set.
      *
      * @param  string $resource
      *   This string should contain the URL where Plexus can read the entity's CDF.
@@ -134,15 +153,9 @@ class ContentServices extends Client
      */
     public function updateEntity($resource, $uuid)
     {
-        if (is_object($resource)) {
-            // Kept only for backwards compatibility.
-            $json = (array) $resource;
-        }
-        else {
-            $json = [
-                'resource' => $resource,
-            ];
-        }
+        $json = [
+            'resource' => $resource,
+        ];
         $request = $this->createRequest('PUT', '/entities/'. $uuid, ['json' => $json]);
         $response = $this->send($request);
         return $response;
@@ -185,7 +198,7 @@ class ContentServices extends Client
      *
      * @param string $endpoint
      *
-     * @return Api
+     * @return array
      */
     public function definition($endpoint = '')
     {
@@ -194,19 +207,31 @@ class ContentServices extends Client
     }
 
     /**
-     * Gets a Plexus User.
+     * Obtains the Settings for the active subscription.
      *
-     * This has to be updated according to this ticket:
-     * https://backlog.acquia.com/browse/COM-646
-     *
-     * @deprecated
-     *
-     * @return User
+     * @return Settings
      */
-    public function getUser()
+    public function getSettings()
     {
-        $response = $this->get('user');
+        $response = $this->get('settings');
         $data = $response->json();
-        return new User($data);
+        return new Settings($data);
+    }
+
+    /**
+     * Sets a webhook for the active subscription.
+     *
+     * @param $webhook_url
+     *
+     * @return array
+     */
+    public function setWebhook($webhook_url)
+    {
+        $json = [
+            'url' => $webhook_url
+        ];
+        $request = $this->createRequest('POST', '/settings/webhooks', ['json' => $json]);
+        $response = $this->send($request);
+        return $response->json();
     }
 }

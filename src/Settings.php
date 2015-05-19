@@ -7,15 +7,12 @@
 namespace Acquia\ContentServicesClient;
 
 /**
- * This class is deprecated and will have to be changed according to the following:
- * https://backlog.acquia.com/browse/COM-646
+ * Settings for the current subscription.
  *
- * @deprecated
- *
- * Class User
+ * Class Settings
  * @package Acquia\ContentServicesClient
  */
-class User extends \ArrayObject
+class Settings extends \ArrayObject
 {
 
     /**
@@ -71,13 +68,33 @@ class User extends \ArrayObject
     }
 
     /**
-     * Returns an array of Webhooks registered for this particular user.
+     * Returns an array of Webhooks registered for this particular subscription.
      *
      * @return array
      */
     public function getWebhooks()
     {
         return $this->getValue('webhooks', []);
+    }
+
+    /**
+     * Returns an array of Clients for this particular subscription.
+     *
+     * @return array
+     */
+    public function getClients()
+    {
+        return $this->getValue('clients', []);
+    }
+
+    /**
+     * Returns the 'success' parameter.
+     *
+     * @return bool
+     */
+    public function success()
+    {
+        return (bool) $this->getValue('success', 0);
     }
 
 } 

@@ -12,7 +12,7 @@ use GuzzleHttp\Message\Response;
 use GuzzleHttp\Stream\Stream;
 use Acquia\ContentServicesClient\User;
 
-class UserTest extends \PHPUnit_Framework_TestCase
+class SettingsTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @return \Acquia\ContentServicesClient\ContentServices
@@ -38,6 +38,13 @@ class UserTest extends \PHPUnit_Framework_TestCase
                     "uuid" => "11111111-0000-0000-0000-000000000000",
                 ],
             ],
+            "clients" => [
+                [
+                    "name" => "My Client Site 1",
+                    "uuid" => "22222222-0000-0000-0000-000000000000",
+                ],
+            ],
+            "success" => 1,
         ];
     }
 
@@ -54,10 +61,12 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $client->getEmitter()->attach($mock);
 
         // Read an Entity
-        $user = $client->getUser();
-        $this->assertEquals($data['uuid'], $user->getUuid());
-        $this->assertEquals($data['created'], $user->getCreated());
-        $this->assertEquals($data['modified'], $user->getModified());
-        $this->assertEquals($data['webhooks'], $user->getWebhooks());
+        $settings = $client->getSettings();
+        $this->assertEquals($data['uuid'], $settings->getUuid());
+        $this->assertEquals($data['created'], $settings->getCreated());
+        $this->assertEquals($data['modified'], $settings->getModified());
+        $this->assertEquals($data['webhooks'], $settings->getWebhooks());
+        $this->assertEquals($data['clients'], $settings->getClients());
+        $this->assertEquals($data['success'], $settings->success());
     }
 }
