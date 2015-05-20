@@ -56,7 +56,6 @@ $origin = '11111111-0000-0000-0000-000000000000';
 $client = new ContentServices($api, $secret, $origin, ['base_url' => 'http://localhost:5000']);
 
 // Register a client
-$client_name = 'My Client Site 1';
 $client_site = $client->register('My Client Site 1');
 
 // The registration returns an origin that will be used in later requests.
