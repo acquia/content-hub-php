@@ -69,6 +69,7 @@ class AttributeTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($data['value']['es'], $attribute->getValue('es'));
         $attribute->setValue((string) $data['value']['und']);
         $this->assertEquals($data['value']['und'], $attribute->getValue());
+        $this->assertEquals($data['value']['und'], $attribute->getValue('it'));
         $this->assertEquals($data['value'], $attribute->getValues());
 
         // Testing 'array<number>'
