@@ -3,7 +3,6 @@
 namespace Acquia\ContentServicesClient\test;
 
 use Acquia\ContentServicesClient\Attribute;
-use foo\bar\Exception;
 
 class AttributeTest extends \PHPUnit_Framework_TestCase
 {
