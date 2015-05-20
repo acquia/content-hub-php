@@ -73,6 +73,11 @@ class EntityTest extends \PHPUnit_Framework_TestCase
         // Checks
         $this->assertEquals($assets, $entity->getAssets());
         $this->assertEquals("http://acquia.com/sites/default/files/foo.png", $entity->getAssets()[0]['url']);
+
+        // Adding the same asset does not mess up with the asset's list.
+        $entity->addAsset(new Asset($data['asset'][0]));
+        $this->assertEquals($assets, $entity->getAssets());
+
         $this->assertEquals($attributes, $entity->getAttributes());
 
         // Adding / Removing Assets
@@ -86,6 +91,7 @@ class EntityTest extends \PHPUnit_Framework_TestCase
         $myasset = $entity->getAsset($asset_array['replace-token']);
         $this->assertEquals($asset_array['url'], $myasset->getUrl());
         $this->assertEquals($asset_array['replace-token'], $myasset->getReplaceToken());
+
         $entity->removeAsset($asset_array['replace-token']);
         $this->assertFalse($entity->getAsset($asset_array['replace-token']));
 
