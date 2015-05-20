@@ -48,7 +48,7 @@ class SettingsTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    public function testReadUser()
+    public function testReadSettings()
     {
         $data = $this->setData();
         $client = $this->getClient();
@@ -60,7 +60,7 @@ class SettingsTest extends \PHPUnit_Framework_TestCase
         $mock->addResponse($mockResponse);
         $client->getEmitter()->attach($mock);
 
-        // Read an Entity
+        // Read Settings
         $settings = $client->getSettings();
         $this->assertEquals($data['uuid'], $settings->getUuid());
         $this->assertEquals($data['created'], $settings->getCreated());
@@ -68,5 +68,61 @@ class SettingsTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($data['webhooks'], $settings->getWebhooks());
         $this->assertEquals($data['clients'], $settings->getClients());
         $this->assertEquals($data['success'], $settings->success());
+
+
+    }
+
+    public function testRegisterClients()
+    {
+        $data = $this->setData()['clients'][0];
+        $client = $this->getClient();
+
+        $mock = new Mock();
+
+        $mockResponseBody = Stream::factory(json_encode($data));
+        $mockResponse = new Response(200, [], $mockResponseBody);
+        $mock->addResponse($mockResponse);
+        $client->getEmitter()->attach($mock);
+        // Add a Client
+        $registered_client = $client->register('My Client Site 1');
+        $this->assertEquals($data, $registered_client);
+    }
+
+    public function testSetWebhook()
+    {
+      $data = $this->setData()['webhooks'][0];
+      $client = $this->getClient();
+
+      $mock = new Mock();
+
+      $mockResponseBody = Stream::factory(json_encode($data));
+      $mockResponse = new Response(200, [], $mockResponseBody);
+      $mock->addResponse($mockResponse);
+      $client->getEmitter()->attach($mock);
+
+      // Set a Webhook
+      $webhook = $client->setWebhook('http://example1.com/webhooks');
+      $this->assertEquals($data, $webhook);
+
+    }
+
+    public function testDeleteWebhook()
+    {
+      $data = [
+          'success' => 1,
+      ];
+      $client = $this->getClient();
+
+      $mock = new Mock();
+
+      $mockResponseBody = Stream::factory(json_encode($data));
+      $mockResponse = new Response(200, [], $mockResponseBody);
+      $mock->addResponse($mockResponse);
+      $client->getEmitter()->attach($mock);
+
+      // Deletes a Webhook
+      $webhook = $client->deleteWebhook('http://example1.com/webhooks');
+      $this->assertEquals($data, $webhook->json());
+
     }
 }
