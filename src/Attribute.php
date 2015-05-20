@@ -50,24 +50,13 @@ class Attribute extends \ArrayObject
 
         // Validate that this attribute type can be handled.
         if (!in_array($type, $this->getTypeHandlers())) {
-          throw new \Exception('Type handler not registered for this type: ' . $type);
+            throw new \Exception('Type handler not registered for this type: ' . $type);
         }
         $array = [
-          'type'  => $type,
-          'value' => [],
+            'type'  => $type,
+            'value' => [],
         ];
         parent::__construct($array);
-    }
-
-    /**
-     * @param string $type
-     *
-     * @return \Acquia\ContentServicesClient\Attribute
-     */
-    public function setType($type)
-    {
-        $this['type'] = $type;
-        return $this;
     }
 
     /**

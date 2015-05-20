@@ -3,6 +3,7 @@
 namespace Acquia\ContentServicesClient\test;
 
 use Acquia\ContentServicesClient\Attribute;
+use foo\bar\Exception;
 
 class AttributeTest extends \PHPUnit_Framework_TestCase
 {
@@ -94,6 +95,13 @@ class AttributeTest extends \PHPUnit_Framework_TestCase
         $attribute->removeValue('it');
         $this->assertEquals($data['value'], $attribute->getValues());
 
+        // Test an unhandled type.
+        try {
+            $attribute = new Attribute('float');
+            $this->fail('It was expected an exception from "float" type.');
+        } catch (\Exception $e) {
+            $this->assertEquals('Type handler not registered for this type: float', $e->getMessage());
+        }
 
     }
 }
