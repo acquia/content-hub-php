@@ -78,6 +78,24 @@ class Settings extends \ArrayObject
     }
 
     /**
+     * Returns a Webhook, given a URL.
+     *
+     * @param $webhook_url
+     *
+     * @return array|bool
+     */
+    public function getWebhook($webhook_url)
+    {
+        $webhooks = $this->getWebhooks();
+        foreach ($webhooks as $webhook) {
+            if ($webhook['url'] == $webhook_url) {
+                return $webhook;
+            }
+        }
+        return FALSE;
+    }
+
+    /**
      * Returns an array of Clients for this particular subscription.
      *
      * @return array
@@ -85,6 +103,24 @@ class Settings extends \ArrayObject
     public function getClients()
     {
         return $this->getValue('clients', []);
+    }
+
+    /**
+     * Gets a Client, given a name.
+     *
+     * @param $name
+     *   The client name.
+     * @return array|bool
+     */
+    public function getClient($name)
+    {
+        $clients = $this->getClients();
+        foreach ($clients as $client) {
+            if ($client['name'] == $name) {
+                return $client;
+            }
+        }
+        return FALSE;
     }
 
     /**

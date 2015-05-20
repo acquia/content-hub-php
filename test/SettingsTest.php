@@ -69,6 +69,10 @@ class SettingsTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($data['clients'], $settings->getClients());
         $this->assertEquals($data['success'], $settings->success());
 
+        $this->assertEquals($data['webhooks'][0], $settings->getWebhook('http://example1.com/webhooks'));
+        $this->assertFalse($settings->getWebhook('http://example.com/webhook'));
+        $this->assertEquals($data['clients'][0], $settings->getClient('My Client Site 1'));
+        $this->assertFalse($settings->getClient('My Client Site 2'));
 
     }
 
