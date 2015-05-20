@@ -220,13 +220,13 @@ class ContentServices extends Client
     }
 
     /**
-     * Sets a webhook for the active subscription.
+     * Adds a webhook to the active subscription.
      *
      * @param $webhook_url
      *
      * @return array
      */
-    public function setWebhook($webhook_url)
+    public function addWebhook($webhook_url)
     {
         $json = [
             'url' => $webhook_url

@@ -101,7 +101,7 @@ class SettingsTest extends \PHPUnit_Framework_TestCase
       $client->getEmitter()->attach($mock);
 
       // Set a Webhook
-      $webhook = $client->setWebhook('http://example1.com/webhooks');
+      $webhook = $client->addWebhook('http://example1.com/webhooks');
       $this->assertEquals($data, $webhook);
 
     }
