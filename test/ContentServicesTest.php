@@ -67,6 +67,25 @@ class ContentServicesTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
+    public function testPing()
+    {
+        $data = [
+            'success' => 1,
+        ];
+        $client = $this->getClient();
+
+        $mock = new Mock();
+
+        $mockResponseBody = Stream::factory(json_encode($data));
+        $mockResponse = new Response(200, [], $mockResponseBody);
+        $mock->addResponse($mockResponse);
+        $client->getEmitter()->attach($mock);
+
+        // Pinging the service
+        $response = $client->ping();
+        $this->assertEquals($data, $response->json());
+    }
+
     public function testDefinition()
     {
         $data = $this->setDefinition();
