@@ -58,7 +58,7 @@ $client = new ContentServices($api, $secret, $origin, ['base_url' => 'http://loc
 // Register a client
 $client_site = $client->register('My Client Site 1');
 
-// The registration returns an origin that will be used in later requests.
+// The registration returns an origin that will be used in following requests.
 $origin = $client_site['uuid'];
 $client = new ContentServices($api, $secret, $origin, ['base_url' => 'http://localhost:5000']);
 
