@@ -73,6 +73,19 @@ class ContentServices extends Client
     }
 
     /**
+     * Discoverability of the API
+     *
+     * @param string $endpoint
+     *
+     * @return array
+     */
+    public function definition($endpoint = '')
+    {
+        $response = $this->options($endpoint);
+        return $response->json();
+    }
+
+    /**
      * Registers a new client for the active subscription.
      *
      * This method also returns the UUID for the new client being registered.
@@ -193,18 +206,6 @@ class ContentServices extends Client
         return $response->json();
     }
 
-    /**
-     * Discoverability of the API
-     *
-     * @param string $endpoint
-     *
-     * @return array
-     */
-    public function definition($endpoint = '')
-    {
-        $response = $this->options($endpoint);
-        return $response->json();
-    }
 
     /**
      * Obtains the Settings for the active subscription.
@@ -219,13 +220,13 @@ class ContentServices extends Client
     }
 
     /**
-     * Sets a webhook for the active subscription.
+     * Adds a webhook to the active subscription.
      *
      * @param $webhook_url
      *
      * @return array
      */
-    public function setWebhook($webhook_url)
+    public function addWebhook($webhook_url)
     {
         $json = [
             'url' => $webhook_url
@@ -233,5 +234,20 @@ class ContentServices extends Client
         $request = $this->createRequest('POST', '/settings/webhooks', ['json' => $json]);
         $response = $this->send($request);
         return $response->json();
+    }
+
+    /**
+     * Deletes a webhook from the active subscription.
+     *
+     * @param $uuid
+     *   The UUID of the webhook to delete
+     *
+     * @return \GuzzleHttp\Message\Response
+     *
+     * @throws \GuzzleHttp\Exception\RequestException
+     */
+    public function deleteWebhook($uuid)
+    {
+        return $this->delete('/settings/webhooks/' . $uuid);
     }
 }

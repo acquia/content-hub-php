@@ -55,6 +55,13 @@ $origin = '11111111-0000-0000-0000-000000000000';
 
 $client = new ContentServices($api, $secret, $origin, ['base_url' => 'http://localhost:5000']);
 
+// Register a client
+$client_site = $client->register('My Client Site 1');
+
+// The registration returns an origin that will be used in following requests.
+$origin = $client_site['uuid'];
+$client = new ContentServices($api, $secret, $origin, ['base_url' => 'http://localhost:5000']);
+
 // Create a Plexus Entity Object
 $entity = new Entity();
 $entity->setUuid('00000000-0000-0000-0000-000000000000');
@@ -117,7 +124,7 @@ $uuid = $entity->getUuid();
 // Get Assets
 $assets = $entity->getAssets();
 
-// Get Attributes
+// Get All Attributes
 $attributes = $entity->getAttributes();
 
 // Get a particular attribute
@@ -129,5 +136,11 @@ $url = $entity->getAsset($token)->getUrl();
 
 // Get the attribute name in spanish.
 $name = $entity->getAttribute('name')->getValue('es');
+
+// Adding a Webhook
+$webhook = $client->addWebhook('http://example.com/webhooks');
+
+// Deleting the same webhook
+$client->deleteWebhook($webhook['uuid']);
 
 ```

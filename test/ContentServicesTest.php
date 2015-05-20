@@ -54,6 +54,36 @@ class ContentServicesTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
+    private function setDefinition()
+    {
+        return [
+          'children' => [
+              0 => '/settings',
+              1 => '/register',
+              2 => '/entities',
+              3 => '/ping',
+              4 => '/elastic',
+          ],
+        ];
+    }
+
+    public function testDefinition()
+    {
+        $data = $this->setDefinition();
+
+        $client = $this->getClient();
+
+        $mock = new Mock();
+        $mockResponseBody = Stream::factory(json_encode($data));
+        $mockResponse = new Response(200, [], $mockResponseBody);
+        $mock->addResponse($mockResponse);
+        $client->getEmitter()->attach($mock);
+
+        $response = $client->definition();
+        $this->assertEquals($data, $response);
+
+    }
+
     public function testCreateEntity()
     {
         $data = [
