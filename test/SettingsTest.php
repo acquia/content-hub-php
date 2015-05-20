@@ -88,7 +88,7 @@ class SettingsTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($data, $registered_client);
     }
 
-    public function testSetWebhook()
+    public function testAddWebhook()
     {
       $data = $this->setData()['webhooks'][0];
       $client = $this->getClient();
