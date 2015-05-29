@@ -191,17 +191,16 @@ class ContentServices extends Client
     /**
      * Searches for entities.
      *
-     * @param  string                                 $index
      * @param  array                                  $query
      *
      * @return array
      *
      * @throws \GuzzleHttp\Exception\RequestException
      */
-    public function searchEntity($index, $query)
+    public function searchEntity($query)
     {
-        $url = '/elastic/' . $index . '/_search';
-        $request = $this->createRequest('POST', $url, ['json' => (array) $query]);
+        $url = '/_search';
+        $request = $this->createRequest('GET', $url, ['json' => (array) $query]);
         $response = $this->send($request);
         return $response->json();
     }
