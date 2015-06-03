@@ -43,22 +43,6 @@ class ContentServices extends Client
     }
 
     /**
-     * @param  array                                         $config
-     *
-     * @return \Acquia\ContentServicesClient\ContentServices
-     *
-     * @deprecated 0.2.0
-     */
-    public static function factory($config = array())
-    {
-        $apikey = $config['defaults']['auth'][0];
-        $secretkey = $config['defaults']['auth'][1];
-        $origin = $config['origin'];
-
-        return new static($apikey, $secretkey, $origin, $config);
-    }
-
-    /**
      * Pings the service to ensure that it is available.
      *
      * @return \GuzzleHttp\Message\Response
