@@ -100,7 +100,25 @@ class ContentServicesTest extends \PHPUnit_Framework_TestCase
 
         $response = $client->definition();
         $this->assertEquals($data, $response);
+    }
 
+    public function testClientByName()
+    {
+        $data = [
+            'name' => 'mysite',
+            'uuid' => '00000000-0000-0000-0000-000000000000',
+        ];
+
+        $client = $this->getClient();
+
+        $mock = new Mock();
+        $mockResponseBody = Stream::factory(json_encode($data));
+        $mockResponse = new Response(200, [], $mockResponseBody);
+        $mock->addResponse($mockResponse);
+        $client->getEmitter()->attach($mock);
+
+        $response = $client->getClientByName('mysite');
+        $this->assertEquals($data, $response);
     }
 
     public function testCreateEntity()

@@ -205,6 +205,21 @@ class ContentServices extends Client
         return $response->json();
     }
 
+    /**
+     * Returns the Client, given the site name.
+     *
+     * @param string $name
+     *
+     * @return array
+     *
+     * @throws \GuzzleHttp\Exception\RequestException
+     */
+    public function getClientByName($name)
+    {
+        $response = $this->get('/settings/clients/' . $name);
+        $data = $response->json();
+        return $data;
+    }
 
     /**
      * Obtains the Settings for the active subscription.
