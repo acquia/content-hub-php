@@ -96,11 +96,12 @@ class ContentServices extends Client
         return $response->json();
     }
 
-
     /**
      * Sends request to asynchronously create an entity.
      *
      * The entity does not need to be passed to this method, but only the resource URL.
+     *
+     * @deprecated since 0.6.0
      *
      * @param  string $resource
      *   This string should contain the URL where Plexus can read the entity's CDF.
@@ -110,6 +111,23 @@ class ContentServices extends Client
      * @throws \GuzzleHttp\Exception\RequestException
      */
     public function createEntity($resource)
+    {
+      return $this->createEntities($resource);
+    }
+
+    /**
+     * Sends request to asynchronously create entities.
+     *
+     * The entity does not need to be passed to this method, but only the resource URL.
+     *
+     * @param  string $resource
+     *   This string should contain the URL where Plexus can read the entities' CDF.
+     *
+     * @return \GuzzleHttp\Message\Response
+     *
+     * @throws \GuzzleHttp\Exception\RequestException
+     */
+    public function createEntities($resource)
     {
         $json = [
             'resource' => $resource,
@@ -154,6 +172,29 @@ class ContentServices extends Client
             'resource' => $resource,
         ];
         $request = $this->createRequest('PUT', '/entities/'. $uuid, ['json' => $json]);
+        $response = $this->send($request);
+        return $response;
+    }
+
+    /**
+     * Updates many entities asynchronously.
+     *
+     * The entities do not need to be passed to this method, but only the resource URL
+     * to the CDF that contains all entities in json format.
+     *
+     * @param  string $resource
+     *   This string should contain the URL where Plexus can read the entities' CDF.
+     *
+     * @return \GuzzleHttp\Message\Response
+     *
+     * @throws \GuzzleHttp\Exception\RequestException
+     */
+    public function updateEntities($resource)
+    {
+        $json = [
+            'resource' => $resource,
+        ];
+        $request = $this->createRequest('PUT', '/entities', ['json' => $json]);
         $response = $this->send($request);
         return $response;
     }

@@ -140,6 +140,14 @@ class ContentServicesTest extends \PHPUnit_Framework_TestCase
         $response = $client->createEntity($resource);
         $this->assertEquals($mockResponse->json(), $response->json());
         $this->assertEquals($mockResponse, $response);
+
+        // Create one or more entities
+        $mock->addResponse($mockResponse);
+        $client->getEmitter()->attach($mock);
+        $response = $client->createEntities($resource);
+        $this->assertEquals($mockResponse->json(), $response->json());
+        $this->assertEquals($mockResponse, $response);
+
     }
 
     public function testReadEntity()
@@ -177,6 +185,13 @@ class ContentServicesTest extends \PHPUnit_Framework_TestCase
 
         // Update an Entity
         $response = $client->updateEntity($resource, '00000000-0000-0000-0000-000000000000');
+        $this->assertEquals($mockResponse->json(), $response->json());
+        $this->assertEquals($mockResponse, $response);
+
+        // Test Update Entities (one or more)
+        $mock->addResponse($mockResponse);
+        $client->getEmitter()->attach($mock);
+        $response = $client->updateEntities($resource);
         $this->assertEquals($mockResponse->json(), $response->json());
         $this->assertEquals($mockResponse, $response);
     }
