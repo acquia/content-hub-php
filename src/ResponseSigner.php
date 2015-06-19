@@ -65,6 +65,9 @@ class ResponseSigner extends Response {
         ];
         parent::__construct($content = '', $status, $headers);
 
+        // Set the date.
+        $this->headers->set('Date', gmdate("D, d M Y H:i:s T"));
+
         // Setting up the keys.
         $this->apiKey = $apiKey;
         $this->secretKey = $secretKey;
