@@ -24,7 +24,7 @@ class ContentServicesTest extends \PHPUnit_Framework_TestCase
             'data' => [
                 'uuid' => '00000000-0000-0000-0000-000000000000',
                 'origin' => '11111111-0000-0000-0000-000000000000',
-                'Data' => [
+                'data' => [
                     'uuid' => '00000000-0000-0000-0000-000000000000',
                     "type" => "product",
                     "created" => "2014-12-21T20:12:11+00:00Z",
@@ -165,7 +165,7 @@ class ContentServicesTest extends \PHPUnit_Framework_TestCase
         // Read an Entity
         $entity = $client->readEntity('00000000-0000-0000-0000-000000000000');
         $this->assertEquals(6, count($entity));
-        $this->assertEquals($data['data']['Data'], (array) $entity);
+        $this->assertEquals($data['data']['data'], (array) $entity);
     }
 
     public function testUpdateEntity()
