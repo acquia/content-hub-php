@@ -150,7 +150,7 @@ class ContentServices extends Client
     {
         $response = $this->get('entities/' . $uuid);
         $data = $response->json();
-        return new Entity($data['data']['Data']);
+        return new Entity($data['data']['data']);
     }
 
     /**
