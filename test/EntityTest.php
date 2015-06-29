@@ -26,7 +26,7 @@ class EntityTest extends \PHPUnit_Framework_TestCase
                     ],
                 ],
             ],
-            "asset" => [
+            "assets" => [
                 [
                     "url" => "http://acquia.com/sites/default/files/foo.png",
                     "replace-token" => "[acquia-logo]",
@@ -57,8 +57,8 @@ class EntityTest extends \PHPUnit_Framework_TestCase
 
         // Adding Assets
         $assets = [
-          new Asset($data['asset'][0]),
-          new Asset($data['asset'][1])
+          new Asset($data['assets'][0]),
+          new Asset($data['assets'][1])
         ];
         $entity->setAssets($assets);
 
@@ -75,7 +75,7 @@ class EntityTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals("http://acquia.com/sites/default/files/foo.png", $entity->getAssets()[0]['url']);
 
         // Adding the same asset does not mess up with the asset's list.
-        $entity->addAsset(new Asset($data['asset'][0]));
+        $entity->addAsset(new Asset($data['assets'][0]));
         $this->assertEquals($assets, $entity->getAssets());
 
         $this->assertEquals($attributes, $entity->getAttributes());
