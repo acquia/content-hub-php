@@ -120,7 +120,7 @@ class Entity extends \ArrayObject
      */
     public function setAssets($assets)
     {
-        $this['asset'] = $assets;
+        $this['assets'] = $assets;
 
         return $this;
     }
@@ -132,7 +132,7 @@ class Entity extends \ArrayObject
      */
     public function getAssets()
     {
-        return $this->getValue('asset', []);
+        return $this->getValue('assets', []);
     }
 
     /**
@@ -150,7 +150,7 @@ class Entity extends \ArrayObject
                 return $this;
             }
         }
-        $this['asset'][] = $asset;
+        $this['assets'][] = $asset;
         return $this;
     }
 

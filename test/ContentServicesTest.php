@@ -39,7 +39,7 @@ class ContentServicesTest extends \PHPUnit_Framework_TestCase
                             ],
                         ],
                     ],
-                    "asset" => [
+                    "assets" => [
                         [
                             "url" => "http://acquia.com/sites/default/files/foo.png",
                             "replace-token" => "[acquia-logo]",

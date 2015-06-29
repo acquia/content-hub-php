@@ -29,7 +29,7 @@ class EntitiesTest extends \PHPUnit_Framework_TestCase
                           ],
                       ],
                   ],
-                  "asset" => [
+                  "assets" => [
                       [
                           "url" => "http://acquia.com/sites/default/files/foo1.png",
                           "replace-token" => "[acquia-logo-1]",
@@ -56,7 +56,7 @@ class EntitiesTest extends \PHPUnit_Framework_TestCase
                           ],
                       ],
                   ],
-                  "asset" => [
+                  "assets" => [
                       [
                           "url" => "http://acquia.com/sites/default/files/foo2.png",
                           "replace-token" => "[acquia-logo-2]",
@@ -87,8 +87,8 @@ class EntitiesTest extends \PHPUnit_Framework_TestCase
 
       // Adding Assets
       $assets = [
-        new Asset($data['asset'][0]),
-        new Asset($data['asset'][1])
+        new Asset($data['assets'][0]),
+        new Asset($data['assets'][1])
       ];
       $entity->setAssets($assets);
 
@@ -115,8 +115,8 @@ class EntitiesTest extends \PHPUnit_Framework_TestCase
 
       // Adding Assets
       $assets = [
-        new Asset($data['asset'][0]),
-        new Asset($data['asset'][1])
+        new Asset($data['assets'][0]),
+        new Asset($data['assets'][1])
       ];
       $entity->setAssets($assets);
 
