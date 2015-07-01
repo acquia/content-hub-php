@@ -1,6 +1,6 @@
 # Acquia Content Hub Client for PHP
 
-[![Build Status](https://magnum.travis-ci.com/acquia/content-service-client-php.svg?token=PH71WkhMufTnsVvCU5rV)](https://magnum.travis-ci.com/acquia/content-service-client-php)
+[![Build Status](https://magnum.travis-ci.com/acquia/content-hub-php.svg?token=PH71WkhMufTnsVvCU5rV)](https://magnum.travis-ci.com/acquia/content-hub-php)
 
 A PHP Client library to consume the Acquia Content Hub API.
 
