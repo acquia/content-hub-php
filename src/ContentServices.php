@@ -217,6 +217,7 @@ class ContentServices extends Client
      * Lists Entities from the Content Hub.
      *
      * Example of how to structure the $options parameter:
+     * <code>
      * $options = [
      *     'limit'  => 20,
      *     'type'   => 'node',
@@ -228,6 +229,7 @@ class ContentServices extends Client
      *         'body' => '/Boston/',
      *     ],
      * ];
+     * </code>
      *
      * @param array $options
      *
