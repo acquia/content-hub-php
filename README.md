@@ -1,12 +1,12 @@
-# Plexus Client for PHP
+# Acquia Content Hub Client for PHP
 
 [![Build Status](https://magnum.travis-ci.com/acquia/content-service-client-php.svg?token=PH71WkhMufTnsVvCU5rV)](https://magnum.travis-ci.com/acquia/content-service-client-php)
 
-A PHP Client for [Plexus](https://github.com/acquia/plexus)
+A PHP Client library to consume the Acquia Content Hub API.
 
 ## Installation
 
-Plexus Client for PHP can be installed with Composer by adding it as a
+Acquia Content Hub Client for PHP can be installed with Composer by adding it as a
 dependency to your project's composer.json file. To start using composer follow
 these steps:
 
@@ -24,11 +24,11 @@ these steps:
     "repositories": [
         {
             "type": "vcs",
-            "url": "https://github.com/acquia/content-service-client-php"
+            "url": "https://github.com/acquia/content-hub-php"
         }
     ],
     "require": {
-        "acquia/content-service-client-php": "*"
+        "acquia/content-hub-php": "*"
     }
 }
 ```
