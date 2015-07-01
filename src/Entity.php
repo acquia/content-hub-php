@@ -1,6 +1,6 @@
 <?php
 
-namespace Acquia\ContentServicesClient;
+namespace Acquia\ContentHubClient;
 
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
@@ -22,7 +22,7 @@ class Entity extends \ArrayObject
      *
      * @param string $uuid
      *
-     * @return \Acquia\ContentServicesClient\Entity
+     * @return \Acquia\ContentHubClient\Entity
      */
     public function setUuid($uuid)
     {
@@ -46,7 +46,7 @@ class Entity extends \ArrayObject
      *
      * @param string $type
      *
-     * @return \Acquia\ContentServicesClient\Entity
+     * @return \Acquia\ContentHubClient\Entity
      */
     public function setType($type)
     {
@@ -70,7 +70,7 @@ class Entity extends \ArrayObject
      *
      * @param string $created
      *
-     * @return \Acquia\ContentServicesClient\Entity
+     * @return \Acquia\ContentHubClient\Entity
      */
     public function setCreated($created)
     {
@@ -94,7 +94,7 @@ class Entity extends \ArrayObject
      *
      * @param string $modified
      *
-     * @return \Acquia\ContentServicesClient\Entity
+     * @return \Acquia\ContentHubClient\Entity
      */
     public function setModified($modified)
     {
@@ -116,7 +116,7 @@ class Entity extends \ArrayObject
     /**
      * @param Asset[] $assets
      *
-     * @return \Acquia\ContentServicesClient\Entity
+     * @return \Acquia\ContentHubClient\Entity
      */
     public function setAssets($assets)
     {
@@ -194,7 +194,7 @@ class Entity extends \ArrayObject
      *
      * @param Attribute[] $attributes
      *
-     * @return \Acquia\ContentServicesClient\Entity
+     * @return \Acquia\ContentHubClient\Entity
      */
     public function setAttributes($attributes)
     {
@@ -222,7 +222,7 @@ class Entity extends \ArrayObject
      * @param string    $name
      * @param Attribute $attribute
      *
-     * @return \Acquia\ContentServicesClient\Entity
+     * @return \Acquia\ContentHubClient\Entity
      */
     public function setAttribute($name, Attribute $attribute)
     {
@@ -237,7 +237,7 @@ class Entity extends \ArrayObject
      * Returns an Attribute, given the name.
      *
      * @param $name
-     * @return \Acquia\ContentServicesClient\Attribute|bool
+     * @return \Acquia\ContentHubClient\Attribute|bool
      */
     public function getAttribute($name)
     {
@@ -249,7 +249,7 @@ class Entity extends \ArrayObject
      *
      * @param $name
      *
-     * @return \Acquia\ContentServicesClient\Entity
+     * @return \Acquia\ContentHubClient\Entity
      */
     public function removeAttribute($name)
     {
@@ -279,7 +279,7 @@ class Entity extends \ArrayObject
      * Sets the origin.
      *
      * @param string $origin
-     * @return \Acquia\ContentServicesClient\Entity
+     * @return \Acquia\ContentHubClient\Entity
      */
     public function setOrigin($origin)
     {

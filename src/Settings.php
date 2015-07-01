@@ -4,13 +4,13 @@
  * Handles the User data.
  */
 
-namespace Acquia\ContentServicesClient;
+namespace Acquia\ContentHubClient;
 
 /**
  * Settings for the current subscription.
  *
  * Class Settings
- * @package Acquia\ContentServicesClient
+ * @package Acquia\ContentHubClient
  */
 class Settings extends \ArrayObject
 {

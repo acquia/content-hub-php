@@ -1,8 +1,8 @@
 <?php
 
-namespace Acquia\ContentServicesClient\test;
+namespace Acquia\ContentHubClient\test;
 
-use Acquia\ContentServicesClient\Attribute;
+use Acquia\ContentHubClient\Attribute;
 
 class AttributeTest extends \PHPUnit_Framework_TestCase
 {

@@ -4,7 +4,7 @@
  * HMAC Response Signer
  */
 
-namespace Acquia\ContentServicesClient;
+namespace Acquia\ContentHubClient;
 
 use Symfony\Component\HttpFoundation\Response;
 

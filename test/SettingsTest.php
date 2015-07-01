@@ -4,22 +4,22 @@
  * Test for User Class.
  */
 
-namespace Acquia\ContentServicesClient\test;
+namespace Acquia\ContentHubClient\test;
 
-use Acquia\ContentServicesClient\ContentServices;
+use Acquia\ContentHubClient\ContentHub;
 use GuzzleHttp\Subscriber\Mock;
 use GuzzleHttp\Message\Response;
 use GuzzleHttp\Stream\Stream;
-use Acquia\ContentServicesClient\User;
+use Acquia\ContentHubClient\User;
 
 class SettingsTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @return \Acquia\ContentServicesClient\ContentServices
+     * @return \Acquia\ContentHubClient\ContentHub
      */
     private function getClient()
     {
-        return new ContentServices('public', 'secret', 'origin');
+        return new ContentHub('public', 'secret', 'origin');
     }
 
     private function setData()

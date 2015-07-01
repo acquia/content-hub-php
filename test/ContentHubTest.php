@@ -1,21 +1,21 @@
 <?php
 
-namespace Acquia\ContentServicesClient\test;
+namespace Acquia\ContentHubClient\test;
 
-use Acquia\ContentServicesClient\Entity;
-use Acquia\ContentServicesClient\ContentServices;
+use Acquia\ContentHubClient\Entity;
+use Acquia\ContentHubClient\ContentHub;
 use GuzzleHttp\Subscriber\Mock;
 use GuzzleHttp\Message\Response;
 use GuzzleHttp\Stream\Stream;
 
-class ContentServicesTest extends \PHPUnit_Framework_TestCase
+class ContentHubTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @return \Acquia\ContentServicesClient\ContentServices
+     * @return \Acquia\ContentHubClient\ContentHub
      */
     private function getClient()
     {
-        return new ContentServices('public', 'secret', 'origin');
+        return new ContentHub('public', 'secret', 'origin');
     }
 
     private function setData()
@@ -126,7 +126,7 @@ class ContentServicesTest extends \PHPUnit_Framework_TestCase
         $data = [
             'success' => true,
         ];
-        $resource = 'http://acquia.com/content_services/node/00000000-0000-0000-0000-000000000000';
+        $resource = 'http://acquia.com/content_hub_connector/node/00000000-0000-0000-0000-000000000000';
         $client = $this->getClient();
 
         $mock = new Mock();
@@ -173,7 +173,7 @@ class ContentServicesTest extends \PHPUnit_Framework_TestCase
         $data = [
             'success' => true,
         ];
-        $resource = 'http://acquia.com/content_services/node/00000000-0000-0000-0000-000000000000';
+        $resource = 'http://acquia.com/content_hub_connector/node/00000000-0000-0000-0000-000000000000';
         $client = $this->getClient();
 
         $mock = new Mock();

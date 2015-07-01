@@ -31,12 +31,12 @@
     },
     "autoload": {
     	"psr-4": {
-            "Acquia\\ContentServicesClient\\": "src/"
+            "Acquia\\ContentHubClient\\": "src/"
     	}
     },
     "autoload-dev": {
     	"psr-4": {
-            "Acquia\\ContentServicesClient\\": "test/"
+            "Acquia\\ContentHubClient\\": "test/"
     	}
     }
 }

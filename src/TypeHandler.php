@@ -4,7 +4,7 @@
  * Handles the supported data types for an Attribute.
  */
 
-namespace Acquia\ContentServicesClient;
+namespace Acquia\ContentHubClient;
 
 
 class TypeHandler

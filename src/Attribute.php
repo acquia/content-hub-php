@@ -1,6 +1,6 @@
 <?php
 
-namespace Acquia\ContentServicesClient;
+namespace Acquia\ContentHubClient;
 
 class Attribute extends \ArrayObject
 {
@@ -24,7 +24,7 @@ class Attribute extends \ArrayObject
     const TYPE_ARRAY_REFERENCE = 'array<reference>';
 
     /**
-     * @var \Acquia\ContentServicesClient\TypeHandler[]
+     * @var \Acquia\ContentHubClient\TypeHandler[]
      */
     protected $handlers = array();
 
@@ -72,7 +72,7 @@ class Attribute extends \ArrayObject
      * @param array|bool|string|float|integer          $value
      * @param string                                   $lang
      *
-     * @return \Acquia\ContentServicesClient\Attribute
+     * @return \Acquia\ContentHubClient\Attribute
      */
     public function setValue($value, $lang = self::LANGUAGE_DEFAULT)
     {
@@ -85,7 +85,7 @@ class Attribute extends \ArrayObject
     /**
      * @param array $value
      *
-     * @return \Acquia\ContentServicesClient\Attribute
+     * @return \Acquia\ContentHubClient\Attribute
      */
     public function setValues(array $value)
     {
@@ -128,7 +128,7 @@ class Attribute extends \ArrayObject
      * Removes a value for a specific language.
      *
      * @param string $lang
-     * @return \Acquia\ContentServicesClient\Attribute
+     * @return \Acquia\ContentHubClient\Attribute
      */
     public function removeValue($lang = self::LANGUAGE_DEFAULT)
     {

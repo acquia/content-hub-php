@@ -1,13 +1,13 @@
 <?php
 
-namespace Acquia\ContentServicesClient;
+namespace Acquia\ContentHubClient;
 
 use Acquia\Hmac\Digest as Digest;
 use GuzzleHttp\Client;
 use Acquia\Hmac\RequestSigner;
 use Acquia\Hmac\Guzzle5\HmacAuthPlugin;
 
-class ContentServices extends Client
+class ContentHub extends Client
 {
     /**
      * Overrides \GuzzleHttp\Client::__construct()
@@ -142,7 +142,7 @@ class ContentServices extends Client
      *
      * @param  string                               $uuid
      *
-     * @return \Acquia\ContentServicesClient\Entity
+     * @return \Acquia\ContentHubClient\Entity
      *
      * @throws \GuzzleHttp\Exception\RequestException
      */

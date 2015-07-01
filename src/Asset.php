@@ -1,6 +1,6 @@
 <?php
 
-namespace Acquia\ContentServicesClient;
+namespace Acquia\ContentHubClient;
 
 class Asset extends \ArrayObject
 {
@@ -16,7 +16,7 @@ class Asset extends \ArrayObject
     /**
      * @param string $url
      *
-     * @return \Acquia\ContentServicesClient\Asset
+     * @return \Acquia\ContentHubClient\Asset
      */
     public function setUrl($url)
     {
@@ -28,7 +28,7 @@ class Asset extends \ArrayObject
     /**
      * @param string $replaceToken
      *
-     * @return \Acquia\ContentServicesClient\Asset
+     * @return \Acquia\ContentHubClient\Asset
      */
     public function setReplaceToken($replaceToken)
     {

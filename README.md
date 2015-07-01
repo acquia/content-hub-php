@@ -43,24 +43,24 @@ these steps:
 #### CRUD Operations
 
 ```php
-use Acquia\ContentServicesClient\Entities;
-use Acquia\ContentServicesClient\Entity;
-use Acquia\ContentServicesClient\Attribute;
-use Acquia\ContentServicesClient\Asset;
-use Acquia\ContentServicesClient\ContentServices;
+use Acquia\ContentHubClient\Entities;
+use Acquia\ContentHubClient\Entity;
+use Acquia\ContentHubClient\Attribute;
+use Acquia\ContentHubClient\Asset;
+use Acquia\ContentHubClient\ContentHub;
 
 $api = 'AAAAAAAAAAAAAAAAAAAA';
 $secret = 'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB';
 $origin = '11111111-0000-0000-0000-000000000000';
 
-$client = new ContentServices($api, $secret, $origin, ['base_url' => 'http://localhost:5000']);
+$client = new ContentHub($api, $secret, $origin, ['base_url' => 'http://localhost:5000']);
 
 // Register a client
 $client_site = $client->register('My Client Site 1');
 
 // The registration returns an origin that will be used in following requests.
 $origin = $client_site['uuid'];
-$client = new ContentServices($api, $secret, $origin, ['base_url' => 'http://localhost:5000']);
+$client = new ContentHub($api, $secret, $origin, ['base_url' => 'http://localhost:5000']);
 
 // Create a Plexus Entity Object
 $entity = new Entity();

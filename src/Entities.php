@@ -4,7 +4,7 @@
  * Creates an array of Entities and its conversion to Json.
  */
 
-namespace Acquia\ContentServicesClient;
+namespace Acquia\ContentHubClient;
 
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
@@ -12,7 +12,7 @@ use Symfony\Component\Serializer\Normalizer\CustomNormalizer;
 
 class Entities extends \ArrayObject {
     /**
-     * @param \Acquia\ContentServicesClient\Entity[] $array
+     * @param \Acquia\ContentHubClient\Entity[] $array
      */
     public function __construct(array $array = [])
     {
@@ -27,8 +27,8 @@ class Entities extends \ArrayObject {
      *
      * It overwrites the entity, if it has the same UUID.
      *
-     * @param \Acquia\ContentServicesClient\Entity    $new_entity
-     * @return \Acquia\ContentServicesClient\Entities $this
+     * @param \Acquia\ContentHubClient\Entity    $new_entity
+     * @return \Acquia\ContentHubClient\Entities $this
      */
     public function addEntity(Entity $new_entity)
     {
@@ -45,7 +45,7 @@ class Entities extends \ArrayObject {
      *
      * @param string $uuid
      *
-     * @return \Acquia\ContentServicesClient\Entity|bool
+     * @return \Acquia\ContentHubClient\Entity|bool
      */
     public function getEntity($uuid)
     {
@@ -61,7 +61,7 @@ class Entities extends \ArrayObject {
      * Removes an Entity from the list, given the UUID.
      *
      * @param $uuid
-     * @return \Acquia\ContentServicesClient\Entities $this
+     * @return \Acquia\ContentHubClient\Entities $this
      */
     public function removeEntity($uuid)
     {
@@ -79,7 +79,7 @@ class Entities extends \ArrayObject {
     /**
      * Returns the list of Entities.
      *
-     * @return \Acquia\ContentServicesClient\Entity[]
+     * @return \Acquia\ContentHubClient\Entity[]
      */
     public function getEntities() {
         return $this['entities'];
@@ -88,8 +88,8 @@ class Entities extends \ArrayObject {
     /**
      * Bulk setting of Entities
      *
-     * @param \Acquia\ContentServicesClient\Entity[]  $entities
-     * @return \Acquia\ContentServicesClient\Entities $this
+     * @param \Acquia\ContentHubClient\Entity[]  $entities
+     * @return \Acquia\ContentHubClient\Entities $this
      */
     public function setEntities($entities = [])
     {

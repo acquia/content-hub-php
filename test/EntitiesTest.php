@@ -1,11 +1,11 @@
 <?php
 
-namespace Acquia\ContentServicesClient\test;
+namespace Acquia\ContentHubClient\test;
 
-use Acquia\ContentServicesClient\Entities;
-use Acquia\ContentServicesClient\Entity;
-use Acquia\ContentServicesClient\Asset;
-use Acquia\ContentServicesClient\Attribute;
+use Acquia\ContentHubClient\Entities;
+use Acquia\ContentHubClient\Entity;
+use Acquia\ContentHubClient\Asset;
+use Acquia\ContentHubClient\Attribute;
 
 class EntitiesTest extends \PHPUnit_Framework_TestCase
 {
@@ -142,7 +142,7 @@ class EntitiesTest extends \PHPUnit_Framework_TestCase
       $this->assertFalse($entities->getEntity($uuid));
 
       foreach ($entities->getEntities() as $entity) {
-          $this->assertInstanceOf('Acquia\ContentServicesClient\Entity', $entity);
+          $this->assertInstanceOf('Acquia\ContentHubClient\Entity', $entity);
       }
 
       $data = $this->getData();

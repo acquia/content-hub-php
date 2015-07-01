@@ -1,8 +1,8 @@
 <?php
 
-namespace Acquia\ContentServicesClient\test;
+namespace Acquia\ContentHubClient\test;
 
-use Acquia\ContentServicesClient\Asset;
+use Acquia\ContentHubClient\Asset;
 
 class AssetTest extends \PHPUnit_Framework_TestCase
 {
