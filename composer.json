@@ -1,24 +1,18 @@
 {
-    "name": "acquia/content-service-client-php",
+    "name": "acquia/content-hub-php",
     "type": "library",
-    "description": "A PHP Client library for consuming the Content Services API.",
-    "homepage": "https://github.com/acquia/content-service-client-php",
+    "description": "A PHP Client library to consume the Acquia Content Hub API.",
+    "homepage": "https://github.com/acquia/content-hub-php",
     "license": "MIT",
     "authors": [
         {
             "name": "See Contributors",
-            "homepage": "https://github.com/acquia/content-service-client-php/graphs/contributors"
+            "homepage": "https://github.com/acquia/content-hub-php/graphs/contributors"
         }
     ],
     "support": {
-        "issues": "https://github.com/acquia/content-service-client-php/issues"
+        "issues": "https://github.com/acquia/content-hub-php/issues"
     },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/acquia/http-hmac-php"
-        }
-    ],
     "require": {
         "php": ">=5.4.0",
         "guzzlehttp/guzzle": "~5.0",
