@@ -214,6 +214,55 @@ class ContentServices extends Client
     }
 
     /**
+     * Lists Entities from the Content Hub.
+     *
+     * Example of how to structure the $options parameter:
+     * <code>
+     * $options = [
+     *     'limit'  => 20,
+     *     'type'   => 'node',
+     *     'origin' => '11111111-1111-1111-1111-111111111111',
+     *     'fields' => 'status,title,body,field_tags,description',
+     *     'filters' => [
+     *         'status' => 1,
+     *         'title' => 'New*',
+     *         'body' => '/Boston/',
+     *     ],
+     * ];
+     * </code>
+     *
+     * @param array $options
+     *
+     * @return array
+     *
+     * @throws \GuzzleHttp\Exception\RequestException
+     */
+    public function listEntities($options = [])
+    {
+        $variables = $options + [
+            'limit' => 1000,
+            'start' => 0,
+        ];
+
+        $url = 'entities?limit={limit}&start={start}';
+
+        $url .= isset($variables['type']) ? '&type={type}' :'';
+        $url .= isset($variables['origin']) ? '&origin={origin}' :'';
+        $url .= isset($variables['language']) ? '&language={language}' :'';
+        $url .= isset($variables['fields']) ? '&fields={fields}' :'';
+        foreach ($variables['filters'] as $name => $value) {
+            $filter = 'filter_' . $name;
+            $variables[$filter] = $value;
+            $url .= isset($value) ? sprintf('&filter:%s={%s}', $name, $filter) : '';
+        }
+        unset($variables['filters']);
+
+        // Now make the request.
+        $response = $this->get(array($url, $variables));
+        return $response->json();
+    }
+
+    /**
      * Searches for entities.
      *
      * @param  array                                  $query
