@@ -56,7 +56,7 @@ $origin = '11111111-0000-0000-0000-000000000000';
 $client = new ContentHub($api, $secret, $origin, ['base_url' => 'http://localhost:5000']);
 
 // Register a client
-$client_site = $client->register('My Client Site 1');
+$client_site = $client->register('myclientsite');
 
 // The registration returns an origin that will be used in following requests.
 $origin = $client_site['uuid'];
@@ -104,7 +104,7 @@ $entities->json();
 // Create an Entity in Plexus.
 // The variable $resource_url should contain a link to the Plexus Entity in json format.
 $resource_url = 'http://plexus.acquia.com/entity/00000000-0000-0000-0000-000000000000';
-$client->createEntity($resource_url);
+$client->createEntities($resource_url);
 
 // Update an Entity in Plexus.
 // The variable $resource_url should contain a link to the Plexus Entity in json format.
