@@ -242,6 +242,7 @@ class ContentHub extends Client
         $variables = $options + [
             'limit' => 1000,
             'start' => 0,
+            'filters' => [],
         ];
 
         $url = 'entities?limit={limit}&start={start}';
