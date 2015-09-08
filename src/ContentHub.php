@@ -214,6 +214,23 @@ class ContentHub extends Client
     }
 
     /**
+     * Purges all entities from the Content Hub.
+     *
+     * This method should be used carefully as it deletes all the entities for
+     * the current subscription from the Content Hub.
+     */
+    public function purge() {
+        $list = $this->listEntities();
+        while ($list["total"] != 0) {
+            foreach ($list["data"] as $entity) {
+                $this->deleteEntity($entity["uuid"]);
+            }
+            $list = $this->listEntities();
+        }
+        return $list;
+    }
+
+    /**
      * Lists Entities from the Content Hub.
      *
      * Example of how to structure the $options parameter:
