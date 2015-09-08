@@ -5,6 +5,7 @@ namespace Acquia\ContentHubClient;
 use Acquia\Hmac\Digest as Digest;
 use Acquia\Hmac\Guzzle6\HmacAuthHandler;
 use Acquia\Hmac\RequestSigner;
+use GuzzleHttp\Middleware;
 use Psr\Http\Message\RequestInterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request;
@@ -21,24 +22,15 @@ class ContentHub extends Client
      */
     public function __construct($apiKey, $secretKey, $origin, array $config = [])
     {
-        if (!isset($config['defaults'])) {
-            $config['defaults'] = [];
-        }
-
-        if (!isset($config['defaults']['headers'])) {
-            $config['defaults']['headers'] = [];
-        }
-
         // Setting up the headers.
-        $config['defaults']['headers'] += [
-            'Content-Type' => 'application/json',
-            'X-Acquia-Plexus-Client-Id' => $origin,
-        ];
+        $config['headers']['Content-Type'] = 'application/json';
+        $config['headers']['X-Acquia-Plexus-Client-Id'] = $origin;
 
         // Add the authentication handler
         // @see https://github.com/acquia/http-hmac-spec
         $requestSigner = new RequestSigner(new Digest\Version1('sha256'));
         $handler = isset($config['handler']) ? $config['handler'] : [];
+
         $stack = HmacAuthHandler::createWithMiddleware($requestSigner, $apiKey, $secretKey, $handler);
         $config['handler'] = $stack;
 
@@ -94,7 +86,8 @@ class ContentHub extends Client
         $json = [
             'name' => $name,
         ];
-        $request = new Request('POST', '/register', ['json' => $json]);
+        $body = json_encode($json);
+        $request = new Request('POST', '/register', [], $body);
         return $this->getResponseJson($request);
     }
 
@@ -134,7 +127,8 @@ class ContentHub extends Client
         $json = [
             'resource' => $resource,
         ];
-        $request = new Request('POST', '/entities', ['json' => $json]);
+        $body = json_encode($json);
+        $request = new Request('POST', '/entities', [], $body);
         $response = $this->send($request);
         return $response;
     }
@@ -173,7 +167,8 @@ class ContentHub extends Client
         $json = [
             'resource' => $resource,
         ];
-        $request = new Request('PUT', '/entities/' . $uuid, ['json' => $json]);
+        $body = json_encode($json);
+        $request = new Request('PUT', '/entities/' . $uuid, [], $body);
         $response = $this->send($request);
         return $response;
     }
@@ -196,7 +191,8 @@ class ContentHub extends Client
         $json = [
             'resource' => $resource,
         ];
-        $request = new Request('PUT', '/entities', ['json' => $json]);
+        $body = json_encode($json);
+        $request = new Request('PUT', '/entities', [], $body);
 
         $response = $this->send($request);
         return $response;
@@ -276,7 +272,9 @@ class ContentHub extends Client
     public function searchEntity($query)
     {
         $url = '/_search';
-        $request = new Request('GET', $url, ['json' => (array) $query]);
+        $json = (array) $query;
+        $body = json_encode($json);
+        $request = new Request('GET', $url, [], $body);
         return $this->getResponseJson($request);
     }
 
@@ -319,7 +317,8 @@ class ContentHub extends Client
         $json = [
             'url' => $webhook_url
         ];
-        $request = new Request('POST', '/settings/webhooks', ['json' => $json]);
+        $body = json_encode($json);
+        $request = new Request('POST', '/settings/webhooks', [], $body);
         return $this->getResponseJson($request);
     }
 
@@ -338,7 +337,8 @@ class ContentHub extends Client
         return $this->delete('/settings/webhooks/' . $uuid);
     }
 
-    protected function getResponseJson(RequestInterface $request) {
+    protected function getResponseJson(RequestInterface $request)
+    {
         $response = $this->send($request);
         $body =  (string) $response->getBody();
         return json_decode($body, TRUE);
