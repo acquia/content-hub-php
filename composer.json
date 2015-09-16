@@ -13,12 +13,18 @@
     "support": {
         "issues": "https://github.com/acquia/content-hub-php/issues"
     },
+    "repositories": [
+        {
+            "type": "git",
+            "url": "https://github.com/lkhaas/http-hmac-php"
+        }
+    ],
     "require": {
-        "php": ">=5.4.0",
-        "guzzlehttp/guzzle": "~5.0",
-        "acquia/http-hmac-php": "~1.0",
-        "symfony/serializer": "~2.6",
-        "symfony/http-foundation": "~2.6"
+        "php": ">=5.4.5",
+        "guzzlehttp/guzzle": "dev-master#1879fbe853b0c64d109e369c7aeff09849e62d1e",
+        "acquia/http-hmac-php": "dev-guzzle6",
+        "symfony/serializer": "2.7.*",
+        "symfony/http-foundation": "2.7.*"
     },
     "require-dev": {
         "fabpot/php-cs-fixer": "~1.0",

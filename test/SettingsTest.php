@@ -7,19 +7,22 @@
 namespace Acquia\ContentHubClient\test;
 
 use Acquia\ContentHubClient\ContentHub;
-use GuzzleHttp\Subscriber\Mock;
-use GuzzleHttp\Message\Response;
-use GuzzleHttp\Stream\Stream;
 use Acquia\ContentHubClient\User;
+use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Psr7\Response;
 
 class SettingsTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @return \Acquia\ContentHubClient\ContentHub
      */
-    private function getClient()
+    private function getClient(array $responses = [])
     {
-        return new ContentHub('public', 'secret', 'origin');
+      $mock = new MockHandler($responses);
+      $stack = HandlerStack::create($mock);
+
+      return new ContentHub('public', 'secret', 'origin', ['handler' => $stack]);
     }
 
     private function setData()
@@ -51,14 +54,10 @@ class SettingsTest extends \PHPUnit_Framework_TestCase
     public function testReadSettings()
     {
         $data = $this->setData();
-        $client = $this->getClient();
-
-        $mock = new Mock();
-
-        $mockResponseBody = Stream::factory(json_encode($data));
-        $mockResponse = new Response(200, [], $mockResponseBody);
-        $mock->addResponse($mockResponse);
-        $client->getEmitter()->attach($mock);
+        $responses = [
+          new Response(200, [], json_encode($data)),
+        ];
+        $client = $this->getClient($responses);
 
         // Read Settings
         $settings = $client->getSettings();
@@ -79,14 +78,10 @@ class SettingsTest extends \PHPUnit_Framework_TestCase
     public function testRegisterClients()
     {
         $data = $this->setData()['clients'][0];
-        $client = $this->getClient();
-
-        $mock = new Mock();
-
-        $mockResponseBody = Stream::factory(json_encode($data));
-        $mockResponse = new Response(200, [], $mockResponseBody);
-        $mock->addResponse($mockResponse);
-        $client->getEmitter()->attach($mock);
+        $responses = [
+          new Response(200, [], json_encode($data))
+        ];
+        $client = $this->getClient($responses);
         // Add a Client
         $registered_client = $client->register('My Client Site 1');
         $this->assertEquals($data, $registered_client);
@@ -95,14 +90,10 @@ class SettingsTest extends \PHPUnit_Framework_TestCase
     public function testAddWebhook()
     {
       $data = $this->setData()['webhooks'][0];
-      $client = $this->getClient();
-
-      $mock = new Mock();
-
-      $mockResponseBody = Stream::factory(json_encode($data));
-      $mockResponse = new Response(200, [], $mockResponseBody);
-      $mock->addResponse($mockResponse);
-      $client->getEmitter()->attach($mock);
+      $responses = [
+        new Response(200, [], json_encode($data)),
+      ];
+      $client = $this->getClient($responses);
 
       // Set a Webhook
       $webhook = $client->addWebhook('http://example1.com/webhooks');
@@ -115,18 +106,14 @@ class SettingsTest extends \PHPUnit_Framework_TestCase
       $data = [
           'success' => 1,
       ];
-      $client = $this->getClient();
-
-      $mock = new Mock();
-
-      $mockResponseBody = Stream::factory(json_encode($data));
-      $mockResponse = new Response(200, [], $mockResponseBody);
-      $mock->addResponse($mockResponse);
-      $client->getEmitter()->attach($mock);
+      $responses = [
+        new Response(200, [], json_encode($data)),
+      ];
+      $client = $this->getClient($responses);
 
       // Deletes a Webhook
       $webhook = $client->deleteWebhook('http://example1.com/webhooks');
-      $this->assertEquals($data, $webhook->json());
+      $this->assertEquals($data, json_decode($webhook->getBody(), TRUE));
 
     }
 }
