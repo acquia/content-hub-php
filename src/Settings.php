@@ -124,6 +124,17 @@ class Settings extends \ArrayObject
     }
 
     /**
+     * Returns the Shared Secret used for Webhook verification.
+     *
+     * @return string|bool
+     *   The shared secret if it is set, FALSE otherwise.
+     */
+    public function getSharedSecret()
+    {
+        return $this->getValue('shared_secret', FALSE);
+    }
+
+    /**
      * Returns the 'success' parameter.
      *
      * @return bool

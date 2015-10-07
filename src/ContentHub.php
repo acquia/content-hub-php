@@ -219,7 +219,8 @@ class ContentHub extends Client
      * This method should be used carefully as it deletes all the entities for
      * the current subscription from the Content Hub.
      */
-    public function purge() {
+    public function purge()
+    {
         $list = $this->listEntities();
         while ($list["total"] != 0) {
             foreach ($list["data"] as $entity) {
@@ -355,5 +356,19 @@ class ContentHub extends Client
     public function deleteWebhook($uuid)
     {
         return $this->delete('/settings/webhooks/' . $uuid);
+    }
+
+    /**
+     * Regenerates a Shared Secret for the Subscription.
+     *
+     * @return array
+     *
+     * @throws \GuzzleHttp\Exception\RequestException
+     */
+    public function regenerateSharedSecret()
+    {
+        $request = $this->createRequest('POST', '/settings/secret', ['json' => []]);
+        $response = $this->send($request);
+        return $response->json();
     }
 }
