@@ -51,7 +51,7 @@ use Acquia\ContentHubClient\ContentHub;
 
 $api = 'AAAAAAAAAAAAAAAAAAAA';
 $secret = 'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB';
-$origin = '11111111-0000-0000-0000-000000000000';
+$origin = '';
 
 $client = new ContentHub($api, $secret, $origin, ['base_url' => 'http://localhost:5000']);
 
