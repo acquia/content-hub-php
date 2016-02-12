@@ -76,9 +76,8 @@ class Attribute extends \ArrayObject
      */
     public function setValue($value, $lang = self::LANGUAGE_DEFAULT)
     {
-        if ($value !== NULL) {
-            $this['value'][$lang] = $this->getTypeHandler()->set($value);
-        }
+        $this['value'][$lang] = $this->getTypeHandler()->set($value);
+    }
         return $this;
     }
 
