@@ -70,14 +70,8 @@ class TypeHandler
         else {
             if ($value !== NULL) {
                 settype($value, $this->getCast());
-            } elseif ($this->getType() == Attribute::TYPE_STRING) {
-                return "";
-            } elseif ($this->getType() == Attribute::TYPE_INTEGER) {
-                return 0;
-            } elseif ($this->getType() == Attribute::TYPE_NUMBER) {
-                return 0.0;
-            } elseif ($this->getType() == Attribute::TYPE_REFERENCE) {
-                return "";
+            } else {
+                return NULL;
             }
         }
         return $value;
