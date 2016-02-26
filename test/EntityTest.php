@@ -25,6 +25,12 @@ class EntityTest extends \PHPUnit_Framework_TestCase
                         "und" => "C",
                     ],
                 ],
+                "empty1" => [
+                    "type" => "boolean",
+                    "value" => [
+                        "und" => null,
+                    ]
+                ],
             ],
             "assets" => [
                 [
@@ -67,6 +73,11 @@ class EntityTest extends \PHPUnit_Framework_TestCase
         $attribute->setValues($data['attributes']['title']['value']);
         $attributes = [
           'title' => $attribute
+        ];
+        $attribute = new Attribute($data['attributes']['empty1']['type']);
+        $attribute->setValues($data['attributes']['empty1']['value']);
+        $attributes = [
+          'empty1' => $attribute
         ];
         $entity->setAttributes($attributes);
 
