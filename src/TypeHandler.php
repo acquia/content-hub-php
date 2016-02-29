@@ -70,6 +70,8 @@ class TypeHandler
         else {
             if ($value !== NULL) {
                 settype($value, $this->getCast());
+            } else {
+                return NULL;
             }
         }
         return $value;
