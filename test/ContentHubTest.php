@@ -2,20 +2,24 @@
 
 namespace Acquia\ContentHubClient\test;
 
-use Acquia\ContentHubClient\Entity;
 use Acquia\ContentHubClient\ContentHub;
-use GuzzleHttp\Subscriber\Mock;
-use GuzzleHttp\Message\Response;
-use GuzzleHttp\Stream\Stream;
+use Guzzle\Stream\Stream;
+use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Psr7\Response;
 
 class ContentHubTest extends \PHPUnit_Framework_TestCase
 {
     /**
+     * @param array $responses Responses
+     *
      * @return \Acquia\ContentHubClient\ContentHub
      */
-    private function getClient()
+    private function getClient(array $responses = [])
     {
-        return new ContentHub('public', 'secret', 'origin');
+        $mock = new MockHandler($responses);
+        $stack = HandlerStack::create($mock);
+        return new ContentHub('public', 'secret', 'origin', ['handler' => $stack]);
     }
 
     private function setData()
@@ -126,98 +130,86 @@ class ContentHubTest extends \PHPUnit_Framework_TestCase
 
     public function testPing()
     {
+        // Setup
         $data = [
             'success' => 1,
         ];
-        $client = $this->getClient();
+        $responses = [
+            new Response('200', [], json_encode($data)),
+        ];
+        $client = $this->getClient($responses);
 
-        $mock = new Mock();
-
-        $mockResponseBody = Stream::factory(json_encode($data));
-        $mockResponse = new Response(200, [], $mockResponseBody);
-        $mock->addResponse($mockResponse);
-        $client->getEmitter()->attach($mock);
-
-        // Pinging the service
+        // Ping the service
         $response = $client->ping();
-        $this->assertEquals($data, $response->json());
+        $body = (string) $response->getBody();
+        $this->assertEquals($data, json_decode($body, TRUE));
     }
 
     public function testDefinition()
     {
+        // Setup
         $data = $this->setDefinition();
+        $responses = [
+            new Response('200', [], json_encode($data)),
+        ];
+        $client = $this->getClient($responses);
 
-        $client = $this->getClient();
-
-        $mock = new Mock();
-        $mockResponseBody = Stream::factory(json_encode($data));
-        $mockResponse = new Response(200, [], $mockResponseBody);
-        $mock->addResponse($mockResponse);
-        $client->getEmitter()->attach($mock);
-
+        // Get definition
         $response = $client->definition();
         $this->assertEquals($data, $response);
     }
 
     public function testClientByName()
     {
+        // Setup
         $data = [
             'name' => 'mysite',
             'uuid' => '00000000-0000-0000-0000-000000000000',
         ];
+        $responses = [
+            new Response('200', [], json_encode($data)),
+        ];
+        $client = $this->getClient($responses);
 
-        $client = $this->getClient();
-
-        $mock = new Mock();
-        $mockResponseBody = Stream::factory(json_encode($data));
-        $mockResponse = new Response(200, [], $mockResponseBody);
-        $mock->addResponse($mockResponse);
-        $client->getEmitter()->attach($mock);
-
+        // Get client by name
         $response = $client->getClientByName('mysite');
         $this->assertEquals($data, $response);
     }
 
     public function testCreateEntity()
     {
+        // Setup
         $data = [
             'success' => true,
         ];
         $resource = 'http://acquia.com/content_hub_connector/node/00000000-0000-0000-0000-000000000000';
-        $client = $this->getClient();
-
-        $mock = new Mock();
-
-        $mockResponseBody = Stream::factory(json_encode($data));
-        $mockResponse = new Response(200, [], $mockResponseBody);
-        $mock->addResponse($mockResponse);
-        $client->getEmitter()->attach($mock);
+        $responses = [
+            new Response(200, [], json_encode($data)),
+            new Response(200, [], json_encode($data)),
+        ];
+        $client = $this->getClient($responses);
 
         // Create an Entity
         $response = $client->createEntity($resource);
-        $this->assertEquals($mockResponse->json(), $response->json());
-        $this->assertEquals($mockResponse, $response);
+        $body = json_decode((string) $response->getBody(), TRUE);
+        $this->assertEquals($data, $body);
+        $this->assertEquals($responses[0], $response);
 
         // Create one or more entities
-        $mock->addResponse($mockResponse);
-        $client->getEmitter()->attach($mock);
         $response = $client->createEntities($resource);
-        $this->assertEquals($mockResponse->json(), $response->json());
-        $this->assertEquals($mockResponse, $response);
-
+        $body = json_decode((string) $response->getBody(), TRUE);
+        $this->assertEquals($data, $body);
+        $this->assertEquals($responses[1], $response);
     }
 
     public function testReadEntity()
     {
+        // Setup
         $data = $this->setData();
-        $client = $this->getClient();
-
-        $mock = new Mock();
-
-        $mockResponseBody = Stream::factory(json_encode($data));
-        $mockResponse = new Response(200, [], $mockResponseBody);
-        $mock->addResponse($mockResponse);
-        $client->getEmitter()->attach($mock);
+        $responses = [
+            new Response(200, [], json_encode($data)),
+        ];
+        $client = $this->getClient($responses);
 
         // Read an Entity
         $entity = $client->readEntity('00000000-0000-0000-0000-000000000000');
@@ -227,41 +219,35 @@ class ContentHubTest extends \PHPUnit_Framework_TestCase
 
     public function testUpdateEntity()
     {
+        // Setup
         $data = [
             'success' => true,
         ];
         $resource = 'http://acquia.com/content_hub_connector/node/00000000-0000-0000-0000-000000000000';
-        $client = $this->getClient();
-
-        $mock = new Mock();
-
-        $mockResponseBody = Stream::factory(json_encode($data));
-        $mockResponse = new Response(200, [], $mockResponseBody);
-        $mock->addResponse($mockResponse);
-        $client->getEmitter()->attach($mock);
+        $responses = [
+            new Response(200, [], json_encode($data)),
+            new Response(200, [], json_encode($data)),
+        ];
+        $client = $this->getClient($responses);
 
         // Update an Entity
         $response = $client->updateEntity($resource, '00000000-0000-0000-0000-000000000000');
-        $this->assertEquals($mockResponse->json(), $response->json());
-        $this->assertEquals($mockResponse, $response);
+        $this->assertEquals(json_encode($data), $response->getBody());
+        $this->assertEquals($responses[0], $response);
 
         // Test Update Entities (one or more)
-        $mock->addResponse($mockResponse);
-        $client->getEmitter()->attach($mock);
         $response = $client->updateEntities($resource);
-        $this->assertEquals($mockResponse->json(), $response->json());
-        $this->assertEquals($mockResponse, $response);
+        $this->assertEquals(json_encode($data), $response->getBody());
+        $this->assertEquals($responses[1], $response);
     }
 
     public function testDeleteEntity()
     {
-        $client = $this->getClient();
-
-        $mock = new Mock();
-
-        $mockResponse = new Response(200);
-        $mock->addResponse($mockResponse);
-        $client->getEmitter()->attach($mock);
+        // Setup
+        $responses = [
+            new Response(200),
+        ];
+        $client = $this->getClient($responses);
 
         // Delete an Entity
         $response = $client->deleteEntity('00000000-0000-0000-0000-000000000000');
@@ -270,15 +256,12 @@ class ContentHubTest extends \PHPUnit_Framework_TestCase
 
     public function testListEntities()
     {
+        // Setup
         $data = $this->setListOfEntities();
-        $client = $this->getClient();
-
-        $mock = new Mock();
-
-        $mockResponseBody = Stream::factory(json_encode($data));
-        $mockResponse = new Response(200, [], $mockResponseBody);
-        $mock->addResponse($mockResponse);
-        $client->getEmitter()->attach($mock);
+        $responses = [
+          new Response(200, [], json_encode($data)),
+        ];
+        $client = $this->getClient($responses);
 
         // Listing entities
         $options = [

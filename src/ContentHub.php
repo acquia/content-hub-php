@@ -3,9 +3,12 @@
 namespace Acquia\ContentHubClient;
 
 use Acquia\Hmac\Digest as Digest;
-use GuzzleHttp\Client;
+use Acquia\Hmac\Guzzle\HmacAuthMiddleware;
 use Acquia\Hmac\RequestSigner;
-use Acquia\Hmac\Guzzle5\HmacAuthPlugin;
+use Psr\Http\Message\RequestInterface;
+use GuzzleHttp\Client;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Psr7\Request;
 
 class ContentHub extends Client
 {
@@ -19,33 +22,33 @@ class ContentHub extends Client
      */
     public function __construct($apiKey, $secretKey, $origin, array $config = [])
     {
-        if (!isset($config['defaults'])) {
-            $config['defaults'] = [];
-        }
-
-        if (!isset($config['defaults']['headers'])) {
-            $config['defaults']['headers'] = [];
+        // "base_url" parameter changed to "base_uri" in Guzzle6, so the following line
+        // is there to make sure it does not disrupt previous configuration.
+        if (!isset($config['base_uri']) && isset($config['base_url'])) {
+            $config['base_uri'] = $config['base_url'];
         }
 
         // Setting up the headers.
-        $config['defaults']['headers'] += [
-            'Content-Type' => 'application/json',
-            'X-Acquia-Plexus-Client-Id' => $origin,
-        ];
+        $config['headers']['Content-Type'] = 'application/json';
+        $config['headers']['X-Acquia-Plexus-Client-Id'] = $origin;
 
-        parent::__construct($config);
-
-        // Add the authentication plugin
+        // Add the authentication handler
         // @see https://github.com/acquia/http-hmac-spec
         $requestSigner = new RequestSigner(new Digest\Version1('sha256'));
-        $plugin = new HmacAuthPlugin($requestSigner, $apiKey, $secretKey);
-        $this->getEmitter()->attach($plugin);
+        $middleware = new HmacAuthMiddleware($requestSigner, $apiKey, $secretKey);
+
+        if (!isset($config['handler'])) {
+            $config['handler'] = HandlerStack::create();
+        }
+        $config['handler']->push($middleware);
+
+        parent::__construct($config);
     }
 
     /**
      * Pings the service to ensure that it is available.
      *
-     * @return \GuzzleHttp\Message\Response
+     * @return \Psr\Http\Message\ResponseInterface
      *
      * @throws \GuzzleHttp\Exception\RequestException
      *
@@ -65,8 +68,8 @@ class ContentHub extends Client
      */
     public function definition($endpoint = '')
     {
-        $response = $this->options($endpoint);
-        return $response->json();
+        $request = new Request('OPTIONS', $endpoint);
+        return $this->getResponseJson($request);
     }
 
     /**
@@ -91,9 +94,9 @@ class ContentHub extends Client
         $json = [
             'name' => $name,
         ];
-        $request = $this->createRequest('POST', '/register', ['json' => $json]);
-        $response = $this->send($request);
-        return $response->json();
+        $body = json_encode($json);
+        $request = new Request('POST', '/register', [], $body);
+        return $this->getResponseJson($request);
     }
 
     /**
@@ -106,7 +109,7 @@ class ContentHub extends Client
      * @param  string $resource
      *   This string should contain the URL where Plexus can read the entity's CDF.
      *
-     * @return \GuzzleHttp\Message\Response
+     * @return \Psr\Http\Message\ResponseInterface
      *
      * @throws \GuzzleHttp\Exception\RequestException
      */
@@ -123,7 +126,7 @@ class ContentHub extends Client
      * @param  string $resource
      *   This string should contain the URL where Plexus can read the entities' CDF.
      *
-     * @return \GuzzleHttp\Message\Response
+     * @return \Psr\Http\Message\ResponseInterface
      *
      * @throws \GuzzleHttp\Exception\RequestException
      */
@@ -132,7 +135,8 @@ class ContentHub extends Client
         $json = [
             'resource' => $resource,
         ];
-        $request = $this->createRequest('POST', '/entities', ['json' => $json]);
+        $body = json_encode($json);
+        $request = new Request('POST', '/entities', [], $body);
         $response = $this->send($request);
         return $response;
     }
@@ -148,8 +152,8 @@ class ContentHub extends Client
      */
     public function readEntity($uuid)
     {
-        $response = $this->get('entities/' . $uuid);
-        $data = $response->json();
+        $request = new Request('GET', '/entities/' . $uuid);
+        $data = $this->getResponseJson($request);
         return new Entity($data['data']['data']);
     }
 
@@ -162,7 +166,7 @@ class ContentHub extends Client
      *   This string should contain the URL where Plexus can read the entity's CDF.
      * @param  string $uuid
      *
-     * @return \GuzzleHttp\Message\Response
+     * @return \Psr\Http\Message\ResponseInterface
      *
      * @throws \GuzzleHttp\Exception\RequestException
      */
@@ -171,7 +175,8 @@ class ContentHub extends Client
         $json = [
             'resource' => $resource,
         ];
-        $request = $this->createRequest('PUT', '/entities/'. $uuid, ['json' => $json]);
+        $body = json_encode($json);
+        $request = new Request('PUT', '/entities/' . $uuid, [], $body);
         $response = $this->send($request);
         return $response;
     }
@@ -185,7 +190,7 @@ class ContentHub extends Client
      * @param  string $resource
      *   This string should contain the URL where Plexus can read the entities' CDF.
      *
-     * @return \GuzzleHttp\Message\Response
+     * @return \Psr\Http\Message\ResponseInterface
      *
      * @throws \GuzzleHttp\Exception\RequestException
      */
@@ -194,7 +199,8 @@ class ContentHub extends Client
         $json = [
             'resource' => $resource,
         ];
-        $request = $this->createRequest('PUT', '/entities', ['json' => $json]);
+        $body = json_encode($json);
+        $request = new Request('PUT', '/entities', [], $body);
         $response = $this->send($request);
         return $response;
     }
@@ -204,13 +210,13 @@ class ContentHub extends Client
      *
      * @param  string                                 $uuid
      *
-     * @return \GuzzleHttp\Message\Response
+     * @return \Psr\Http\Message\ResponseInterface
      *
      * @throws \GuzzleHttp\Exception\RequestException
      */
     public function deleteEntity($uuid)
     {
-        return $this->delete('entities/' . $uuid);
+        return $this->delete('/entities/' . $uuid);
     }
 
     /**
@@ -263,22 +269,21 @@ class ContentHub extends Client
             'filters' => [],
         ];
 
-        $url = 'entities?limit={limit}&start={start}';
+        $url = "entities?limit={$variables['limit']}&start={$variables['start']}";
 
-        $url .= isset($variables['type']) ? '&type={type}' :'';
-        $url .= isset($variables['origin']) ? '&origin={origin}' :'';
-        $url .= isset($variables['language']) ? '&language={language}' :'';
-        $url .= isset($variables['fields']) ? '&fields={fields}' :'';
+        $url .= isset($variables['type']) ? "&type={$variables['type']}" :'';
+        $url .= isset($variables['origin']) ? "&origin={$variables['origin']}" :'';
+        $url .= isset($variables['language']) ? "&language={$variables['language']}" :'';
+        $url .= isset($variables['fields']) ? "&fields={$variables['fields']}" :'';
         foreach ($variables['filters'] as $name => $value) {
             $filter = 'filter_' . $name;
             $variables[$filter] = $value;
-            $url .= isset($value) ? sprintf('&filter:%s={%s}', $name, $filter) : '';
+            $url .= isset($value) ? sprintf('&filter:%s=%s', $name, $value) : '';
         }
-        unset($variables['filters']);
 
         // Now make the request.
-        $response = $this->get(array($url, $variables));
-        return $response->json();
+        $request = new Request('GET', $url);
+        return $this->getResponseJson($request);
     }
 
     /**
@@ -293,9 +298,10 @@ class ContentHub extends Client
     public function searchEntity($query)
     {
         $url = '/_search';
-        $request = $this->createRequest('GET', $url, ['json' => (array) $query]);
-        $response = $this->send($request);
-        return $response->json();
+        $json = (array) $query;
+        $body = json_encode($json);
+        $request = new Request('GET', $url, [], $body);
+        return $this->getResponseJson($request);
     }
 
     /**
@@ -309,9 +315,8 @@ class ContentHub extends Client
      */
     public function getClientByName($name)
     {
-        $response = $this->get('/settings/clients/' . $name);
-        $data = $response->json();
-        return $data;
+        $request = new Request('GET', '/settings/clients/' . $name);
+        return $this->getResponseJson($request);
     }
 
     /**
@@ -321,8 +326,8 @@ class ContentHub extends Client
      */
     public function getSettings()
     {
-        $response = $this->get('settings');
-        $data = $response->json();
+        $request = new Request('GET', '/settings');
+        $data = $this->getResponseJson($request);
         return new Settings($data);
     }
 
@@ -338,9 +343,9 @@ class ContentHub extends Client
         $json = [
             'url' => $webhook_url
         ];
-        $request = $this->createRequest('POST', '/settings/webhooks', ['json' => $json]);
-        $response = $this->send($request);
-        return $response->json();
+        $body = json_encode($json);
+        $request = new Request('POST', '/settings/webhooks', [], $body);
+        return $this->getResponseJson($request);
     }
 
     /**
@@ -349,7 +354,7 @@ class ContentHub extends Client
      * @param $uuid
      *   The UUID of the webhook to delete
      *
-     * @return \GuzzleHttp\Message\Response
+     * @return \Psr\Http\Message\ResponseInterface
      *
      * @throws \GuzzleHttp\Exception\RequestException
      */
@@ -370,5 +375,12 @@ class ContentHub extends Client
         $request = $this->createRequest('POST', '/settings/secret', ['json' => []]);
         $response = $this->send($request);
         return $response->json();
+    }
+
+    protected function getResponseJson(RequestInterface $request)
+    {
+        $response = $this->send($request);
+        $body = (string) $response->getBody();
+        return json_decode($body, TRUE);
     }
 }

@@ -53,14 +53,14 @@ $api = 'AAAAAAAAAAAAAAAAAAAA';
 $secret = 'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB';
 $origin = '';
 
-$client = new ContentHub($api, $secret, $origin, ['base_url' => 'http://localhost:5000']);
+$client = new ContentHub($api, $secret, $origin, ['base_uri' => 'http://localhost:5000']);
 
 // Register a client
 $client_site = $client->register('myclientsite');
 
 // The registration returns an origin that will be used in following requests.
 $origin = $client_site['uuid'];
-$client = new ContentHub($api, $secret, $origin, ['base_url' => 'http://localhost:5000']);
+$client = new ContentHub($api, $secret, $origin, ['base_uri' => 'http://localhost:5000']);
 
 // Create a Plexus Entity Object
 $entity = new Entity();
