@@ -3,7 +3,6 @@
 namespace Acquia\ContentHubClient\test;
 
 use Acquia\ContentHubClient\ContentHub;
-use Guzzle\Stream\Stream;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;

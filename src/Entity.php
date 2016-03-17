@@ -114,6 +114,28 @@ class Entity extends \ArrayObject
     }
 
     /**
+     * @param Metadata[] $metadata
+     *
+     * @return \Acquia\ContentHubClient\Entity
+     */
+    public function setMetaData($metadata)
+    {
+        $this['metadata'] = $metadata;
+
+        return $this;
+    }
+
+    /**
+     * Gets the metadata associated with the Entity
+     *
+     * @return Metadata[]
+     */
+    public function getMetadata()
+    {
+        return $this->getValue('metadata', []);
+    }
+
+    /**
      * @param Asset[] $assets
      *
      * @return \Acquia\ContentHubClient\Entity
