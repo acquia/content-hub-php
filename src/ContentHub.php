@@ -390,7 +390,7 @@ class ContentHub extends Client
     {
         $json = [];
         $body = json_encode($json);
-        $request = new Request('POST', '/reindex/', [], $body);
+        $request = new Request('POST', '/reindex', [], $body);
         $response = $this->send($request);
         return $response;
     }
