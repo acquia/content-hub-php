@@ -376,6 +376,24 @@ class ContentHub extends Client
         $response = $this->send($request);
         return $response->json();
     }
+    
+    /**
+     * Reindex
+     *
+     * Schedules a reindex process.
+     *
+     * @return \Psr\Http\Message\ResponseInterface
+     *
+     * @throws \GuzzleHttp\Exception\RequestException
+     */
+    public function reindex()
+    {
+        $json = [];
+        $body = json_encode($json);
+        $request = new Request('POST', '/reindex/', [], $body);
+        $response = $this->send($request);
+        return $response;
+    }
 
     protected function getResponseJson(RequestInterface $request)
     {
