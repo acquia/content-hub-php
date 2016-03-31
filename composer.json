@@ -29,6 +29,9 @@
         "scrutinizer/ocular": "~1.0",
         "sebastian/phpcpd": "~2.0"
     },
+    "suggest": {
+        "ramsey/uuid": "A PHP 5.4+ library for generating RFC 4122 version 1, 3, 4, and 5 universally unique identifiers (UUID)"
+    },
     "autoload": {
     	"psr-4": {
             "Acquia\\ContentHubClient\\": "src/"
