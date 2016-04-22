@@ -9,6 +9,10 @@ use Acquia\Hmac\Guzzle5\HmacAuthPlugin;
 
 class ContentHub extends Client
 {
+    // Override VERSION inherited from GuzzleHttp::ClientInterface
+    const VERSION = '0.6.4';
+    const LIBRARYNAME = 'AcquiaContentHubPHPLib';
+
     /**
      * Overrides \GuzzleHttp\Client::__construct()
      *
@@ -27,10 +31,16 @@ class ContentHub extends Client
             $config['defaults']['headers'] = [];
         }
 
+        $user_agent_string = $this::LIBRARYNAME . '/' . $this::VERSION . ' ' . static::getDefaultUserAgent();
+        if (isset($config['client-user-agent'])) {
+            $user_agent_string = $config['client-user-agent'] . ' ' . $user_agent_string;
+        }
+
         // Setting up the headers.
         $config['defaults']['headers'] += [
             'Content-Type' => 'application/json',
             'X-Acquia-Plexus-Client-Id' => $origin,
+            'User-Agent' => $user_agent_string,
         ];
 
         parent::__construct($config);
