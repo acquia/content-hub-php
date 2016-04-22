@@ -177,3 +177,4 @@ $client->updateEntity($resourceUrl, $uuid);
 $client->deleteEntity($uuid);
 
 ```
+
