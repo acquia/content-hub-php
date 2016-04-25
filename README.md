@@ -4,6 +4,11 @@
 
 A PHP Client library to consume the Acquia Content Hub API.
 
+## Version Information
+
+* `0.6.x` branch: Uses guzzle version `~5.0`. Drupal 7 [content hub module](https://docs.acquia.com/content-hub) depends upon builds against this branch.
+* `master` branch: Uses guzzle version `~6.0`. Drupal 8 content hub work, that is in progress at the moment, depends upon builds against this branch.
+
 ## Installation
 
 Install the latest version with [Composer](https://getcomposer.org/):
