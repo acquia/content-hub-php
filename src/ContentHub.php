@@ -10,7 +10,7 @@ use Acquia\Hmac\Guzzle5\HmacAuthPlugin;
 class ContentHub extends Client
 {
     // Override VERSION inherited from GuzzleHttp::ClientInterface
-    const VERSION = '0.6.4';
+    const VERSION = '0.6.5';
     const LIBRARYNAME = 'AcquiaContentHubPHPLib';
 
     /**
