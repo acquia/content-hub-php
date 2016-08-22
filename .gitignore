@@ -2,5 +2,5 @@ bootstrap.php
 build
 vendor
 composer.lock
-
+.idea
 nbproject

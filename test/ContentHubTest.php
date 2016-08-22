@@ -18,7 +18,7 @@ class ContentHubTest extends \PHPUnit_Framework_TestCase
     {
         $mock = new MockHandler($responses);
         $stack = HandlerStack::create($mock);
-        return new ContentHub('public', 'secret', 'origin', ['handler' => $stack]);
+        return new ContentHub('public', 'secret', 'origin', ['handler' => $stack, 'auth_middleware' => false]);
     }
 
     private function setData()
