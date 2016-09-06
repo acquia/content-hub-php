@@ -65,10 +65,8 @@ class Attribute extends \ArrayObject
         switch ($type) {
             case self::TYPE_INTEGER:
             case self::TYPE_STRING:
-            case self::TYPE_KEYWORD:
             case self::TYPE_BOOLEAN:
             case self::TYPE_NUMBER:
-            case self::TYPE_REFERENCE:
                 return $type;
 
             case self::TYPE_ARRAY_INTEGER:
@@ -77,17 +75,18 @@ class Attribute extends \ArrayObject
             case self::TYPE_ARRAY_STRING:
                 return self::TYPE_STRING;
 
-            case self::TYPE_ARRAY_KEYWORD:
-                return self::TYPE_KEYWORD;
-
             case self::TYPE_ARRAY_BOOLEAN:
                 return self::TYPE_BOOLEAN;
 
             case self::TYPE_ARRAY_NUMBER:
                 return self::TYPE_NUMBER;
 
+            case self::TYPE_ARRAY_KEYWORD:
             case self::TYPE_ARRAY_REFERENCE:
-                return self::TYPE_REFERENCE;
+            case self::TYPE_KEYWORD;
+            case self::TYPE_REFERENCE:
+                return self::TYPE_STRING;
+
         }
     }
 
