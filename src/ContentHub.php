@@ -12,6 +12,12 @@ use GuzzleHttp\Psr7\Request;
 
 class ContentHub extends Client
 {
+
+    /**
+     * @var string The account we are using
+     */
+    protected $accountId;
+
     /**
      * Overrides \GuzzleHttp\Client::__construct()
      *
@@ -19,8 +25,9 @@ class ContentHub extends Client
      * @param string $secretKey
      * @param string $origin
      * @param array  $config
+     * @param array  $account_id
      */
-    public function __construct($apiKey, $secretKey, $origin, array $config = [])
+    public function __construct($apiKey, $secretKey, $origin, array $config = [], $account_id = "")
     {
         // "base_url" parameter changed to "base_uri" in Guzzle6, so the following line
         // is there to make sure it does not disrupt previous configuration.
@@ -32,17 +39,59 @@ class ContentHub extends Client
         $config['headers']['Content-Type'] = 'application/json';
         $config['headers']['X-Acquia-Plexus-Client-Id'] = $origin;
 
-        // Add the authentication handler
-        // @see https://github.com/acquia/http-hmac-spec
-        $requestSigner = new RequestSigner(new Digest\Version1('sha256'));
-        $middleware = new HmacAuthMiddleware($requestSigner, $apiKey, $secretKey);
-
+        // Set our default HandlerStack if nothing is provided
         if (!isset($config['handler'])) {
             $config['handler'] = HandlerStack::create();
         }
+
+        // If our account ID is empty, do not add it to the request. Content
+        // hub will try to guess it based on the metadata of the key. This will
+        // default to the Acquia UUID + Environment that is set in the key.
+        if (!empty($account_id)) {
+            $this->accountId = $account_id;
+            // Add our Account and Site identifiers.
+            $config['handler']->push($this->addAccountId());
+        }
+
+        $middleware = false;
+        if (isset($config['auth_middleware']) && $config['auth_middleware'] !== false) {
+            $middleware = $config['auth_middleware'];
+        } else {
+            // Add the authentication handler
+            // @see https://github.com/acquia/http-hmac-spec
+            $requestSigner = new RequestSigner(new Digest\Version1('sha256'));
+            $middleware = new HmacAuthMiddleware($requestSigner, $apiKey, $secretKey);
+        }
+
+        // Set the appropriate middleware.
         $config['handler']->push($middleware);
 
         parent::__construct($config);
+    }
+
+    public function addAccountId()
+    {
+        // We cannot keep references in such functions.
+        $account_id = $this->accountId;
+        return function (callable $handler) use ($account_id) {
+            return function (
+              RequestInterface $request,
+              array $options
+            ) use ($handler, $account_id) {
+                $auth_query = "account_id={$account_id}";
+                $uri = $request->getUri();
+                $query = $uri->getQuery();
+                if (empty($query)) {
+                    $query = $auth_query;
+                } else {
+                    $query = $query.'&'.$auth_query;
+                }
+                $uri = $uri->withQuery($query);
+                $uri->withQuery($query);
+                $request = $request->withUri($uri);
+                return $handler($request, $options);
+            };
+        };
     }
 
     /**
