@@ -27,9 +27,9 @@ class Attribute extends \ArrayObject
     const TYPE_ARRAY_REFERENCE = 'array<reference>';
 
     /**
-     * @var \Acquia\ContentHubClient\TypeHandler[]
+     * @var \Acquia\ContentHubClient\TypeHandler
      */
-    protected $handlers = array();
+    protected $handler;
 
     /**
      * Attribute's Constructor.
@@ -39,24 +39,12 @@ class Attribute extends \ArrayObject
      */
     public function __construct($type)
     {
-        $this->setTypeHandler(new TypeHandler(self::TYPE_INTEGER, 'integer'))
-             ->setTypeHandler(new TypeHandler(self::TYPE_STRING, 'string'))
-             ->setTypeHandler(new TypeHandler(self::TYPE_KEYWORD, 'string'))
-             ->setTypeHandler(new TypeHandler(self::TYPE_BOOLEAN, 'boolean'))
-             ->setTypeHandler(new TypeHandler(self::TYPE_NUMBER, 'float'))
-             ->setTypeHandler(new TypeHandler(self::TYPE_REFERENCE, 'string'))
-             ->setTypeHandler(new TypeHandler(self::TYPE_ARRAY_INTEGER, 'integer'))
-             ->setTypeHandler(new TypeHandler(self::TYPE_ARRAY_STRING, 'string'))
-             ->setTypeHandler(new TypeHandler(self::TYPE_ARRAY_KEYWORD, 'string'))
-             ->setTypeHandler(new TypeHandler(self::TYPE_ARRAY_BOOLEAN, 'boolean'))
-             ->setTypeHandler(new TypeHandler(self::TYPE_ARRAY_NUMBER, 'float'))
-             ->setTypeHandler(new TypeHandler(self::TYPE_ARRAY_REFERENCE, 'string'))
-        ;
-
         // Validate that this attribute type can be handled.
         if (!in_array($type, $this->getTypeHandlers())) {
             throw new \Exception('Type handler not registered for this type: ' . $type);
         }
+
+        $this->setTypeHandler(new TypeHandler($type, $this->getCastType($type)));
         $array = [
             'type'  => $type,
             'value' => [],
@@ -65,6 +53,45 @@ class Attribute extends \ArrayObject
     }
 
     /**
+     * Obtains the type to cast the instance of that type.
+     *
+     * @param string $type
+     *   The Attribute type.
+     *
+     * @return string
+     *   The type to cast that attribute type.
+     */
+    protected function getCastType($type) {
+        switch ($type) {
+            case self::TYPE_INTEGER:
+            case self::TYPE_STRING:
+            case self::TYPE_BOOLEAN:
+            case self::TYPE_NUMBER:
+                return $type;
+
+            case self::TYPE_ARRAY_INTEGER:
+                return self::TYPE_INTEGER;
+
+            case self::TYPE_ARRAY_STRING:
+                return self::TYPE_STRING;
+
+            case self::TYPE_ARRAY_BOOLEAN:
+                return self::TYPE_BOOLEAN;
+
+            case self::TYPE_ARRAY_NUMBER:
+                return self::TYPE_NUMBER;
+
+            case self::TYPE_ARRAY_KEYWORD:
+            case self::TYPE_ARRAY_REFERENCE:
+            case self::TYPE_KEYWORD;
+            case self::TYPE_REFERENCE:
+                return self::TYPE_STRING;
+
+        }
+    }
+
+    /**
+     * Returns the type.
      *
      * @return string
      */
@@ -170,8 +197,7 @@ class Attribute extends \ArrayObject
      */
     public function setTypeHandler(TypeHandler $typeHandler)
     {
-        $handlerName = $typeHandler->getType();
-        $this->handlers[$handlerName] = $typeHandler;
+        $this->handler = $typeHandler;
         return $this;
     }
 
@@ -182,17 +208,29 @@ class Attribute extends \ArrayObject
      */
     public function getTypeHandler()
     {
-        return $this->handlers[$this->getType()];
+        return $this->handler;
     }
 
     /**
-     * Returns the types for all TypeHandlers registered.
+     * Returns the types for all possible TypeHandlers.
      *
      * @return array
      */
     public function getTypeHandlers()
     {
-        return array_keys($this->handlers);
+        return [
+            self::TYPE_INTEGER,
+            self::TYPE_STRING,
+            self::TYPE_KEYWORD,
+            self::TYPE_BOOLEAN,
+            self::TYPE_NUMBER,
+            self::TYPE_REFERENCE,
+            self::TYPE_ARRAY_INTEGER,
+            self::TYPE_ARRAY_STRING,
+            self::TYPE_ARRAY_KEYWORD,
+            self::TYPE_ARRAY_BOOLEAN,
+            self::TYPE_ARRAY_NUMBER,
+            self::TYPE_ARRAY_REFERENCE,
+        ];
     }
-
 }
