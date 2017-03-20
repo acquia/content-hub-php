@@ -13,6 +13,9 @@ class ContentHub extends Client
     const VERSION = '0.6.5';
     const LIBRARYNAME = 'AcquiaContentHubPHPLib';
 
+    private $to_schema = 'drupal-7';
+    private $to_langcode = 'und';
+
     /**
      * Overrides \GuzzleHttp\Client::__construct()
      *
@@ -160,7 +163,61 @@ class ContentHub extends Client
     {
         $response = $this->get('entities/' . $uuid);
         $data = $response->json();
-        return new Entity($data['data']['data']);
+
+        $raw_entity_data = $data['data']['data'];
+
+        $schema = $this->detectSchema($raw_entity_data);
+
+        $entity_data = $this->transcode($raw_entity_data, $schema);
+
+        return new Entity($entity_data);
+    }
+
+    private function detectSchema($data)
+    {
+        // Detect Drupal 7.
+        if (isset($data['attributes']['language']['value'])) {
+          return 'drupal-7';
+        }
+
+        // Detect Drupal 8.
+        if (isset($data['attributes']['langcode']['value'])) {
+          return 'drupal-8';
+        }
+
+        // Shouldn't reach here.
+        throw new \Exception('Could not determine language.');
+    }
+
+    private function transcode($data, $schema)
+    {
+        if ($this->to_schema === $schema) {
+          return $data;
+        }
+
+        if ('drupal-8' === $schema) {
+          return $this->doTranscodeDrupal8($data);
+        }
+
+        // Shouldn't reach here.
+        throw new \Exception('Could not find the transcoder.');
+    }
+
+    private function doTranscodeDrupal8($data)
+    {
+        $from_lancode = 'en';
+
+        // language to langcode.
+        $data['attributes']['language'] = $data['attributes']['langcode'];
+        $data['attributes']['language']['value'][$from_lancode] = $this->to_langcode;
+        unset($data['attributes']['langcode']);
+
+        foreach ($data['attributes'] as $attribute_name => $attribute_value) {
+          $data['attributes'][$attribute_name]['value'][$this->to_langcode] = $data['attributes'][$attribute_name]['value'][$from_lancode];
+          unset($data['attributes'][$attribute_name]['value'][$from_lancode]);
+        }
+        
+        return $data;
     }
 
     /**
