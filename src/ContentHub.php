@@ -6,6 +6,7 @@ use Acquia\Hmac\Digest as Digest;
 use GuzzleHttp\Client;
 use Acquia\Hmac\RequestSigner;
 use Acquia\Hmac\Guzzle5\HmacAuthPlugin;
+use Acquia\ContentHubClient\Data\Adapter;
 
 class ContentHub extends Client
 {
@@ -16,6 +17,8 @@ class ContentHub extends Client
     private $to_schema = 'drupal-7';
     private $to_langcode = 'und';
 
+    private $adapter;
+
     /**
      * Overrides \GuzzleHttp\Client::__construct()
      *
@@ -23,8 +26,9 @@ class ContentHub extends Client
      * @param string $secretKey
      * @param string $origin
      * @param array  $config
+     * @param string $schemaId
      */
-    public function __construct($apiKey, $secretKey, $origin, array $config = [])
+    public function __construct($apiKey, $secretKey, $origin, array $config = [], $schemaId = 'None')
     {
         if (!isset($config['defaults'])) {
             $config['defaults'] = [];
@@ -47,6 +51,9 @@ class ContentHub extends Client
         ];
 
         parent::__construct($config);
+
+        // Set the Adapter.
+        $this->adapter = new Adapter($schemaId);
 
         // Add the authentication plugin
         // @see https://github.com/acquia/http-hmac-spec
@@ -163,13 +170,10 @@ class ContentHub extends Client
     {
         $response = $this->get('entities/' . $uuid);
         $data = $response->json();
-
-        $raw_entity_data = $data['data']['data'];
-
-        $schema = $this->detectSchema($raw_entity_data);
-
-        $entity_data = $this->transcode($raw_entity_data, $schema);
-
+        $config = [
+          'dataType' => 'Entity',
+        ];
+        $entity_data = $this->adapter->translate($data['data']['data'], $config);
         return new Entity($entity_data);
     }
 
