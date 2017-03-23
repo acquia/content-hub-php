@@ -7,39 +7,44 @@ use Acquia\ContentHubClient\Data\Exception\DataAdapterException;
 
 class Adapter
 {
-    private $schemaId;
+    private $config;
     private $mappers;
 
     /**
      * Constructor.
      *
-     * @param string $schemaId
+     * @param array $config
      *
-     * @throws \Exception
+     * @throws \Acquia\ContentHubClient\Data\Exception\UnsupportedMappingException
      */
-    public function __construct($schemaId = 'None')
+    public function __construct(array $config = [])
     {
-        if ($schemaId !== 'None' && !class_exists(__NAMESPACE__ . '\\Mapper\\' . $schemaId)) {
+        if (!isset($config['schemaId'])) {
+          $config['schemaId'] = 'None';
+        }
+
+        if ($config['schemaId'] !== 'None' && !class_exists(__NAMESPACE__ . '\\Mapper\\' . $config['schemaId'])) {
             throw new UnsupportedMapperException('The localized data schema is not yet supported: ' . $schemaId);
         }
 
-        $this->schemaId = $schemaId;
+        $this->config = $config;
     }
 
     public function translate($data, $config)
     {
-        if ($this->schemaId === 'None') {
+        $adapterSchema = $this->config['schemaId'];
+        if ($adapterSchema === 'None') {
             return $data;
         }
 
         $dataSchemaId = $this->getSchemaId($data, $config);
 
-        if ($this->schemaId === $dataSchemaId) {
+        if ($adapterSchema === $dataSchemaId) {
             return $data;
         }
 
         $standardized_data = $this->getMapper($dataSchemaId)->standardize($data, $config);
-        return $this->getMapper($this->schemaId)->localize($standardized_data, $config);
+        return $this->getMapper($adapterSchema)->localize($standardized_data, $config);
     }
 
     private function getSchemaId($data, $config)

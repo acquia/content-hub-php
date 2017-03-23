@@ -26,9 +26,8 @@ class ContentHub extends Client
      * @param string $secretKey
      * @param string $origin
      * @param array  $config
-     * @param string $schemaId
      */
-    public function __construct($apiKey, $secretKey, $origin, array $config = [], $schemaId = 'None')
+    public function __construct($apiKey, $secretKey, $origin, array $config = [])
     {
         if (!isset($config['defaults'])) {
             $config['defaults'] = [];
@@ -50,10 +49,13 @@ class ContentHub extends Client
             'User-Agent' => $user_agent_string,
         ];
 
+        $adapterConfig = isset($config['adapterConfig']) ? $config['adapterConfig'] : [];
+        unset($config['adapterConfig']);
+
         parent::__construct($config);
 
         // Set the Adapter.
-        $this->adapter = new Adapter($schemaId);
+        $this->adapter = new Adapter($adapterConfig);
 
         // Add the authentication plugin
         // @see https://github.com/acquia/http-hmac-spec
