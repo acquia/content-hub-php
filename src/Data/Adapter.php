@@ -32,7 +32,7 @@ class Adapter
             return $data;
         }
 
-        $dataSchemaId = $this->getSchemaId($data);
+        $dataSchemaId = $this->getSchemaId($data, $config);
 
         if ($this->schemaId === $dataSchemaId) {
             return $data;
@@ -42,7 +42,7 @@ class Adapter
         return $this->getMapper($this->schemaId)->localize($standardized_data, $config);
     }
 
-    private function getSchemaId($data)
+    private function getSchemaId($data, $config)
     {
         // Detect already defined schema.
         if (!empty($data['metadata']['schema'])) {
@@ -57,6 +57,11 @@ class Adapter
         // Detect Drupal 8.
         if (isset($data['attributes']['langcode']['value'])) {
             return 'Drupal8';
+        }
+
+        // Detect Mixed.
+        if ($config['dataType'] === 'ListEntities') {
+            return 'Mixed';
         }
 
         // Shouldn't reach here.
