@@ -14,9 +14,6 @@ class ContentHub extends Client
     const VERSION = '0.6.5';
     const LIBRARYNAME = 'AcquiaContentHubPHPLib';
 
-    private $to_schema = 'drupal-7';
-    private $to_langcode = 'und';
-
     private $adapter;
 
     /**
@@ -177,74 +174,6 @@ class ContentHub extends Client
         ];
         $entity_data = $this->adapter->translate($data['data']['data'], $config);
         return new Entity($entity_data);
-    }
-
-    private function detectSchema($data)
-    {
-        // Detect Drupal 7.
-        if (isset($data['attributes']['language']['value'])) {
-          return 'drupal-7';
-        }
-
-        // Detect Drupal 8.
-        if (isset($data['attributes']['langcode']['value'])) {
-          return 'drupal-8';
-        }
-
-        // Shouldn't reach here.
-        throw new \Exception('Could not determine language.');
-    }
-
-    private function transcode($data, $schema)
-    {
-        if ($this->to_schema === $schema) {
-          return $data;
-        }
-
-        if ('drupal-8' === $schema) {
-          return $this->doTranscodeDrupal8($data);
-        }
-
-        // Shouldn't reach here.
-        throw new \Exception('Could not find the transcoder.');
-    }
-
-    private function doTranscodeDrupal8($data)
-    {
-        $from_lancode = 'en';
-
-        // language to langcode.
-        $data['attributes']['language'] = $data['attributes']['langcode'];
-        $data['attributes']['language']['value'][$from_lancode] = $this->to_langcode;
-        unset($data['attributes']['langcode']);
-
-        foreach ($data['attributes'] as $attribute_name => $attribute_value) {
-            $data['attributes'][$attribute_name]['value'][$this->to_langcode] = $data['attributes'][$attribute_name]['value'][$from_lancode];
-            unset($data['attributes'][$attribute_name]['value'][$from_lancode]);
-
-            if ($attribute_value['type'] == 'array<string>') {
-                foreach ($data['attributes'][$attribute_name]['value'][$this->to_langcode] as $key => $item) {
-                    $field_value = json_decode($item, TRUE);
-                    if (is_array($field_value) && isset($field_value['format'])) {
-
-                        switch ($field_value['format']) {
-                            case 'basic html':
-                                $field_value['format'] = 'filtered_html';
-                                break;
-
-                            case 'rich_text':
-                                $field_value['format'] = 'full_html';
-                                break;
-
-                        }
-
-                        $data['attributes'][$attribute_name]['value'][$this->to_langcode][$key] = json_encode($field_value, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT);
-                    }
-                }
-            }
-        }
-        
-        return $data;
     }
 
     /**
