@@ -14,9 +14,6 @@ class ContentHub extends Client
     const VERSION = '0.6.5';
     const LIBRARYNAME = 'AcquiaContentHubPHPLib';
 
-    private $to_schema = 'drupal-7';
-    private $to_langcode = 'und';
-
     private $adapter;
 
     /**
