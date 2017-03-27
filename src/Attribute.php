@@ -12,7 +12,6 @@ class Attribute extends \ArrayObject
     /**
      *  Attribute's data types.
      */
-
     const TYPE_INTEGER         = 'integer';
     const TYPE_STRING          = 'string';
     const TYPE_KEYWORD         = 'keyword';

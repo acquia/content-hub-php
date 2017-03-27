@@ -54,11 +54,13 @@ class Drupal7 extends Mappable
      * Localizes the listEntities method.
      *
      * @param $data
-     *
-     * @param $config
      */
-    protected function localizeListEntities($data, $config)
+    protected function localizeListEntities($data)
     {
+        if (empty($data['data'])) {
+            return $data;
+        }
+
         // Language Code.
         $from_lancode = 'en';
         foreach($data['data'] as $key => $item) {
@@ -69,6 +71,8 @@ class Drupal7 extends Mappable
             }
             $data['data'][$key] = $item;
         }
-       return $data;
+
+        return $data;
     }
+
 }

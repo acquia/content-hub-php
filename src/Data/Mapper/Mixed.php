@@ -6,10 +6,14 @@ use Acquia\ContentHubClient\Attribute;
 
 class Mixed extends Mappable
 {
-    protected function standardizeListEntities($data, $config)
+    protected function standardizeListEntities($data)
     {
         // Standarizing means having at least UND/EN values in the Entity.
         $language_standard = 'en';
+
+        if (empty($data['data'])) {
+            return $data;
+        }
 
         foreach($data['data'] as $key => $item) {
             foreach ($item['attributes'] as $attribute_name => $attribute_value) {
