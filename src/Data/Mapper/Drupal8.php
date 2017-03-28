@@ -17,10 +17,12 @@ class Drupal8 extends Mappable
 
         foreach ($data['attributes'] as $attribute_name => $attribute_value) {
             if (isset($attribute_value['value'][$language_standard]) && !isset($attribute_value['value'][Attribute::LANGUAGE_DEFAULT])) {
-                $data['attributes'][$attribute_name]['value'][Attribute::LANGUAGE_DEFAULT] = $attribute_value['value'][$language_standard];
+                $attribute_value = $attribute_name === 'langcode' ? Attribute::LANGUAGE_DEFAULT : $attribute_value['value'][$language_standard];
+                $data['attributes'][$attribute_name]['value'][Attribute::LANGUAGE_DEFAULT] = $attribute_value;
             }
             if (isset($attribute_value['value'][Attribute::LANGUAGE_DEFAULT]) && !isset($attribute_value['value'][$language_standard])) {
-                $data['attributes'][$attribute_name]['value'][$language_standard] = $attribute_value['value'][Attribute::LANGUAGE_DEFAULT];
+                $attribute_value = $attribute_name === 'language' ? $language_standard : $attribute_value['value'][Attribute::LANGUAGE_DEFAULT];
+                $data['attributes'][$attribute_name]['value'][$language_standard] = $attribute_value;
             }
         }
 
