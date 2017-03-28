@@ -5,12 +5,12 @@ namespace Acquia\ContentHubClient\Data\Mapper;
 class Drupal7 extends Mappable
 {
     private $defaultConfig = [
-      'filters_mapping' => [
-        'restricted_html' => 'filtered_html',
-        'basic_html' => 'filtered_html',
-        'full_html' => 'full_html',
-        'rich_text' => 'full_html',
-      ],
+        'filters_mapping' => [
+            'restricted_html' => 'filtered_html',
+            'basic_html' => 'filtered_html',
+            'full_html' => 'full_html',
+            'rich_text' => 'full_html',
+        ],
     ];
 
     protected function localizeEntity($data, $config)
@@ -25,19 +25,19 @@ class Drupal7 extends Mappable
             unset($data['attributes']['langcode']);
         }
 
-        foreach ($data['attributes'] as $attribute_name => $attribute_value) {
+        foreach ($data['attributes'] as $attribute_name => $attributeValue) {
             // Convert the input formats.
-            if ($attribute_value['type'] === 'array<string>') {
+            if ($attributeValue['type'] === 'array<string>') {
                 $data['attributes'][$attribute_name]['type'] = 'string';
-                foreach ($attribute_value['value'] as $langcode => $item) {
-                    $field_value = json_decode($item[0], TRUE);
-                    if (!is_array($field_value) || !isset($field_value['format'])) {
+                foreach ($attributeValue['value'] as $langcode => $item) {
+                    $fieldValue = json_decode($item[0], TRUE);
+                    if (!is_array($fieldValue) || !isset($fieldValue['format'])) {
                         continue;
                     }
                     // If default mapping is not satisfactory, assign
                     // 'filtered_html' by default.
-                    $field_value['format'] = isset($config['filters_mapping'][$field_value['format']]) ? $config['filters_mapping'][$field_value['format']] : 'filtered_html';
-                    $data['attributes'][$attribute_name]['value'][$langcode] = json_encode($field_value, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT);
+                    $fieldValue['format'] = isset($config['filters_mapping'][$fieldValue['format']]) ? $config['filters_mapping'][$fieldValue['format']] : 'filtered_html';
+                    $data['attributes'][$attribute_name]['value'][$langcode] = json_encode($fieldValue, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT);
                 }
             }
         }
@@ -59,8 +59,8 @@ class Drupal7 extends Mappable
         // Language Code.
         $from_lancode = 'en';
         foreach($data['data'] as $key => $item) {
-            foreach ($item['attributes'] as $attribute_name => $attribute_value) {
-                if (isset($attribute_value[$from_lancode])) {
+            foreach ($item['attributes'] as $attribute_name => $attributeValue) {
+                if (isset($attributeValue[$from_lancode])) {
                     unset($item['attributes'][$attribute_name][$from_lancode]);
                 }
             }

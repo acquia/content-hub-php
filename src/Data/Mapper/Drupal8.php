@@ -9,20 +9,20 @@ class Drupal8 extends Mappable
     protected function standardizeEntity($data, $config)
     {
         // Standarizing means having at least UND/EN values in the Entity.
-        $language_standard = 'en';
+        $languageStandard = 'en';
 
         if (empty($data['attributes'])) {
             return $data;
         }
 
-        foreach ($data['attributes'] as $attribute_name => $attribute_value) {
-            if (isset($attribute_value['value'][$language_standard]) && !isset($attribute_value['value'][Attribute::LANGUAGE_DEFAULT])) {
-                $attribute_value = $attribute_name === 'langcode' ? Attribute::LANGUAGE_DEFAULT : $attribute_value['value'][$language_standard];
-                $data['attributes'][$attribute_name]['value'][Attribute::LANGUAGE_DEFAULT] = $attribute_value;
+        foreach ($data['attributes'] as $attributeName => $attributeValue) {
+            if (isset($attributeValue['value'][$languageStandard]) && !isset($attributeValue['value'][Attribute::LANGUAGE_DEFAULT])) {
+                $attributeValue = $attributeName === 'langcode' ? Attribute::LANGUAGE_DEFAULT : $attributeValue['value'][$languageStandard];
+                $data['attributes'][$attributeName]['value'][Attribute::LANGUAGE_DEFAULT] = $attributeValue;
             }
-            if (isset($attribute_value['value'][Attribute::LANGUAGE_DEFAULT]) && !isset($attribute_value['value'][$language_standard])) {
-                $attribute_value = $attribute_name === 'language' ? $language_standard : $attribute_value['value'][Attribute::LANGUAGE_DEFAULT];
-                $data['attributes'][$attribute_name]['value'][$language_standard] = $attribute_value;
+            if (isset($attributeValue['value'][Attribute::LANGUAGE_DEFAULT]) && !isset($attributeValue['value'][$languageStandard])) {
+                $attributeValue = $attributeName === 'language' ? $languageStandard : $attributeValue['value'][Attribute::LANGUAGE_DEFAULT];
+                $data['attributes'][$attributeName]['value'][$languageStandard] = $attributeValue;
             }
         }
 

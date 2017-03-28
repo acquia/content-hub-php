@@ -16,12 +16,12 @@ class Mixed extends Mappable
         }
 
         foreach($data['data'] as $key => $item) {
-            foreach ($item['attributes'] as $attribute_name => $attribute_value) {
-                if (isset($attribute_value[$language_standard]) && !$attribute_value[Attribute::LANGUAGE_DEFAULT]) {
-                    $data['data'][$key]['attributes'][$attribute_name][Attribute::LANGUAGE_DEFAULT] = $attribute_value[$language_standard];
+            foreach ($item['attributes'] as $attributeName => $attributeValue) {
+                if (isset($attributeValue[$language_standard]) && !$attributeValue[Attribute::LANGUAGE_DEFAULT]) {
+                    $data['data'][$key]['attributes'][$attributeName][Attribute::LANGUAGE_DEFAULT] = $attributeValue[$language_standard];
                 }
-                if ($attribute_value[Attribute::LANGUAGE_DEFAULT] && !isset($attribute_value[$language_standard])) {
-                    $data['data'][$key]['attributes'][$attribute_name][$language_standard] = $attribute_value[Attribute::LANGUAGE_DEFAULT];
+                if ($attributeValue[Attribute::LANGUAGE_DEFAULT] && !isset($attributeValue[$language_standard])) {
+                    $data['data'][$key]['attributes'][$attributeName][$language_standard] = $attributeValue[Attribute::LANGUAGE_DEFAULT];
                 }
             }
         }
