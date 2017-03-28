@@ -25,10 +25,10 @@ class Drupal7 extends Mappable
             unset($data['attributes']['langcode']);
         }
 
-        foreach ($data['attributes'] as $attribute_name => $attributeValue) {
+        foreach ($data['attributes'] as $attributeName => $attributeValue) {
             // Convert the input formats.
             if ($attributeValue['type'] === 'array<string>') {
-                $data['attributes'][$attribute_name]['type'] = 'string';
+                $data['attributes'][$attributeName]['type'] = 'string';
                 foreach ($attributeValue['value'] as $langcode => $item) {
                     $fieldValue = json_decode($item[0], TRUE);
                     if (!is_array($fieldValue) || !isset($fieldValue['format'])) {
@@ -37,7 +37,7 @@ class Drupal7 extends Mappable
                     // If default mapping is not satisfactory, assign
                     // 'filtered_html' by default.
                     $fieldValue['format'] = isset($config['filters_mapping'][$fieldValue['format']]) ? $config['filters_mapping'][$fieldValue['format']] : 'filtered_html';
-                    $data['attributes'][$attribute_name]['value'][$langcode] = json_encode($fieldValue, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT);
+                    $data['attributes'][$attributeName]['value'][$langcode] = json_encode($fieldValue, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT);
                 }
             }
         }
@@ -57,11 +57,11 @@ class Drupal7 extends Mappable
         }
 
         // Language Code.
-        $from_lancode = 'en';
+        $fromLancode = 'en';
         foreach($data['data'] as $key => $item) {
-            foreach ($item['attributes'] as $attribute_name => $attributeValue) {
-                if (isset($attributeValue[$from_lancode])) {
-                    unset($item['attributes'][$attribute_name][$from_lancode]);
+            foreach ($item['attributes'] as $attributeName => $attributeValue) {
+                if (isset($attributeValue[$fromLancode])) {
+                    unset($item['attributes'][$attributeName][$fromLancode]);
                 }
             }
             $data['data'][$key] = $item;
