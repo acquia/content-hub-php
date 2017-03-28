@@ -29,6 +29,4 @@ class Mixed extends Mappable
         return $data;
     }
 
-
-
 }
