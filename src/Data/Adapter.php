@@ -43,8 +43,8 @@ class Adapter
             return $data;
         }
 
-        $standardized_data = $this->getMapper($dataSchemaId)->standardize($data, $config);
-        return $this->getMapper($adapterSchema)->localize($standardized_data, $config);
+        $standardizedData = $this->getMapper($dataSchemaId)->standardize($data, $config);
+        return $this->getMapper($adapterSchema)->localize($standardizedData, $config);
     }
 
     private function getSchemaId($data, $config)
