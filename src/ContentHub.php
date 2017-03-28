@@ -173,8 +173,8 @@ class ContentHub extends Client
             'dataType' => 'Entity',
             'filters_mapping' => [],
         ];
-        $entity_data = $this->adapter->translate($data['data']['data'], $config);
-        return new Entity($entity_data);
+        $translatedData = $this->adapter->translate($data['data']['data'], $config);
+        return new Entity($translatedData);
     }
 
     /**
@@ -307,8 +307,8 @@ class ContentHub extends Client
         $config = [
           'dataType' => 'ListEntities',
         ];
-        $list_data = $this->adapter->translate($items, $config);
-        return $list_data;
+        $translatedData = $this->adapter->translate($items, $config);
+        return $translatedData;
     }
 
     /**
