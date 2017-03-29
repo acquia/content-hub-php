@@ -98,6 +98,7 @@ class Drupal7 extends Mappable
                     }
                     $fieldValue = json_decode($item[0], TRUE);
                     if (!is_array($fieldValue) || !isset($fieldValue['format'])) {
+                        $data['attributes'][$attributeName]['value'][$langcode] = reset($item);
                         continue;
                     }
                     // If default mapping is not satisfactory, assign
