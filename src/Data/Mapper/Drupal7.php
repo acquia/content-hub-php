@@ -13,11 +13,13 @@ class Drupal7 extends Mappable
         ],
     ];
 
-    protected function localizeEntity($data, $config)
-    {
-        // This has to be given as an argument: filter mapping D8 => D7.
-        $config += $this->defaultConfig;
+    public function __construct(array $config = []) {
+        parent::__construct($config);
+        $this->config += $this->defaultConfig;
+    }
 
+    protected function localizeEntity($data)
+    {
         // language to langcode.
         // Only set language field if it is a node.
         if (isset($data['attributes']['langcode']) && $data['type'] == 'node') {
@@ -36,7 +38,7 @@ class Drupal7 extends Mappable
                     }
                     // If default mapping is not satisfactory, assign
                     // 'filtered_html' by default.
-                    $fieldValue['format'] = isset($config['filters_mapping'][$fieldValue['format']]) ? $config['filters_mapping'][$fieldValue['format']] : 'filtered_html';
+                    $fieldValue['format'] = isset($this->config['filters_mapping'][$fieldValue['format']]) ? $this->config['filters_mapping'][$fieldValue['format']] : 'filtered_html';
                     $data['attributes'][$attributeName]['value'][$langcode] = json_encode($fieldValue, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT);
                 }
             }
@@ -46,27 +48,14 @@ class Drupal7 extends Mappable
     }
 
     /**
-     * Localizes the listEntities method.
+     * Localizes the listEntities data.
      *
-     * @param $data
+     * @param mixed $data
+     *
+     * @return mixed
      */
     protected function localizeListEntities($data)
     {
-        if (empty($data['data'])) {
-            return $data;
-        }
-
-        // Language Code.
-        $fromLancode = 'en';
-        foreach($data['data'] as $key => $item) {
-            foreach ($item['attributes'] as $attributeName => $attributeValue) {
-                if (isset($attributeValue[$fromLancode])) {
-                    unset($item['attributes'][$attributeName][$fromLancode]);
-                }
-            }
-            $data['data'][$key] = $item;
-        }
-
         return $data;
     }
 

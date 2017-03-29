@@ -6,8 +6,18 @@ use Acquia\ContentHubClient\Data\Exception\UnsupportedMappingException;
 
 abstract class Mappable implements MapperInterface
 {
-    public function standardize($data, $config = [])
+    protected $config = [];
+
+    public function __construct(array $config = []) {
+        $this->config += $config;
+    }
+
+    public function standardize($data, array $config = [])
     {
+        if (empty($config['dataType'])) {
+            throw new UnsupportedMappingException('The standardization must know data\'s type');
+        }
+
         $dataType = $config['dataType'];
         $functionName = 'standardize' . $dataType;
 
@@ -18,8 +28,12 @@ abstract class Mappable implements MapperInterface
         return $this->$functionName($data, $config);
     }
 
-    public function localize($data, $config = [])
+    public function localize($data, array $config = [])
     {
+        if (empty($config['dataType'])) {
+            throw new UnsupportedMappingException('The localization must know data\'s type');
+        }
+
         $dataType = $config['dataType'];
         $functionName = 'localize' . $dataType;
 

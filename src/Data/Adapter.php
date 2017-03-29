@@ -24,7 +24,7 @@ class Adapter
         }
 
         if ($config['schemaId'] !== 'None' && !class_exists(__NAMESPACE__ . '\\Mapper\\' . $config['schemaId'])) {
-            throw new UnsupportedMapperException('The localized data schema is not yet supported: ' . $schemaId);
+            throw new UnsupportedMapperException('The localized data schema is not yet supported: ' . $config['schemaId']);
         }
 
         $this->config = $config;
@@ -80,7 +80,7 @@ class Adapter
         }
 
         if (!isset($this->mappers[$schemaId])) {
-            $this->mappers[$schemaId] = new $mapperClassName();
+            $this->mappers[$schemaId] = new $mapperClassName($this->config);
         }
 
         return $this->mappers[$schemaId];
