@@ -6,6 +6,8 @@ use Acquia\ContentHubClient\Attribute;
 
 class Drupal7 extends Mappable
 {
+    const VALID_UUID = '[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}';
+
     private $defaultConfig = [
         'filters_mapping' => [
             'restricted_html' => 'filtered_html',
@@ -89,6 +91,11 @@ class Drupal7 extends Mappable
             if ($attributeValue['type'] === 'array<string>') {
                 $data['attributes'][$attributeName]['type'] = 'string';
                 foreach ($attributeValue['value'] as $langcode => $item) {
+
+                    if ($this->isFileReference($data, reset($item))) {
+                        $data['attributes'][$attributeName]['value'][$langcode] = reset($item);
+                        continue;
+                    }
                     $fieldValue = json_decode($item[0], TRUE);
                     if (!is_array($fieldValue) || !isset($fieldValue['format'])) {
                         continue;
@@ -116,4 +123,39 @@ class Drupal7 extends Mappable
         return $data;
     }
 
+    /**
+     * Verifies that this is a valid UUID.
+     *
+     * @param string $uuid
+     *
+     * @return bool
+     *   TRUE if this is a valid UUID, FALSE otherwise.
+     */
+    private function isUuid($uuid) {
+        return (bool) preg_match('/^' . self::VALID_UUID . '$/', $uuid);
+    }
+
+    /**
+     * Checks if the reference given is a file.
+     *
+     * @param array $entity
+     *   Entity array.
+     * @param string $value
+     *   Value to check if it is a file.
+     *
+     * @return bool
+     *   TRUE if it is a file, FALSE otherwise.
+     */
+    private function isFileReference($entity, $value) {
+        preg_match('#\[(.*)\]#', $value, $match);
+        $uuid = isset($match[1]) ? $match[1] : '';
+        if (self::isUuid($uuid)) {
+            foreach ($entity['assets'] as $asset) {
+                if ($asset['replace-token'] === $value) {
+                   return TRUE;
+                }
+            }
+        }
+        return FALSE;
+    }
 }
