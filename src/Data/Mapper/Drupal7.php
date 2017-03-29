@@ -2,6 +2,8 @@
 
 namespace Acquia\ContentHubClient\Data\Mapper;
 
+use Acquia\ContentHubClient\Attribute;
+
 class Drupal7 extends Mappable
 {
     private $defaultConfig = [
@@ -25,6 +27,61 @@ class Drupal7 extends Mappable
         if (isset($data['attributes']['langcode']) && $data['type'] == 'node') {
             $data['attributes']['language'] = $data['attributes']['langcode'];
             unset($data['attributes']['langcode']);
+        }
+        elseif (isset($data['attributes']['langcode']) && $data['type'] == 'taxonomy_term') {
+            $data['attributes']['language'] = $data['attributes']['langcode'];
+            unset($data['attributes']['langcode']);
+
+            // Change vocabulary to type.
+            $data['attributes']['type'] = $data['attributes']['vocabulary'];
+
+            // Change name from array<string> to string.
+            $data['attributes']['name']['type'] = Attribute::TYPE_STRING;
+            foreach ($data['attributes']['name']['value'] as $language => $value) {
+                $data['attributes']['name']['value'][$language] = reset($value);
+            }
+
+            // Change weight from array<string> to string.
+            $data['attributes']['weight']['type'] = Attribute::TYPE_STRING;
+            foreach ($data['attributes']['weight']['value'] as $language => $value) {
+                $data['attributes']['weight']['value'][$language] = reset($value);
+            }
+        }
+        elseif (isset($data['attributes']['langcode']) && $data['type'] == 'file') {
+            // If it is a file coming from D8 then try to convert it to D7 format.
+            $data['attributes']['language'] = $data['attributes']['langcode'];
+            unset($data['attributes']['langcode']);
+
+            // Now convert the filemime field to type field.
+            $data['attributes']['type']['type'] = Attribute::TYPE_STRING;
+            foreach ($data['attributes']['filemime']['value'] as $language => $value) {
+                list($type, $format) = explode('/', reset($value));
+                $data['attributes']['type']['value'][$language] = $type;
+            }
+
+            // Change filemime to mime.
+            $data['attributes']['mime'] = $data['attributes']['filemime'];
+            unset($data['attributes']['filemime']);
+            $data['attributes']['mime']['type'] = Attribute::TYPE_STRING;
+            foreach ($data['attributes']['mime']['value'] as $language => $value) {
+                $data['attributes']['mime']['value'][$language] = reset($value);
+            }
+
+            // Change filename to name.
+            $data['attributes']['name'] = $data['attributes']['filename'];
+            unset($data['attributes']['filename']);
+            $data['attributes']['name']['type'] = Attribute::TYPE_STRING;
+            foreach ($data['attributes']['name']['value'] as $language => $value) {
+                $data['attributes']['name']['value'][$language] = reset($value);
+            }
+
+            // Change filesize to size.
+            $data['attributes']['size'] = $data['attributes']['filesize'];
+            unset($data['attributes']['filesize']);
+            $data['attributes']['size']['type'] = Attribute::TYPE_STRING;
+            foreach ($data['attributes']['size']['value'] as $language => $value) {
+                $data['attributes']['size']['value'][$language] = reset($value);
+            }
         }
 
         foreach ($data['attributes'] as $attributeName => $attributeValue) {
