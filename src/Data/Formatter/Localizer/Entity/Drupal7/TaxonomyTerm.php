@@ -11,8 +11,6 @@ class TaxonomyTerm extends Entity
         $this->massager->rename($data['attributes'], 'vocabulary', 'type');
         $this->massager->arrayStringToString($data['attributes'], 'name');
         $this->massager->arrayStringToString($data['attributes'], 'weight');
-
-        return $data;
     }
 
 }

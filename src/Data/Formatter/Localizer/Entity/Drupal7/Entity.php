@@ -16,8 +16,6 @@ class Entity
     public function localizeEntity(&$data)
     {
         $this->massager->rename($data['attributes'], 'langcode', 'language');
-
-        return $data;
     }
 
 }

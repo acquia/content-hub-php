@@ -27,8 +27,6 @@ class File extends Entity
 
         $this->massager->rename($data['attributes'], 'filesize', 'size');
         $this->massager->arrayStringToString($data['attributes'], 'size');
-
-        return $data;
     }
 
 }
