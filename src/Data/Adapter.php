@@ -23,8 +23,8 @@ class Adapter
           $config['schemaId'] = 'None';
         }
 
-        if ($config['schemaId'] !== 'None' && !class_exists(__NAMESPACE__ . '\\Mapper\\' . $config['schemaId'])) {
-            throw new UnsupportedMapperException('The localized data schema is not yet supported: ' . $config['schemaId']);
+        if ($config['schemaId'] !== 'None' && !class_exists(__NAMESPACE__ . '\\Formatter\\Localizer\\' . $config['schemaId'])) {
+            throw new UnsupportedFormatException('The localized data schema is not yet supported: ' . $config['schemaId']);
         }
 
         $this->config = $config;

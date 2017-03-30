@@ -2,20 +2,20 @@
 
 namespace Acquia\ContentHubClient\Data\Formatter\Localizer\Entity\Drupal7;
 
-use Acquia\ContentHubClient\Data\Formatter\Massager\Drupal7 as Massager;
+use Acquia\ContentHubClient\Data\Formatter\Transformer\Drupal7 as Transformer;
 
 class Entity
 {
-    protected $massager;
+    protected $transformer;
 
     public function __construct()
     {
-        $this->massager = new Massager();
+        $this->transformer = new Transformer();
     }
 
     public function localizeEntity(&$data)
     {
-        $this->massager->rename($data['attributes'], 'langcode', 'language');
+        $this->transformer->rename($data['attributes'], 'langcode', 'language');
     }
 
 }

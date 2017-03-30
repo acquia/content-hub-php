@@ -1,6 +1,6 @@
 <?php
 
-namespace Acquia\ContentHubClient\Data\Formatter\Massager;
+namespace Acquia\ContentHubClient\Data\Formatter\Transformer;
 
 class General
 {

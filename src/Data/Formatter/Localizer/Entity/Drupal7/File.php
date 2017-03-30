@@ -19,14 +19,14 @@ class File extends Entity
             }
         }
 
-        $this->massager->rename($data['attributes'], 'filemime', 'mime');
-        $this->massager->arrayStringToString($data['attributes'], 'mime');
+        $this->transformer->rename($data['attributes'], 'filemime', 'mime');
+        $this->transformer->arrayStringToString($data['attributes'], 'mime');
 
-        $this->massager->rename($data['attributes'], 'filename', 'name');
-        $this->massager->arrayStringToString($data['attributes'], 'name');
+        $this->transformer->rename($data['attributes'], 'filename', 'name');
+        $this->transformer->arrayStringToString($data['attributes'], 'name');
 
-        $this->massager->rename($data['attributes'], 'filesize', 'size');
-        $this->massager->arrayStringToString($data['attributes'], 'size');
+        $this->transformer->rename($data['attributes'], 'filesize', 'size');
+        $this->transformer->arrayStringToString($data['attributes'], 'size');
     }
 
 }

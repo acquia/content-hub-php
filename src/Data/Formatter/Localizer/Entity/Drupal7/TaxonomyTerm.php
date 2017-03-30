@@ -8,9 +8,9 @@ class TaxonomyTerm extends Entity
     {
         parent::localizeEntity($data);
 
-        $this->massager->rename($data['attributes'], 'vocabulary', 'type');
-        $this->massager->arrayStringToString($data['attributes'], 'name');
-        $this->massager->arrayStringToString($data['attributes'], 'weight');
+        $this->transformer->rename($data['attributes'], 'vocabulary', 'type');
+        $this->transformer->arrayStringToString($data['attributes'], 'name');
+        $this->transformer->arrayStringToString($data['attributes'], 'weight');
     }
 
 }
