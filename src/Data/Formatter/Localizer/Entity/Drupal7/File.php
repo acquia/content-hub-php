@@ -11,7 +11,7 @@ class File extends Entity
         parent::localizeEntity($data);
 
         // Change type from array<string> to string.
-        if (isset($data['attributes']['type'])) {
+        if (!isset($data['attributes']['type'])) {
             $data['attributes']['type']['type'] = Attribute::TYPE_STRING;
             foreach ($data['attributes']['filemime']['value'] as $language => $value) {
                 list($type, $format) = explode('/', reset($value));
