@@ -25,7 +25,7 @@ class Drupal7 extends Localizable
     protected function localizeEntity($data)
     {
         $typeLocalizerClassName = str_replace('_', '', ucwords($data['type'], '_'));
-        $entityTypeLocalizerClassName = __NAMESPACE__ . '\\Entity\\' . $typeLocalizerClassName;
+        $entityTypeLocalizerClassName = __NAMESPACE__ . '\\Entity\\Drupal7\\' . $typeLocalizerClassName;
         if (class_exists($entityTypeLocalizerClassName)) {
             $entityLocalizer = new $entityTypeLocalizerClassName();
             $data = $entityLocalizer->localizeEntity($data);
