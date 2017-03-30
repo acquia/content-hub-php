@@ -8,7 +8,7 @@ class Drupal8 extends Standardizable
 {
     protected function standardizeEntity($data)
     {
-        // Standarizing means having at least UND/EN values in the Entity.
+        // Standardizing means having at least UND/EN values in the Entity.
         $defaultLanguageId = $this->config['defaultLanguageId'];
 
         if (empty($data['attributes'])) {
