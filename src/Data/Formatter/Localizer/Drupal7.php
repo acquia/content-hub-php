@@ -4,8 +4,6 @@ namespace Acquia\ContentHubClient\Data\Formatter\Localizer;
 
 class Drupal7 extends AbstractLocalizer
 {
-    const VALID_UUID = '[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}';
-
     private $defaultConfig = [
         'filters_mapping' => [
             'restricted_html' => 'filtered_html',
@@ -32,26 +30,22 @@ class Drupal7 extends AbstractLocalizer
         foreach ($data['attributes'] as $attributeName => $attributeValue) {
             // Convert the input formats.
             if ($attributeValue['type'] === 'array<string>') {
-                $data['attributes'][$attributeName]['type'] = 'string';
-                foreach ($attributeValue['value'] as $langcode => $item) {
-
-                    if ($this->isFileReference($data, reset($item))) {
-                        $data['attributes'][$attributeName]['value'][$langcode] = reset($item);
-                        continue;
+                foreach ($attributeValue['value'] as $langcode => $items) {
+                    foreach ($items as $key => $item) {
+                        $fieldValue = json_decode($item, TRUE);
+                        if (!is_array($fieldValue) || !isset($fieldValue['format'])) {
+                            $items[$key] = $item;
+                            continue;
+                        }
+                        // If default mapping is not satisfactory, assign
+                        // 'filtered_html' by default.
+                        $fieldValue['format'] = isset($this->config['filters_mapping'][$fieldValue['format']]) ? $this->config['filters_mapping'][$fieldValue['format']] : 'filtered_html';
+                        $items[$key] = json_encode($fieldValue, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT);
                     }
-                    $fieldValue = json_decode($item[0], TRUE);
-                    if (!is_array($fieldValue) || !isset($fieldValue['format'])) {
-                        $data['attributes'][$attributeName]['value'][$langcode] = reset($item);
-                        continue;
-                    }
-                    // If default mapping is not satisfactory, assign
-                    // 'filtered_html' by default.
-                    $fieldValue['format'] = isset($this->config['filters_mapping'][$fieldValue['format']]) ? $this->config['filters_mapping'][$fieldValue['format']] : 'filtered_html';
-                    $data['attributes'][$attributeName]['value'][$langcode] = json_encode($fieldValue, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT);
+                    $data['attributes'][$attributeName]['value'][$langcode] = $items;
                 }
             }
         }
-
         return $data;
     }
 
@@ -65,41 +59,5 @@ class Drupal7 extends AbstractLocalizer
     protected function localizeListEntities($data)
     {
         return $data;
-    }
-
-    /**
-     * Verifies that this is a valid UUID.
-     *
-     * @param string $uuid
-     *
-     * @return bool
-     *   TRUE if this is a valid UUID, FALSE otherwise.
-     */
-    private function isUuid($uuid) {
-        return (bool) preg_match('/^' . self::VALID_UUID . '$/', $uuid);
-    }
-
-    /**
-     * Checks if the reference given is a file.
-     *
-     * @param array $entity
-     *   Entity array.
-     * @param string $value
-     *   Value to check if it is a file.
-     *
-     * @return bool
-     *   TRUE if it is a file, FALSE otherwise.
-     */
-    private function isFileReference($entity, $value) {
-        preg_match('#\[(.*)\]#', $value, $match);
-        $uuid = isset($match[1]) ? $match[1] : '';
-        if ($this->isUuid($uuid)) {
-            foreach ($entity['assets'] as $asset) {
-                if ($asset['replace-token'] === $value) {
-                   return TRUE;
-                }
-            }
-        }
-        return FALSE;
     }
 }
