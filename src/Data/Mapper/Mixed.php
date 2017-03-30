@@ -8,7 +8,7 @@ class Mixed extends Mappable
 {
     protected function standardizeListEntities($data)
     {
-        // Standarizing means having at least UND/EN values in the Entity.
+        // Standardizing means having at least UND/EN values in the Entity.
         $language_standard = $this->config['defaultLanguageId'];
 
         if (empty($data['data'])) {
