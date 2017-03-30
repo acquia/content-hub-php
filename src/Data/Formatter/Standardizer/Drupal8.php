@@ -4,7 +4,7 @@ namespace Acquia\ContentHubClient\Data\Formatter\Standardizer;
 
 use Acquia\ContentHubClient\Attribute;
 
-class Drupal8 extends Standardizable
+class Drupal8 extends AbstractStandardizer
 {
     protected function standardizeEntity($data)
     {

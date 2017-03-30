@@ -4,7 +4,7 @@ namespace Acquia\ContentHubClient\Data\Formatter\Standardizer;
 
 use Acquia\ContentHubClient\Data\Exception\UnsupportedFormatException;
 
-abstract class Standardizable implements StandardizerInterface
+abstract class AbstractStandardizer implements StandardizerInterface
 {
     protected $config = [];
 

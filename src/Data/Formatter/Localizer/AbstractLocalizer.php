@@ -4,7 +4,7 @@ namespace Acquia\ContentHubClient\Data\Formatter\Localizer;
 
 use Acquia\ContentHubClient\Data\Exception\UnsupportedFormatException;
 
-abstract class Localizable implements LocalizerInterface
+abstract class AbstractLocalizer implements LocalizerInterface
 {
     protected $config = [];
 

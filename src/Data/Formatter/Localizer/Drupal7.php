@@ -2,7 +2,7 @@
 
 namespace Acquia\ContentHubClient\Data\Formatter\Localizer;
 
-class Drupal7 extends Localizable
+class Drupal7 extends AbstractLocalizer
 {
     const VALID_UUID = '[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}';
 

@@ -4,7 +4,7 @@ namespace Acquia\ContentHubClient\Data\Formatter\Standardizer;
 
 use Acquia\ContentHubClient\Attribute;
 
-class Mixed extends Standardizable
+class Mixed extends AbstractStandardizer
 {
     protected function standardizeListEntities($data)
     {
