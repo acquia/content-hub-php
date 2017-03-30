@@ -29,6 +29,11 @@ class Drupal7 extends AbstractLocalizer
 
         foreach ($data['attributes'] as $attributeName => $attributeValue) {
             // Convert the input formats.
+            if ($attributeValue['type'] === 'boolean') {
+                foreach ($attributeValue['value'] as $langcode => $value) {
+                    $data['attributes']['value'][$langcode] = $value === FALSE ? null : $value;
+                }
+            }
             if ($attributeValue['type'] === 'array<string>') {
                 foreach ($attributeValue['value'] as $langcode => $items) {
                     foreach ($items as $key => $item) {
