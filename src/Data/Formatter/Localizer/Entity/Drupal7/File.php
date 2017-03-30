@@ -2,15 +2,13 @@
 
 namespace Acquia\ContentHubClient\Data\Formatter\Localizer\Entity\Drupal7;
 
-class File
+use Acquia\ContentHubClient\Attribute;
+
+class File extends Entity
 {
-    public function localizeEntity($data)
+    public function localizeEntity(&$data)
     {
-        // Change language to langcode.
-        if (isset($data['attributes']['langcode'])) {
-            $data['attributes']['language'] = $data['attributes']['langcode'];
-            unset($data['attributes']['langcode']);
-        }
+        parent::localizeEntity($data);
 
         // Change type from array<string> to string.
         if (isset($data['attributes']['type'])) {
@@ -21,47 +19,14 @@ class File
             }
         }
 
-        // Change filemime to mime.
-        if (isset($data['attributes']['filemime'])) {
-            $data['attributes']['mime'] = $data['attributes']['filemime'];
-            unset($data['attributes']['filemime']);
-        }
+        $this->massager->rename($data['attributes'], 'filemime', 'mime');
+        $this->massager->arrayStringToString($data['attributes'], 'mime');
 
-        // Change mime from array<string> to string.
-        if (isset($data['attributes']['mime'])) {
-            $data['attributes']['mime']['type'] = Attribute::TYPE_STRING;
-            foreach ($data['attributes']['mime']['value'] as $language => $value) {
-                $data['attributes']['mime']['value'][$language] = reset($value);
-            }
-        }
+        $this->massager->rename($data['attributes'], 'filename', 'name');
+        $this->massager->arrayStringToString($data['attributes'], 'name');
 
-        // Change filename to name.
-        if (isset($data['attributes']['name'])) {
-            $data['attributes']['name'] = $data['attributes']['filename'];
-            unset($data['attributes']['filename']);
-        }
-
-        // Change name from array<string> to string.
-        if (isset($data['attributes']['name'])) {
-            $data['attributes']['name']['type'] = Attribute::TYPE_STRING;
-            foreach ($data['attributes']['name']['value'] as $language => $value) {
-                $data['attributes']['name']['value'][$language] = reset($value);
-            }
-        }
-
-        // Change filesize to size.
-        if (isset($data['attributes']['size'])) {
-            $data['attributes']['size'] = $data['attributes']['filesize'];
-            unset($data['attributes']['filesize']);
-        }
-
-        // Change size from array<string> to string.
-        if (isset($data['attributes']['size'])) {
-            $data['attributes']['size']['type'] = Attribute::TYPE_STRING;
-            foreach ($data['attributes']['size']['value'] as $language => $value) {
-                $data['attributes']['size']['value'][$language] = reset($value);
-            }
-        }
+        $this->massager->rename($data['attributes'], 'filesize', 'size');
+        $this->massager->arrayStringToString($data['attributes'], 'size');
 
         return $data;
     }

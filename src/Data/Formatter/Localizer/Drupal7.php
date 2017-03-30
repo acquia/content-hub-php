@@ -2,8 +2,6 @@
 
 namespace Acquia\ContentHubClient\Data\Formatter\Localizer;
 
-use Acquia\ContentHubClient\Attribute;
-
 class Drupal7 extends Localizable
 {
     const VALID_UUID = '[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}';
@@ -28,7 +26,7 @@ class Drupal7 extends Localizable
         $entityTypeLocalizerClassName = __NAMESPACE__ . '\\Entity\\Drupal7\\' . $typeLocalizerClassName;
         if (class_exists($entityTypeLocalizerClassName)) {
             $entityLocalizer = new $entityTypeLocalizerClassName();
-            $data = $entityLocalizer->localizeEntity($data);
+            $entityLocalizer->localizeEntity($data);
         }
 
         foreach ($data['attributes'] as $attributeName => $attributeValue) {
