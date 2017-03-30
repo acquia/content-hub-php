@@ -28,20 +28,4 @@ abstract class Standardizable implements StandardizerInterface
         return $this->$functionName($data, $config);
     }
 
-    public function localize($data, array $config = [])
-    {
-        if (empty($config['dataType'])) {
-            throw new UnsupportedFormatException('The localization must know data\'s type.');
-        }
-
-        $dataType = $config['dataType'];
-        $functionName = 'localize' . $dataType;
-
-        if (!method_exists($this, $functionName)) {
-            throw new UnsupportedFormatException('The following data type\'s localization is not yet supported: ' . $dataType);
-        }
-
-        return $this->$functionName($data, $config);
-    }
-
 }
