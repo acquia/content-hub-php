@@ -2,20 +2,20 @@
 
 namespace Acquia\ContentHubClient\Data;
 
-use Acquia\ContentHubClient\Data\Exception\UnsupportedMappingException;
+use Acquia\ContentHubClient\Data\Exception\UnsupportedFormatException;
 use Acquia\ContentHubClient\Data\Exception\DataAdapterException;
 
 class Adapter
 {
     private $config;
-    private $mappers;
+    private $formatters;
 
     /**
      * Constructor.
      *
      * @param array $config
      *
-     * @throws \Acquia\ContentHubClient\Data\Exception\UnsupportedMappingException
+     * @throws \Acquia\ContentHubClient\Data\Exception\UnsupportedFormatException
      */
     public function __construct(array $config = [])
     {
@@ -32,19 +32,19 @@ class Adapter
 
     public function translate($data, $config)
     {
-        $adapterSchema = $this->config['schemaId'];
-        if ($adapterSchema === 'None') {
+        $adapterSchemaId = $this->config['schemaId'];
+        if ($adapterSchemaId === 'None') {
             return $data;
         }
 
         $dataSchemaId = $this->getSchemaId($data, $config);
 
-        if ($adapterSchema === $dataSchemaId) {
+        if ($adapterSchemaId === $dataSchemaId) {
             return $data;
         }
 
-        $standardizedData = $this->getMapper($dataSchemaId)->standardize($data, $config);
-        return $this->getMapper($adapterSchema)->localize($standardizedData, $config);
+        $standardizedData = $this->getStandardizer($dataSchemaId)->standardize($data, $config);
+        return $this->getLocalizer($adapterSchemaId)->localize($standardizedData, $config);
     }
 
     private function getSchemaId($data, $config)
@@ -73,17 +73,27 @@ class Adapter
         throw new DataAdapterException('The data adapter could not determine the data\'s schema ID.');
     }
 
-    private function getMapper($schemaId) {
-        $mapperClassName = __NAMESPACE__ . '\\Mapper\\' . $schemaId;
-        if (!class_exists($mapperClassName)) {
-            throw new UnsupportedMappingException('The data schema is not yet supported: ' . $schemaId);
+    private function getStandardizer($schemaId) {
+        $formaterClassName = 'Standardizer\\' . $schemaId;
+        return $this->getFormatter($formaterClassName);
+    }
+
+    private function getLocalizer($schemaId) {
+        $formaterClassName = 'Localizer\\' . $schemaId;
+        return $this->getFormatter($formaterClassName);
+    }
+
+    private function getFormatter($formaterClassName) {
+        $formatterFullClassName = __NAMESPACE__ . '\\Formatter\\' . $formaterClassName;
+        if (!class_exists($formatterFullClassName)) {
+            throw new UnsupportedFormatException('This data formatting action is not yet supported: ' . $formaterClassName);
         }
 
-        if (!isset($this->mappers[$schemaId])) {
-            $this->mappers[$schemaId] = new $mapperClassName($this->config);
+        if (!isset($this->formatters[$formaterClassName])) {
+            $this->formatters[$formaterClassName] = new $formatterFullClassName($this->config);
         }
 
-        return $this->mappers[$schemaId];
+        return $this->formatters[$formaterClassName];
     }
 
 }

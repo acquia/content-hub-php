@@ -2,4 +2,4 @@
 
 namespace Acquia\ContentHubClient\Data\Exception;
 
-class UnsupportedMappingException extends \Exception {}
+class UnsupportedFormatException extends \Exception {}

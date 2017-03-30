@@ -1,10 +1,10 @@
 <?php
 
-namespace Acquia\ContentHubClient\Data\Mapper;
+namespace Acquia\ContentHubClient\Data\Formatter\Standardizer;
 
 use Acquia\ContentHubClient\Data\Exception\UnsupportedFormatException;
 
-abstract class Mappable implements MapperInterface
+abstract class Standardizable implements StandardizerInterface
 {
     protected $config = [];
 
