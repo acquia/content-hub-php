@@ -18,11 +18,13 @@ class Drupal7
 
     public function arrayStringToString(&$data, $index)
     {
-        if (isset($data['attributes'][$index])) {
-            $data['attributes'][$index]['type'] = Attribute::TYPE_STRING;
-            foreach ($data['attributes'][$index]['value'] as $languageId => $value) {
-                $data['attributes'][$index]['value'][$languageId] = reset($value);
-            }
+        if (!isset($data[$index])) {
+            return;
+        }
+
+        $data[$index]['type'] = Attribute::TYPE_STRING;
+        foreach ($data[$index]['value'] as $languageId => $value) {
+            $data[$index]['value'][$languageId] = reset($value);
         }
     }
 }
