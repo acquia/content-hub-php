@@ -14,4 +14,13 @@ class General
         unset($data[$fromIndex]);
     }
 
+    public function duplicate(&$data, $fromIndex, $toIndex)
+    {
+        if (!isset($data[$fromIndex])) {
+            return;
+        }
+
+        $data[$toIndex] = $data[$fromIndex];
+    }
+
 }

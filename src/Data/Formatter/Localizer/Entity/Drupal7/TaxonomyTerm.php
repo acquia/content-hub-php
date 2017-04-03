@@ -8,7 +8,7 @@ class TaxonomyTerm extends Entity
     {
         parent::localizeEntity($data);
 
-        $this->transformer->rename($data['attributes'], 'vocabulary', 'type');
+        $this->transformer->duplicate($data['attributes'], 'vocabulary', 'type');
         $this->transformer->arrayStringToString($data['attributes'], 'name');
         $this->transformer->arrayStringToString($data['attributes'], 'weight');
     }
