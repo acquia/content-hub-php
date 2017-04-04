@@ -11,6 +11,7 @@ class TaxonomyTerm extends Entity
         $this->transformer->duplicate($data['attributes'], 'vocabulary', 'type');
         $this->transformer->arrayStringToString($data['attributes'], 'name');
         $this->transformer->arrayStringToString($data['attributes'], 'weight');
+        $this->transformer->arrayStringToString($data['attributes'], 'description');
     }
 
 }
