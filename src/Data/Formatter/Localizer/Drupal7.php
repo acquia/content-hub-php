@@ -38,7 +38,22 @@ class Drupal7 extends AbstractLocalizer
                 foreach ($attributeValue['value'] as $langcode => $items) {
                     foreach ($items as $key => $item) {
                         $fieldValue = json_decode($item, TRUE);
-                        if (!is_array($fieldValue) || !isset($fieldValue['format'])) {
+                        if (!is_array($fieldValue)) {
+                            $items[$key] = $item;
+                            continue;
+                        }
+
+                        // Localize Link fields - Hack.
+                        // @TODO: Fix this for Links Type.
+                        if (isset($fieldValue['uri'])) {
+                            $fieldValue['url'] = $fieldValue['uri'];
+                            unset($fieldValue['uri']);
+                            $items[$key] = json_encode($fieldValue, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT);
+                            continue;
+                        }
+
+                        // Localize string fields.
+                        if (!isset($fieldValue['format'])) {
                             $items[$key] = $item;
                             continue;
                         }
