@@ -12,6 +12,7 @@ class TaxonomyTerm extends Entity
         $this->transformer->arrayStringToString($data['attributes'], 'name');
         $this->transformer->arrayStringToString($data['attributes'], 'weight');
         $this->transformer->arrayStringToString($data['attributes'], 'description');
+        $this->transformer->addArrayReferenceIfNotExist($data['attributes'], 'parent');
     }
 
 }
