@@ -171,7 +171,6 @@ class ContentHub extends Client
         $data = $response->json();
         $config = [
             'dataType' => 'Entity',
-            'filters_mapping' => [],
         ];
         $translatedData = $this->adapter->translate($data['data']['data'], $config);
         return new Entity($translatedData);
