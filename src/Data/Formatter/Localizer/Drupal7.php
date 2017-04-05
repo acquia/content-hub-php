@@ -46,7 +46,9 @@ class Drupal7 extends AbstractLocalizer
                         // Localize Link fields - Hack.
                         // @TODO: Fix this for Links Type.
                         if (isset($fieldValue['uri'])) {
-                            $fieldValue['url'] = $fieldValue['uri'];
+                            // Checking if it is an internal URL. If it is,
+                            // then strip out the 'internal:/' prefix.
+                            $fieldValue['url'] = (substr($fieldValue['uri'], 0, 10) === 'internal:/') ? str_replace('internal:/', '', $fieldValue['uri']) : $fieldValue['uri'];
                             unset($fieldValue['uri']);
                             $items[$key] = json_encode($fieldValue, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT);
                             continue;
