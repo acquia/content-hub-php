@@ -194,4 +194,58 @@ class Attribute extends \ArrayObject
         return array_keys($this->handlers);
     }
 
+    /**
+     * Converts a TYPE_ARRAY_* attribute to a single TYPE (cardinality = 1).
+     *
+     * It only works if the attribute is of TYPE_ARRAY_* and if it only contains
+     * a single value to prevent data loss.
+     *
+     * @return $this
+     */
+    public function setCardinalitySingle()
+    {
+        // If this attribute has more than one single element then it obviously
+        // has cardinality greater than 1 or unlimited so just return it as is.
+        if (count($this->getValue()) > 1) {
+            return $this;
+        }
+
+        // Otherwise, change the type to a single value (cardinality = 1).
+        switch ($this->getType()) {
+            case self::TYPE_ARRAY_KEYWORD:
+                $this['type'] = self::TYPE_KEYWORD;
+                break;
+
+            case self::TYPE_ARRAY_STRING:
+                $this['type'] = self::TYPE_STRING;
+                break;
+
+            case self::TYPE_ARRAY_NUMBER:
+                $this['type'] = self::TYPE_NUMBER;
+                break;
+
+            case self::TYPE_ARRAY_INTEGER:
+                $this['type'] = self::TYPE_INTEGER;
+                break;
+
+            case self::TYPE_ARRAY_BOOLEAN:
+                $this['type'] = self::TYPE_BOOLEAN;
+                break;
+
+            case self::TYPE_ARRAY_REFERENCE:
+                $this['type'] = self::TYPE_REFERENCE;
+                break;
+
+            default:
+                // If this attribute is not a type array, then return as it is.
+                return $this;
+        }
+
+        $languages = array_keys($this->getValues());
+        foreach ($languages as $language) {
+            $value = $this->getValue($language);
+            $this->setValue(reset($value), $language);
+        }
+        return $this;
+    }
 }
