@@ -23,6 +23,20 @@ class ArrayString
                     continue;
                 }
 
+                // Addess fields - Hack.
+                if (isset($fieldValue['country_code'])) {
+                    $fieldValue['country'] = $fieldValue['country_code'];
+                    $fieldValue['thoroughfare'] = $fieldValue['address_line1'];
+                    $fieldValue['premise'] = $fieldValue['address_line2'];
+                    $fieldValue['organisation_name'] = $fieldValue['organization'];
+                    $fieldValue['first_name'] = $fieldValue['given_name'];
+                    $fieldValue['last_name'] = $fieldValue['family_name'];
+                    $to_unset = array('country_code', 'address_line1', 'address_line2', 'organization', 'given_name', 'family_name');
+                    $fieldValue = array_diff_key($fieldValue, array_flip($to_unset));
+                    $valueList[$key] = json_encode($fieldValue, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT);
+                    continue;
+                }
+
                 // Localize Link fields - Hack.
                 // @TODO: Fix this for Links Type.
                 if (isset($fieldValue['uri'])) {
