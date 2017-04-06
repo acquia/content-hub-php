@@ -2,7 +2,7 @@
 
 namespace Acquia\ContentHubClient\Data\Formatter\Localizer\Attribute\Drupal7;
 
-class Boolean
+class Boolean extends Attribute
 {
     public function localizeEntity(&$data)
     {

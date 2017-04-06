@@ -2,7 +2,7 @@
 
 namespace Acquia\ContentHubClient\Data\Formatter\Localizer\Entity\Drupal7;
 
-use Acquia\ContentHubClient\Data\Formatter\Transformer\Drupal7 as Transformer;
+use Acquia\ContentHubClient\Data\Formatter\Transformer\Entity\Drupal7 as Transformer;
 
 class Entity
 {

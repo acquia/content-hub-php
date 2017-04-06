@@ -2,7 +2,7 @@
 
 namespace Acquia\ContentHubClient\Data\Formatter\Localizer\Attribute\Drupal7;
 
-class ArrayString
+class ArrayString extends Attribute
 {
     private $config = [
         'filters_mapping' => [
@@ -23,16 +23,15 @@ class ArrayString
                     continue;
                 }
 
-                // Address fields - Hack.
+                // Localize Link fields - Address.
+                // @TODO: Fix this for Address Type.
                 if (isset($fieldValue['country_code'])) {
-                    $fieldValue['country'] = $fieldValue['country_code'];
-                    $fieldValue['thoroughfare'] = $fieldValue['address_line1'];
-                    $fieldValue['premise'] = $fieldValue['address_line2'];
-                    $fieldValue['organisation_name'] = $fieldValue['organization'];
-                    $fieldValue['first_name'] = $fieldValue['given_name'];
-                    $fieldValue['last_name'] = $fieldValue['family_name'];
-                    $to_unset = array('country_code', 'address_line1', 'address_line2', 'organization', 'given_name', 'family_name');
-                    $fieldValue = array_diff_key($fieldValue, array_flip($to_unset));
+                    $this->transformer->rename($fieldValue, 'country_code', 'country');
+                    $this->transformer->rename($fieldValue, 'address_line1', 'thoroughfare');
+                    $this->transformer->rename($fieldValue, 'address_line2', 'premise');
+                    $this->transformer->rename($fieldValue, 'organization', 'organisation_name');
+                    $this->transformer->rename($fieldValue, 'given_name', 'first_name');
+                    $this->transformer->rename($fieldValue, 'family_name', 'last_name');
                     $valueList[$key] = json_encode($fieldValue, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT);
                     continue;
                 }

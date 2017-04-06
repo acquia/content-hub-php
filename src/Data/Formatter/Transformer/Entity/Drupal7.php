@@ -1,8 +1,9 @@
 <?php
 
-namespace Acquia\ContentHubClient\Data\Formatter\Transformer;
+namespace Acquia\ContentHubClient\Data\Formatter\Transformer\Entity;
 
 use Acquia\ContentHubClient\Attribute;
+use Acquia\ContentHubClient\Data\Formatter\Transformer\General;
 
 class Drupal7 extends General
 {
