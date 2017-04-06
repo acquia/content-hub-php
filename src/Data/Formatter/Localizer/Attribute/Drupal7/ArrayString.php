@@ -23,7 +23,7 @@ class ArrayString
                     continue;
                 }
 
-                // Addess fields - Hack.
+                // Address fields - Hack.
                 if (isset($fieldValue['country_code'])) {
                     $fieldValue['country'] = $fieldValue['country_code'];
                     $fieldValue['thoroughfare'] = $fieldValue['address_line1'];
