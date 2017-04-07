@@ -210,37 +210,14 @@ class Attribute extends \ArrayObject
             return $this;
         }
 
-        // Otherwise, change the type to a single value (cardinality = 1).
-        switch ($this->getType()) {
-            case self::TYPE_ARRAY_KEYWORD:
-                $this['type'] = self::TYPE_KEYWORD;
-                break;
+        $attributeType = $this->getType();
+        $singularAttributeType = preg_replace('/^array\<|\>$/', '', $attributeType);
 
-            case self::TYPE_ARRAY_STRING:
-                $this['type'] = self::TYPE_STRING;
-                break;
-
-            case self::TYPE_ARRAY_NUMBER:
-                $this['type'] = self::TYPE_NUMBER;
-                break;
-
-            case self::TYPE_ARRAY_INTEGER:
-                $this['type'] = self::TYPE_INTEGER;
-                break;
-
-            case self::TYPE_ARRAY_BOOLEAN:
-                $this['type'] = self::TYPE_BOOLEAN;
-                break;
-
-            case self::TYPE_ARRAY_REFERENCE:
-                $this['type'] = self::TYPE_REFERENCE;
-                break;
-
-            default:
-                // If this attribute is not a type array, then return as it is.
-                return $this;
+        if ($attributeType === $singularAttributeType) {
+            return $this;
         }
 
+        $this['type'] = $singularAttributeType;
         $languages = array_keys($this->getValues());
         foreach ($languages as $language) {
             $value = $this->getValue($language);
