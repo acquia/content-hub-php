@@ -86,4 +86,64 @@ class AdapterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $translatedData);
     }
 
+    /**
+     * Tests translate() method, both adapter and data schema are "Drupal7".
+     *
+     * @covers ::translate
+     */
+    public function testTranslateDataBothSchemaDrupal7()
+    {
+        $adapterConfig = [
+            'schemaId' => 'Drupal7',
+        ];
+        $adapter = new Adapter($adapterConfig);
+        $data = [
+            'attributes' => [
+                'language' => [
+                    'value' => 'en',
+                ],
+            ],
+        ];
+        $translatedData = $adapter->translate($data, []);
+
+        $expected = [
+            'attributes' => [
+                'language' => [
+                    'value' => 'en',
+                ],
+            ],
+        ];
+        $this->assertEquals($expected, $translatedData);
+    }
+
+    /**
+     * Tests translate() method, both adapter and data schema are "Drupal8".
+     *
+     * @covers ::translate
+     */
+    public function testTranslateDataBothSchemaDrupal8()
+    {
+        $adapterConfig = [
+            'schemaId' => 'Drupal8',
+        ];
+        $adapter = new Adapter($adapterConfig);
+        $data = [
+            'attributes' => [
+                'langcode' => [
+                    'value' => 'en',
+                ],
+            ],
+        ];
+        $translatedData = $adapter->translate($data, []);
+
+        $expected = [
+            'attributes' => [
+                'langcode' => [
+                    'value' => 'en',
+                ],
+            ],
+        ];
+        $this->assertEquals($expected, $translatedData);
+    }
+
 }
