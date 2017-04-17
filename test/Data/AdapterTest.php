@@ -1,9 +1,15 @@
 <?php
 
-namespace Acquia\ContentHubClient\test;
+namespace Acquia\ContentHubClient\test\Data;
 
 use Acquia\ContentHubClient\Data\Adapter;
 
+/**
+ * Adapter test.
+ *
+ * @coversDefaultClass Acquia\ContentHubClient\Data\Adapter
+ * @group content-hub-php
+ */
 class AdapterTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -143,6 +149,31 @@ class AdapterTest extends \PHPUnit_Framework_TestCase
                 ],
             ],
         ];
+        $this->assertEquals($expected, $translatedData);
+    }
+
+    /**
+     * Tests translate() method, do call standardizer and localizer.
+     *
+     * @covers ::translate
+     */
+    public function testTranslateDataDoCallStandardizerAndLocalizer()
+    {
+        $adapterConfig = [
+            'schemaId' => 'Drupal7',
+            'defaultLanguageId' => 'de',
+        ];
+        $adapter = new Adapter($adapterConfig);
+        $data = [];
+        $data['data'][0]['attributes']['dataIndex1']['de'] = 'dataValue1';
+        $translateConfig = [
+            'dataType' => 'ListEntities',
+        ];
+        $translatedData = $adapter->translate($data, $translateConfig);
+
+        $expected = [];
+        $expected['data'][0]['attributes']['dataIndex1']['de'] = 'dataValue1';
+        $expected['data'][0]['attributes']['dataIndex1']['und'] = 'dataValue1';
         $this->assertEquals($expected, $translatedData);
     }
 

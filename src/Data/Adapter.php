@@ -5,6 +5,9 @@ namespace Acquia\ContentHubClient\Data;
 use Acquia\ContentHubClient\Data\Exception\UnsupportedFormatException;
 use Acquia\ContentHubClient\Data\Exception\DataAdapterException;
 
+/**
+ * Data adapter class.
+ */
 class Adapter
 {
     private $config;
