@@ -83,7 +83,7 @@ class Adapter
         }
 
         // Detect Mixed.
-        if ($config['dataType'] === 'ListEntities') {
+        if (isset($config['dataType']) && $config['dataType'] === 'ListEntities') {
             return 'Mixed';
         }
 

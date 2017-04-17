@@ -64,4 +64,26 @@ class AdapterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $translatedData);
     }
 
+    /**
+     * Tests translate() method, adapter schema is undeterminable.
+     *
+     * @covers ::translate
+     *
+     * @expectedException \Acquia\ContentHubClient\Data\Exception\DataAdapterException
+     * @expectedExceptionCode 0
+     * @expectedExceptionMessage The data adapter could not determine the data's schema ID.
+     */
+    public function testTranslateDataSchemaUndeterminable()
+    {
+        $adapterConfig = [
+            'schemaId' => 'Drupal7',
+        ];
+        $adapter = new Adapter($adapterConfig);
+        $data = ['Undeterminable schema id'];
+        $translatedData = $adapter->translate($data, []);
+
+        $expected = ['should not reach here'];
+        $this->assertEquals($expected, $translatedData);
+    }
+
 }
