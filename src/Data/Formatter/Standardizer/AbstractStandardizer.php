@@ -4,14 +4,30 @@ namespace Acquia\ContentHubClient\Data\Formatter\Standardizer;
 
 use Acquia\ContentHubClient\Data\Exception\UnsupportedFormatException;
 
+/**
+ * Abstract data standardizer class.
+ */
 abstract class AbstractStandardizer implements StandardizerInterface
 {
+    /**
+     * @var array Config
+     */
     protected $config = [];
 
+    /**
+     * AbstractStandardizer constructor.
+     *
+     * @param array $config Config
+     */
     public function __construct(array $config = []) {
         $this->config += $config;
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @throws \Acquia\ContentHubClient\Data\Exception\UnsupportedFormatException
+     */
     public function standardize($data, array $config = [])
     {
         if (empty($config['dataType'])) {
