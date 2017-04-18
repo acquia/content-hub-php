@@ -82,4 +82,26 @@ class Drupal7Test extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $data);
     }
 
+    /**
+     * Tests the addArrayReferenceIfNotExist() method.
+     *
+     * @covers ::addArrayReferenceIfNotExist
+     */
+    public function testAddArrayReferenceIfNotExist()
+    {
+        $transformer = new Transformer();
+        $data = [];
+        $transformer->addArrayReferenceIfNotExist($data, 'index1');
+
+        $expected = [
+            'index1' => [
+                'type' => 'array<reference>',
+                'value' => [
+                    'und' => [],
+                ],
+            ],
+        ];
+        $this->assertEquals($expected, $data);
+    }
+
 }
