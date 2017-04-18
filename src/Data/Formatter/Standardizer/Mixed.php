@@ -6,7 +6,7 @@ use Acquia\ContentHubClient\Attribute;
 
 class Mixed extends AbstractStandardizer
 {
-    protected function standardizeListEntities($data)
+    protected function standardizeListEntities(&$data)
     {
         // Standardizing means having at least UND/EN values in the Entity.
         $language_standard = $this->config['defaultLanguageId'];
@@ -30,8 +30,6 @@ class Mixed extends AbstractStandardizer
                 }
             }
         }
-
-        return $data;
     }
 
 }

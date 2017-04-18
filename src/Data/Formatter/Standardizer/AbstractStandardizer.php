@@ -25,7 +25,9 @@ abstract class AbstractStandardizer implements StandardizerInterface
             throw new UnsupportedFormatException('The following data type\'s standardization is not yet supported: ' . $dataType);
         }
 
-        return $this->$functionName($data, $config);
+        $this->$functionName($data, $config);
+
+        return $data;
     }
 
 }

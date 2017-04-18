@@ -6,7 +6,7 @@ use Acquia\ContentHubClient\Attribute;
 
 class Drupal8 extends AbstractStandardizer
 {
-    protected function standardizeEntity($data)
+    protected function standardizeEntity(&$data)
     {
         // Standardizing means having at least UND/EN values in the Entity.
         $defaultLanguageId = $this->config['defaultLanguageId'];
@@ -25,8 +25,6 @@ class Drupal8 extends AbstractStandardizer
                 $data['attributes'][$attributeName]['value'][$defaultLanguageId] = $attributeValue;
             }
         }
-
-        return $data;
     }
 
 }
