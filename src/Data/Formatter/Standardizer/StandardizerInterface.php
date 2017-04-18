@@ -8,6 +8,8 @@ namespace Acquia\ContentHubClient\Data\Formatter\Standardizer;
 interface StandardizerInterface
 {
     /**
+     * Standardize.
+     *
      * @param mixed $data Data
      * @param array $config Config
      *
