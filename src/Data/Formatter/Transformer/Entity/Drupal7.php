@@ -5,11 +5,20 @@ namespace Acquia\ContentHubClient\Data\Formatter\Transformer\Entity;
 use Acquia\ContentHubClient\Attribute;
 use Acquia\ContentHubClient\Data\Formatter\Transformer\General;
 
+/**
+ * Drupal 7 data transformer class.
+ */
 class Drupal7 extends General
 {
+    /**
+     * Transform - array string to string.
+     *
+     * @param mixed $data Data to transform
+     * @param mixed $index Transform data of index
+     */
     public function arrayStringToString(&$data, $index)
     {
-        if (!isset($data[$index])) {
+        if (!isset($data[$index]) || empty($data[$index]['type']) || empty($data[$index]['value'])) {
             return;
         }
 
@@ -19,6 +28,12 @@ class Drupal7 extends General
         }
     }
 
+    /**
+     * Transform - add array reference if it doesn't exist already.
+     *
+     * @param mixed $data Data to transform
+     * @param mixed $index Transform data of index
+     */
     public function addArrayReferenceIfNotExist(&$data, $index) {
         if (isset($data[$index])) {
             return;
