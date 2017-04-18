@@ -10,7 +10,9 @@ use Acquia\ContentHubClient\Data\Exception\UnsupportedFormatException;
 abstract class AbstractStandardizer implements StandardizerInterface
 {
     /**
-     * @var array Config
+     * Config.
+     *
+     * @var array
      */
     protected $config = [];
 

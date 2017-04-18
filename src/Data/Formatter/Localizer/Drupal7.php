@@ -2,8 +2,18 @@
 
 namespace Acquia\ContentHubClient\Data\Formatter\Localizer;
 
+/**
+ * Drupal 7 data localizer class.
+ */
 class Drupal7 extends AbstractLocalizer
 {
+    /**
+     * Localize "listEntities".
+     *
+     * @param mixed $data
+     *
+     * @return mixed
+     */
     protected function localizeEntity($data)
     {
         $this->localizeEntityByEntityType($data);
@@ -15,6 +25,11 @@ class Drupal7 extends AbstractLocalizer
         return $data;
     }
 
+    /**
+     * Localize "Entity" by entity type.
+     *
+     * @param mixed $data
+     */
     private function localizeEntityByEntityType(&$data) {
         $localizerClassName = $this->getLocalizerClassName($data['type'], 'Entity');
         if (!class_exists($localizerClassName)) {
@@ -25,6 +40,11 @@ class Drupal7 extends AbstractLocalizer
         $localizer->localizeEntity($data);
     }
 
+    /**
+     * Localize "Entity" by attribute type.
+     *
+     * @param mixed $data
+     */
     private function localizeEntityByAttributeType(&$data) {
         $localizerClassName = $this->getLocalizerClassName($data['type'], 'Attribute');
         if (!class_exists($localizerClassName)) {
@@ -36,7 +56,7 @@ class Drupal7 extends AbstractLocalizer
     }
 
     /**
-     * Localizes the listEntities data.
+     * Localize "listEntities".
      *
      * @param mixed $data
      *
@@ -55,6 +75,11 @@ class Drupal7 extends AbstractLocalizer
         return $data;
     }
 
+    /**
+     * Localize "listEntities" by entity type.
+     *
+     * @param mixed $data Data
+     */
     private function localizeListEntitiesByEntityType(&$data)
     {
         $localizerClassName = $this->getLocalizerClassName($data['type'], 'Entity');

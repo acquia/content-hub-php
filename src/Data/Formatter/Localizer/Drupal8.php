@@ -2,10 +2,13 @@
 
 namespace Acquia\ContentHubClient\Data\Formatter\Localizer;
 
+/**
+ * Drupal 8 data localizer class.
+ */
 class Drupal8 extends AbstractLocalizer
 {
     /**
-     * Localizes the listEntities data.
+     * Localize "listEntities".
      *
      * @param mixed $data
      *
