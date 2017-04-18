@@ -13,9 +13,9 @@ use Acquia\ContentHubClient\Data\Formatter\Standardizer\Drupal8 as Standardizer;
 class Drupal8Test extends \PHPUnit_Framework_TestCase
 {
     /**
-     * Tests the standardizeEntities() method, empty data.
+     * Tests the standardizeEntity() method, empty data.
      *
-     * @covers ::standardizeListEntities
+     * @covers ::standardizeEntity
      */
     public function testStandardizeListEntitiesEmptyData()
     {
@@ -34,9 +34,9 @@ class Drupal8Test extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Tests the standardizeListEntities() method.
+     * Tests the standardizeEntity() method.
      *
-     * @covers ::standardizeListEntities
+     * @covers ::standardizeEntity
      */
     public function testRenameIndexDoesNotExist()
     {
