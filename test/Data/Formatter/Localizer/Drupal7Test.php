@@ -2,15 +2,15 @@
 
 namespace Acquia\ContentHubClient\test\Data\Formatter\Localizer;
 
-use Acquia\ContentHubClient\Data\Formatter\Localizer\Drupal8 as Localizer;
+use Acquia\ContentHubClient\Data\Formatter\Localizer\Drupal7 as Localizer;
 
 /**
- * Drupal8 data localizer test.
+ * Drupal7 data localizer test.
  *
- * @coversDefaultClass Acquia\ContentHubClient\Data\Formatter\Localizer\Drupal8
+ * @coversDefaultClass Acquia\ContentHubClient\Data\Formatter\Localizer\Drupal7
  * @group content-hub-php
  */
-class Drupal8Test extends \PHPUnit_Framework_TestCase
+class Drupal7Test extends \PHPUnit_Framework_TestCase
 {
     /**
      * Tests the localizeListEntities() method.
