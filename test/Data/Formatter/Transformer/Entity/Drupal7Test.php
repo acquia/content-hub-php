@@ -7,7 +7,7 @@ use Acquia\ContentHubClient\Data\Formatter\Transformer\Entity\Drupal7 as Transfo
 /**
  * Drupal7 data transformer test.
  *
- * @coversDefaultClass Acquia\ContentHubClient\Data\Formatter\Transformer\Entity\Drupal
+ * @coversDefaultClass Acquia\ContentHubClient\Data\Formatter\Transformer\Entity\Drupal7
  * @group content-hub-php
  */
 class Drupal7Test extends \PHPUnit_Framework_TestCase

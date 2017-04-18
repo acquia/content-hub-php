@@ -4,15 +4,23 @@ namespace Acquia\ContentHubClient\Data\Formatter\Standardizer;
 
 use Acquia\ContentHubClient\Attribute;
 
+/**
+ * Mixed data standardizer class.
+ */
 class Mixed extends AbstractStandardizer
 {
+    /**
+     * Standardize "ListEntities".
+     *
+     * @param mixed $data Data
+     */
     protected function standardizeListEntities(&$data)
     {
         // Standardizing means having at least UND/EN values in the Entity.
         $language_standard = $this->config['defaultLanguageId'];
 
         if (empty($data['data'])) {
-            return $data;
+            return;
         }
 
         foreach($data['data'] as $key => $item) {

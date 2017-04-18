@@ -12,7 +12,7 @@ class Drupal8 extends AbstractStandardizer
         $defaultLanguageId = $this->config['defaultLanguageId'];
 
         if (empty($data['attributes'])) {
-            return $data;
+            return;
         }
 
         foreach ($data['attributes'] as $attributeName => $attributeValue) {
