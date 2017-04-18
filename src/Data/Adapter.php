@@ -10,7 +10,18 @@ use Acquia\ContentHubClient\Data\Exception\DataAdapterException;
  */
 class Adapter
 {
+    /**
+     * Config.
+     *
+     * @var array
+     */
     private $config;
+
+    /**
+     * Formatters.
+     *
+     * @var array
+     */
     private $formatters;
 
     /**
@@ -101,7 +112,8 @@ class Adapter
      *
      * @return \Acquia\ContentHubClient\Data\Formatter\Standardizer\StandardizerInterface
      */
-    private function getStandardizer($schemaId) {
+    private function getStandardizer($schemaId)
+    {
         $formaterClassName = 'Standardizer\\' . $schemaId;
         return $this->getFormatter($formaterClassName);
     }
@@ -113,7 +125,8 @@ class Adapter
      *
      * @return \Acquia\ContentHubClient\Data\Formatter\Localizer\LocalizerInterface
      */
-    private function getLocalizer($schemaId) {
+    private function getLocalizer($schemaId)
+    {
         $formaterClassName = 'Localizer\\' . $schemaId;
         return $this->getFormatter($formaterClassName);
     }
@@ -127,7 +140,8 @@ class Adapter
      *
      * @throws \Acquia\ContentHubClient\Data\Exception\UnsupportedFormatException
      */
-    private function getFormatter($formaterClassName) {
+    private function getFormatter($formaterClassName)
+    {
         $formatterFullClassName = __NAMESPACE__ . '\\Formatter\\' . $formaterClassName;
         if (!class_exists($formatterFullClassName)) {
             throw new UnsupportedFormatException('This data formatting action is not yet supported: ' . $formaterClassName);

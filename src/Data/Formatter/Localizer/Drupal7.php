@@ -43,7 +43,7 @@ class Drupal7 extends AbstractLocalizer
     /**
      * Localize "Entity" by attribute type.
      *
-     * @param mixed $data
+     * @param mixed $data Data
      */
     private function localizeEntityByAttributeType(&$data) {
         $localizerClassName = $this->getLocalizerClassName($data['type'], 'Attribute');

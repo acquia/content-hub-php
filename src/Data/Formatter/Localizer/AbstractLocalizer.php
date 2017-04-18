@@ -21,7 +21,8 @@ abstract class AbstractLocalizer implements LocalizerInterface
      *
      * @param array $config Config
      */
-    public function __construct(array $config = []) {
+    public function __construct(array $config = [])
+    {
         $this->config += $config;
     }
 
