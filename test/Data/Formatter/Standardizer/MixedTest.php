@@ -17,21 +17,19 @@ class GeneralTest extends \PHPUnit_Framework_TestCase
      *
      * @covers ::standardizeListEntities
      */
-    public function testRenameIndexDoesNotExistEmptyData()
+    public function testStandardizeListEntitiesEmptyData()
     {
         $config = [
             'defaultLanguageId' => 'de',
         ];
         $standardizer = new Standardizer($config);
-        $data = [
-        ];
+        $data = [];
         $standardizeConfig = [
             'dataType' => 'ListEntities',
         ];
         $standardizer->standardize($data, $standardizeConfig);
 
-        $expected = [
-        ];
+        $expected = [];
         $this->assertEquals($expected, $data);
     }
 
@@ -40,7 +38,7 @@ class GeneralTest extends \PHPUnit_Framework_TestCase
      *
      * @covers ::standardizeListEntities
      */
-    public function testRenameIndexDoesNotExist()
+    public function testStandardizeListEntities()
     {
         $config = [
             'defaultLanguageId' => 'de',

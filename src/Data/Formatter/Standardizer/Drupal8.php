@@ -4,8 +4,16 @@ namespace Acquia\ContentHubClient\Data\Formatter\Standardizer;
 
 use Acquia\ContentHubClient\Attribute;
 
+/**
+ * Drupal 8 data standardizer class.
+ */
 class Drupal8 extends AbstractStandardizer
 {
+    /**
+     * Standardize "Entity".
+     *
+     * @param mixed $data Data
+     */
     protected function standardizeEntity(&$data)
     {
         // Standardizing means having at least UND/EN values in the Entity.
