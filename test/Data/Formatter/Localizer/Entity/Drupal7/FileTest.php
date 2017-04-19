@@ -1,6 +1,6 @@
 <?php
 
-namespace Acquia\ContentHubClient\test\Data\Formatter\Localizer;
+namespace Acquia\ContentHubClient\test\Data\Formatter\Localizer\Entity\Drupal7;
 
 use Acquia\ContentHubClient\Data\Formatter\Localizer\Entity\Drupal7\File as Localizer;
 
