@@ -25,7 +25,9 @@ class ArrayStringTest extends \PHPUnit_Framework_TestCase
                 'und' => [
                     'single_value_field' => 'single_value_data',
                     'one_address_field' => '{"country_code":"country_code_data","address_line1":"address_line1_data","address_line2":"address_line2_data","organization":"organization_data","given_name":"given_name_data","family_name":"family_name_data"}',
-                    'link_field' => '{"uri":"internal:\/my_internal_uri"}',
+                    'internal_link_field' => '{"uri":"internal:\/my_internal_uri"}',
+                    'external_link_field1' => '{"uri":"my_internal_uri"}',
+                    'external_link_field2' => '{"uri":"my_interinternal:\/nal_uri"}',
                 ],
                 'de' => [
                     'single_value_field' => 'single_value_data',
@@ -44,7 +46,9 @@ class ArrayStringTest extends \PHPUnit_Framework_TestCase
                 'und' => [
                     'single_value_field' => 'single_value_data',
                     'one_address_field' => '{"country":"country_code_data","thoroughfare":"address_line1_data","premise":"address_line2_data","organisation_name":"organization_data","first_name":"given_name_data","last_name":"family_name_data"}',
-                    'link_field' => '{"url":"my_internal_uri"}',
+                    'internal_link_field' => '{"url":"my_internal_uri"}',
+                    'external_link_field1' => '{"url":"my_internal_uri"}',
+                    'external_link_field2' => '{"url":"my_interinternal:\/nal_uri"}',
                 ],
                 'de' => [
                     'single_value_field' => 'single_value_data',
