@@ -27,10 +27,10 @@ class Drupal8Test extends \PHPUnit_Framework_TestCase
         $standardizeConfig = [
             'dataType' => 'Entity',
         ];
-        $standardizer->standardize($data, $standardizeConfig);
+        $updatedData = $standardizer->standardize($data, $standardizeConfig);
 
         $expected = [];
-        $this->assertEquals($expected, $data);
+        $this->assertEquals($expected, $updatedData);
     }
 
     /**

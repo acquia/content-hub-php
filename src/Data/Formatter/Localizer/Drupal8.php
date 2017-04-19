@@ -11,12 +11,7 @@ class Drupal8 extends AbstractLocalizer
      * Localize "listEntities".
      *
      * @param mixed $data
-     *
-     * @return mixed
      */
-    protected function localizeListEntities($data)
-    {
-        return $data;
-    }
+    protected function localizeListEntities(&$data) {}
 
 }

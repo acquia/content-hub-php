@@ -41,12 +41,7 @@ abstract class AbstractLocalizer implements LocalizerInterface
     }
 
     /**
-     * Localize.
-     *
-     * @param mixed $data Data
-     * @param array $config Config
-     *
-     * @return mixed
+     * {@inheritdoc}
      *
      * @throws \Acquia\ContentHubClient\Data\Exception\UnsupportedFormatException
      */
@@ -63,7 +58,9 @@ abstract class AbstractLocalizer implements LocalizerInterface
             throw new UnsupportedFormatException('The following data type\'s localization is not yet supported: ' . $dataType);
         }
 
-        return $this->$functionName($data, $config);
+        $this->$functionName($data, $config);
+
+        return $data;
     }
 
 }

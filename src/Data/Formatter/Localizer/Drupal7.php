@@ -10,25 +10,21 @@ class Drupal7 extends AbstractLocalizer
     /**
      * Localize "listEntities".
      *
-     * @param mixed $data
-     *
-     * @return mixed
+     * @param mixed $data Data
      */
-    protected function localizeEntity($data)
+    protected function localizeEntity(&$data)
     {
         $this->localizeEntityByEntityType($data);
 
         foreach ($data['attributes'] as $attributeName => $attributeValue) {
             $this->localizeEntityByAttributeType($data['attributes'][$attributeName]);
         }
-
-        return $data;
     }
 
     /**
      * Localize "Entity" by entity type.
      *
-     * @param mixed $data
+     * @param mixed $data Data
      */
     private function localizeEntityByEntityType(&$data) {
         $localizerClassName = $this->getLocalizerClassName($data['type'], 'Entity');

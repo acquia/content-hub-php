@@ -20,14 +20,14 @@ class Drupal8Test extends \PHPUnit_Framework_TestCase
     public function testLocalizeListEntities()
     {
         $config = [];
-        $standardizer = new Localizer($config);
-        $data = ['same standardized data'];
-        $standardizeConfig = [
+        $localizer = new Localizer($config);
+        $data = ['same localized data'];
+        $localizeConfig = [
             'dataType' => 'ListEntities',
         ];
-        $standardizer->localize($data, $standardizeConfig);
+        $localizer->localize($data, $localizeConfig);
 
-        $expected = ['same standardized data'];
+        $expected = ['same localized data'];
         $this->assertEquals($expected, $data);
     }
 
