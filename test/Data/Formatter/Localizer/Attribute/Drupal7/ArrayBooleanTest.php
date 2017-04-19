@@ -5,7 +5,7 @@ namespace Acquia\ContentHubClient\test\Data\Formatter\Localizer\Attribute\Drupal
 use Acquia\ContentHubClient\Data\Formatter\Localizer\Attribute\Drupal7\ArrayBoolean as Localizer;
 
 /**
- * Boolean data localizer test.
+ * Array boolean data localizer test.
  *
  * @coversDefaultClass Acquia\ContentHubClient\Data\Formatter\Localizer\Attribute\Drupal7\ArrayBoolean
  * @group content-hub-php
