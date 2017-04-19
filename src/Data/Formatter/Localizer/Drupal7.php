@@ -42,6 +42,21 @@ class Drupal7 extends AbstractLocalizer
     }
 
     /**
+     * Localizes List Entities by Entity Type.
+     *
+     * @param mixed $data
+     *
+     * @return mixed
+     */
+    private function localizeListEntitiesByEntityType(&$data) {
+        if ($data['type'] == 'taxonomy_term') {
+            foreach ($data['attributes']['name'] as $language => $value) {
+                $data['attributes']['name'][$language] = is_array($value) ? reset($value) : $value;
+            }
+        }
+    }
+
+    /**
      * Localizes the listEntities data.
      *
      * @param mixed $data
@@ -50,6 +65,10 @@ class Drupal7 extends AbstractLocalizer
      */
     protected function localizeListEntities($data)
     {
+        foreach ($data['data'] as $key => $item) {
+            $this->localizeListEntitiesByEntityType($item);
+            $data['data'][$key] = $item;
+        }
         return $data;
     }
 }
