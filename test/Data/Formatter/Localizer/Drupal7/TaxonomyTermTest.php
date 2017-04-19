@@ -22,6 +22,7 @@ class TaxonomyTermTest extends \PHPUnit_Framework_TestCase
         $localizer = new Localizer();
         $data = [
             'attributes' => [
+                'langcode' => 'langcode data',
                 'vocabulary' => ['vocabulary data'],
                 'name' => [
                     'type' => 'old_type',
@@ -56,6 +57,7 @@ class TaxonomyTermTest extends \PHPUnit_Framework_TestCase
 
         $expected = [
             'attributes' => [
+                'language' => 'langcode data',
                 'vocabulary' => ['vocabulary data'],
                 'name' => [
                     'type' => 'string',
