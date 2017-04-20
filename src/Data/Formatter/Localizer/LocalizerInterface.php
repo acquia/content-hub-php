@@ -8,7 +8,7 @@ namespace Acquia\ContentHubClient\Data\Formatter\Localizer;
 interface LocalizerInterface
 {
     /**
-     * Localize.
+     * Localize - takes the data, and reformat into the local format.
      *
      * @param mixed $data Data
      * @param array $config Config

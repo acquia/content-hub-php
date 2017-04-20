@@ -55,6 +55,8 @@ abstract class AbstractLocalizer implements LocalizerInterface
         $functionName = 'localize' . $dataType;
 
         if (!method_exists($this, $functionName)) {
+            // If you are here, you should now create the function in the
+            // corresponding concrete classes to support the localization.
             throw new UnsupportedFormatException('The following data type\'s localization is not yet supported: ' . $dataType);
         }
 

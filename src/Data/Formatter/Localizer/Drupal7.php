@@ -33,6 +33,9 @@ class Drupal7 extends AbstractLocalizer
 
         $localizerClassName = $this->getLocalizerClassName($data['type'], 'Entity');
         if (!class_exists($localizerClassName)) {
+            // If you're here and still need additional localization, you should
+            // now create the entity-specific class. See $localizerClassName for
+            // its anticipated path.
             return;
         }
 
@@ -52,6 +55,9 @@ class Drupal7 extends AbstractLocalizer
 
         $localizerClassName = $this->getLocalizerClassName($data['type'], 'Attribute');
         if (!class_exists($localizerClassName)) {
+            // If you're here and still need additional localization, you should
+            // now create the attribute-specific class. See $localizerClassName
+            // for its anticipated path.
             return;
         }
 
@@ -88,6 +94,9 @@ class Drupal7 extends AbstractLocalizer
 
         $localizerClassName = $this->getLocalizerClassName($data['type'], 'Entity');
         if (!class_exists($localizerClassName)) {
+            // If you're here and still need additional localization, you should
+            // now create the entity-specific class. See $localizerClassName for
+            // its anticipated path.
             return;
         }
 

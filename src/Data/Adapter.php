@@ -47,6 +47,10 @@ class Adapter
     /**
      * Translate data into localized format.
      *
+     * This function 1) standardizes all data into one universal format
+     * (i.e. D8), then 2) localizes the data into the currently configured
+     * format in "schemaId".
+     *
      * @param array $data   Data to be translated
      * @param array $config Additional function config
      *
