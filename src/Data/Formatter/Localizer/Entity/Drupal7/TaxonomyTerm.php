@@ -15,4 +15,15 @@ class TaxonomyTerm extends Entity
         $this->transformer->addArrayReferenceIfNotExist($data['attributes'], 'parent');
     }
 
+    public function localizeListEntities(&$data)
+    {
+        if (!isset($data['attributes']['name'])) {
+            return;
+        }
+
+        foreach ($data['attributes']['name'] as $language => $value) {
+            $data['attributes']['name'][$language] = is_array($value) ? reset($value) : $value;
+        }
+    }
+
 }

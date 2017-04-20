@@ -12,6 +12,12 @@ abstract class AbstractLocalizer implements LocalizerInterface
         $this->config += $config;
     }
 
+    protected function getLocalizerClassName($type, $kind)
+    {
+        $className = str_replace(['_', '<', '>'], '', ucwords($type, '_<>'));
+        return __NAMESPACE__ . '\\' . $kind . '\\Drupal7\\' . $className;
+    }
+
     public function localize($data, array $config = [])
     {
         if (empty($config['dataType'])) {

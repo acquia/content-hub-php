@@ -16,8 +16,7 @@ class Drupal7 extends AbstractLocalizer
     }
 
     private function localizeEntityByEntityType(&$data) {
-        $className = $this->getLocalizerClassName($data['type']);
-        $localizerClassName = __NAMESPACE__ . '\\Entity\\Drupal7\\' . $className;
+        $localizerClassName = $this->getLocalizerClassName($data['type'], 'Entity');
         if (!class_exists($localizerClassName)) {
             return;
         }
@@ -27,33 +26,13 @@ class Drupal7 extends AbstractLocalizer
     }
 
     private function localizeEntityByAttributeType(&$data) {
-        $className = $this->getLocalizerClassName($data['type']);
-        $localizerClassName = __NAMESPACE__ . '\\Attribute\\Drupal7\\' . $className;
+        $localizerClassName = $this->getLocalizerClassName($data['type'], 'Attribute');
         if (!class_exists($localizerClassName)) {
             return;
         }
 
         $localizer = new $localizerClassName();
         $localizer->localizeEntity($data);
-    }
-
-    private function getLocalizerClassName($type) {
-        return str_replace(['_', '<', '>'], '', ucwords($type, '_<>'));
-    }
-
-    /**
-     * Localizes List Entities by Entity Type.
-     *
-     * @param mixed $data
-     *
-     * @return mixed
-     */
-    private function localizeListEntitiesByEntityType(&$data) {
-        if ($data['type'] == 'taxonomy_term') {
-            foreach ($data['attributes']['name'] as $language => $value) {
-                $data['attributes']['name'][$language] = is_array($value) ? reset($value) : $value;
-            }
-        }
     }
 
     /**
@@ -65,10 +44,25 @@ class Drupal7 extends AbstractLocalizer
      */
     protected function localizeListEntities($data)
     {
+        if (!isset($data['data'])) {
+            return;
+        }
+
         foreach ($data['data'] as $key => $item) {
             $this->localizeListEntitiesByEntityType($item);
-            $data['data'][$key] = $item;
         }
         return $data;
     }
+
+    private function localizeListEntitiesByEntityType(&$data)
+    {
+        $localizerClassName = $this->getLocalizerClassName($data['type'], 'Entity');
+        if (!class_exists($localizerClassName)) {
+            return;
+        }
+
+        $localizer = new $localizerClassName();
+        $localizer->localizeEntity($data);
+    }
+
 }
