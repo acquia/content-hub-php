@@ -63,8 +63,6 @@ class Drupal7 extends AbstractLocalizer
      * Localize "listEntities".
      *
      * @param mixed $data
-     *
-     * @return mixed
      */
     protected function localizeListEntities(&$data)
     {
