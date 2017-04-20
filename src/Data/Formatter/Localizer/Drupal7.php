@@ -66,17 +66,15 @@ class Drupal7 extends AbstractLocalizer
      *
      * @return mixed
      */
-    protected function localizeListEntities($data)
+    protected function localizeListEntities(&$data)
     {
         if (!isset($data['data'])) {
             return;
         }
 
         foreach ($data['data'] as $key => $item) {
-            $this->localizeListEntitiesByEntityType($item);
-            $data['data'][$key] = $item;
+            $this->localizeListEntitiesByEntityType($data['data'][$key]);
         }
-        return $data;
     }
 
     /**
