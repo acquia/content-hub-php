@@ -8,7 +8,7 @@ namespace Acquia\ContentHubClient\Data\Formatter\Standardizer;
 interface StandardizerInterface
 {
     /**
-     * Standardize.
+     * Standardize - takes the data, and reformat into the universal format.
      *
      * @param mixed $data Data
      * @param array $config Config

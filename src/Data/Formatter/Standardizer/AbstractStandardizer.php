@@ -41,6 +41,8 @@ abstract class AbstractStandardizer implements StandardizerInterface
         $functionName = 'standardize' . $dataType;
 
         if (!method_exists($this, $functionName)) {
+            // If you are here, you should now create the function in the
+            // corresponding concrete classes to support the standardization.
             throw new UnsupportedFormatException('The following data type\'s standardization is not yet supported: ' . $dataType);
         }
 
