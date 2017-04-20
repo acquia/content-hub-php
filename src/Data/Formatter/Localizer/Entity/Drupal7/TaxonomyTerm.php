@@ -23,6 +23,11 @@ class TaxonomyTerm extends Entity
         $this->transformer->addArrayReferenceIfNotExist($data['attributes'], 'parent');
     }
 
+    /**
+     * Localize "listEntities".
+     *
+     * @param mixed $data Data
+     */
     public function localizeListEntities(&$data)
     {
         if (!isset($data['attributes']['name'])) {
