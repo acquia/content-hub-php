@@ -5,9 +5,23 @@ namespace Acquia\ContentHubClient\Data;
 use Acquia\ContentHubClient\Data\Exception\UnsupportedFormatException;
 use Acquia\ContentHubClient\Data\Exception\DataAdapterException;
 
+/**
+ * Data adapter class.
+ */
 class Adapter
 {
+    /**
+     * Config.
+     *
+     * @var array
+     */
     private $config;
+
+    /**
+     * Formatters.
+     *
+     * @var array
+     */
     private $formatters;
 
     /**
@@ -30,6 +44,14 @@ class Adapter
         $this->config = $config;
     }
 
+    /**
+     * Translate data into localized format.
+     *
+     * @param array $data   Data to be translated
+     * @param array $config Additional function config
+     *
+     * @return array
+     */
     public function translate($data, $config)
     {
         $adapterSchemaId = $this->config['schemaId'];
@@ -47,6 +69,16 @@ class Adapter
         return $this->getLocalizer($adapterSchemaId)->localize($standardizedData, $config);
     }
 
+    /**
+     * Get schema id by "cold reading" the data.
+     *
+     * @param array $data   Data to be "cold read"
+     * @param array $config Additional function config
+     *
+     * @return string
+     *
+     * @throws \Acquia\ContentHubClient\Data\Exception\DataAdapterException
+     */
     private function getSchemaId($data, $config)
     {
         // Detect already defined schema.
@@ -65,7 +97,7 @@ class Adapter
         }
 
         // Detect Mixed.
-        if ($config['dataType'] === 'ListEntities') {
+        if (isset($config['dataType']) && $config['dataType'] === 'ListEntities') {
             return 'Mixed';
         }
 
@@ -73,17 +105,43 @@ class Adapter
         throw new DataAdapterException('The data adapter could not determine the data\'s schema ID.');
     }
 
-    private function getStandardizer($schemaId) {
+    /**
+     * Get standardizer by the given schema ID.
+     *
+     * @param string $schemaId Schema Id
+     *
+     * @return \Acquia\ContentHubClient\Data\Formatter\Standardizer\StandardizerInterface
+     */
+    private function getStandardizer($schemaId)
+    {
         $formaterClassName = 'Standardizer\\' . $schemaId;
         return $this->getFormatter($formaterClassName);
     }
 
-    private function getLocalizer($schemaId) {
+    /**
+     * Get localizer by the given schema ID.
+     *
+     * @param string $schemaId Schema Id
+     *
+     * @return \Acquia\ContentHubClient\Data\Formatter\Localizer\LocalizerInterface
+     */
+    private function getLocalizer($schemaId)
+    {
         $formaterClassName = 'Localizer\\' . $schemaId;
         return $this->getFormatter($formaterClassName);
     }
 
-    private function getFormatter($formaterClassName) {
+    /**
+     * Get formatter by formatter class name.
+     *
+     * @param string $formaterClassName
+     *
+     * @return \Acquia\ContentHubClient\Data\Formatter\Standardizer\StandardizerInterface|\Acquia\ContentHubClient\Data\Formatter\Localizer\LocalizerInterface
+     *
+     * @throws \Acquia\ContentHubClient\Data\Exception\UnsupportedFormatException
+     */
+    private function getFormatter($formaterClassName)
+    {
         $formatterFullClassName = __NAMESPACE__ . '\\Formatter\\' . $formaterClassName;
         if (!class_exists($formatterFullClassName)) {
             throw new UnsupportedFormatException('This data formatting action is not yet supported: ' . $formaterClassName);

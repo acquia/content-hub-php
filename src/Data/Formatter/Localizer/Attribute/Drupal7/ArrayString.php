@@ -2,8 +2,16 @@
 
 namespace Acquia\ContentHubClient\Data\Formatter\Localizer\Attribute\Drupal7;
 
+/**
+ * ArrayString attribute data localizer class.
+ */
 class ArrayString extends Attribute
 {
+    /**
+     * Config.
+     *
+     * @var array
+     */
     private $config = [
         'filters_mapping' => [
             'restricted_html' => 'filtered_html',
@@ -13,8 +21,17 @@ class ArrayString extends Attribute
         ],
     ];
 
+    /**
+     * Localize "entity".
+     *
+     * @param mixed $data Data
+     */
     public function localizeEntity(&$data)
     {
+        if (!isset($data['value'])) {
+            return;
+        }
+
         foreach ($data['value'] as $langcode => $valueList) {
             foreach ($valueList as $key => $value) {
                 $fieldValue = json_decode($value, TRUE);
@@ -39,9 +56,8 @@ class ArrayString extends Attribute
                 // Localize Link fields - Hack.
                 // @TODO: Fix this for Links Type.
                 if (isset($fieldValue['uri'])) {
-                    // Checking if it is an internal URL. If it is,
-                    // then strip out the 'internal:/' prefix.
-                    $fieldValue['url'] = (substr($fieldValue['uri'], 0, 10) === 'internal:/') ? str_replace('internal:/', '', $fieldValue['uri']) : $fieldValue['uri'];
+                    // Strip out the 'internal:/' prefix.
+                    $fieldValue['url'] = preg_replace('~^internal:/~', '', $fieldValue['uri']);
                     unset($fieldValue['uri']);
                     $valueList[$key] = json_encode($fieldValue, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT);
                     continue;

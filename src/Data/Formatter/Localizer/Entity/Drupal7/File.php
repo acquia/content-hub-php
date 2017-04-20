@@ -4,8 +4,16 @@ namespace Acquia\ContentHubClient\Data\Formatter\Localizer\Entity\Drupal7;
 
 use Acquia\ContentHubClient\Attribute;
 
+/**
+ * File entity data localizer class.
+ */
 class File extends Entity
 {
+    /**
+     * Localize "entity".
+     *
+     * @param mixed $data Data
+     */
     public function localizeEntity(&$data)
     {
         parent::localizeEntity($data);
