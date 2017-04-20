@@ -68,13 +68,40 @@ class Drupal7Test extends \PHPUnit_Framework_TestCase
     {
         $config = [];
         $localizer = new Localizer($config);
-        $data = ['same standardized data'];
+        $data = [
+            'data' => [
+                0 => [
+                    'type' => 'taxonomy_term',
+                    'attributes' => [
+                        'name' => [
+                            'und' => 'my_taxonomy_term',
+                            'en' => [
+                                'my_taxonomy_term_1',
+                                'my_taxonomy_term_2',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
         $localizerConfig = [
             'dataType' => 'ListEntities',
         ];
         $updatedData = $localizer->localize($data, $localizerConfig);
 
-        $expected = ['same standardized data'];
+        $expected = [
+            'data' => [
+                0 => [
+                    'type' => 'taxonomy_term',
+                    'attributes' => [
+                        'name' => [
+                            'und' => 'my_taxonomy_term',
+                            'en' => 'my_taxonomy_term_1',
+                        ],
+                    ],
+                ],
+            ],
+        ];
         $this->assertEquals($expected, $updatedData);
     }
 
