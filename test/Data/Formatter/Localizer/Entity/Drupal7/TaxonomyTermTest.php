@@ -89,4 +89,39 @@ class TaxonomyTermTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $data);
     }
 
+    /**
+     * Tests the localizeListEntities() method.
+     *
+     * @covers ::localizeListEntities
+     */
+    public function testLocalizeListEntities()
+    {
+        $config = [];
+        $localizer = new Localizer($config);
+        $data = [
+            'attributes' => [
+                'name' => [
+                    'und' => 'my_taxonomy_term',
+                    'en' => [
+                        'my_taxonomy_term_1',
+                        'my_taxonomy_term_2',
+                    ],
+                ],
+            ],
+        ];
+        $localizerConfig = [
+            'dataType' => 'ListEntities',
+        ];
+        $localizer->localizeListEntities($data, $localizerConfig);
+
+        $expected = [
+            'attributes' => [
+                'name' => [
+                    'und' => 'my_taxonomy_term',
+                    'en' => 'my_taxonomy_term_1',
+                ],
+            ],
+        ];
+        $this->assertEquals($expected, $data);
+    }
 }
