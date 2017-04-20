@@ -6,12 +6,15 @@ use Acquia\Hmac\Digest as Digest;
 use GuzzleHttp\Client;
 use Acquia\Hmac\RequestSigner;
 use Acquia\Hmac\Guzzle5\HmacAuthPlugin;
+use Acquia\ContentHubClient\Data\Adapter;
 
 class ContentHub extends Client
 {
     // Override VERSION inherited from GuzzleHttp::ClientInterface
     const VERSION = '0.6.5';
     const LIBRARYNAME = 'AcquiaContentHubPHPLib';
+
+    private $adapter;
 
     /**
      * Overrides \GuzzleHttp\Client::__construct()
@@ -43,7 +46,13 @@ class ContentHub extends Client
             'User-Agent' => $user_agent_string,
         ];
 
+        $adapterConfig = isset($config['adapterConfig']) ? $config['adapterConfig'] : [];
+        unset($config['adapterConfig']);
+
         parent::__construct($config);
+
+        // Set the Adapter.
+        $this->adapter = new Adapter($adapterConfig);
 
         // Add the authentication plugin
         // @see https://github.com/acquia/http-hmac-spec
@@ -160,7 +169,11 @@ class ContentHub extends Client
     {
         $response = $this->get('entities/' . $uuid);
         $data = $response->json();
-        return new Entity($data['data']['data']);
+        $config = [
+            'dataType' => 'Entity',
+        ];
+        $translatedData = $this->adapter->translate($data['data']['data'], $config);
+        return new Entity($translatedData);
     }
 
     /**
@@ -288,7 +301,13 @@ class ContentHub extends Client
 
         // Now make the request.
         $response = $this->get(array($url, $variables));
-        return $response->json();
+        $items = $response->json();
+
+        $config = [
+          'dataType' => 'ListEntities',
+        ];
+        $translatedData = $this->adapter->translate($items, $config);
+        return $translatedData;
     }
 
     /**
