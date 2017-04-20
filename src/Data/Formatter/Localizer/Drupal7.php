@@ -50,6 +50,7 @@ class Drupal7 extends AbstractLocalizer
 
         foreach ($data['data'] as $key => $item) {
             $this->localizeListEntitiesByEntityType($item);
+            $data['data'][$key] = $item;
         }
         return $data;
     }
@@ -62,7 +63,7 @@ class Drupal7 extends AbstractLocalizer
         }
 
         $localizer = new $localizerClassName();
-        $localizer->localizeEntity($data);
+        $localizer->localizeListEntities($data);
     }
 
 }
