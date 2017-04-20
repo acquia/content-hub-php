@@ -27,6 +27,10 @@ class Drupal7 extends AbstractLocalizer
      * @param mixed $data Data
      */
     private function localizeEntityByEntityType(&$data) {
+        if (!isset($data['type'])) {
+            return;
+        }
+
         $localizerClassName = $this->getLocalizerClassName($data['type'], 'Entity');
         if (!class_exists($localizerClassName)) {
             return;
@@ -42,6 +46,10 @@ class Drupal7 extends AbstractLocalizer
      * @param mixed $data Data
      */
     private function localizeEntityByAttributeType(&$data) {
+        if (!isset($data['type'])) {
+            return;
+        }
+
         $localizerClassName = $this->getLocalizerClassName($data['type'], 'Attribute');
         if (!class_exists($localizerClassName)) {
             return;
@@ -78,6 +86,10 @@ class Drupal7 extends AbstractLocalizer
      */
     private function localizeListEntitiesByEntityType(&$data)
     {
+        if (!isset($data['type'])) {
+            return;
+        }
+
         $localizerClassName = $this->getLocalizerClassName($data['type'], 'Entity');
         if (!class_exists($localizerClassName)) {
             return;
