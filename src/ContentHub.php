@@ -292,7 +292,7 @@ class ContentHub extends Client
     }
 
     /**
-     * Reindex
+     * Reindex a subscription.
      *
      * Schedules a reindex process.
      *
@@ -303,6 +303,23 @@ class ContentHub extends Client
     public function reindex()
     {
         $endpoint = "/{$this->api_version}/reindex";
+        $request = $this->createRequest('POST', $endpoint, ['json' => []]);
+        $response = $this->send($request);
+        return $response;
+    }
+
+    /**
+     * Obtains Customer-Facing-Logs for the subscription.
+     *
+     * This is forward search request to Elastic Search.
+     *
+     * @return \Psr\Http\Message\ResponseInterface
+     *
+     * @throws \GuzzleHttp\Exception\RequestException
+     */
+    public function history()
+    {
+        $endpoint = "/{$this->api_version}/history";
         $request = $this->createRequest('POST', $endpoint, ['json' => []]);
         $response = $this->send($request);
         return $response;
