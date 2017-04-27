@@ -280,13 +280,29 @@ class ContentHub extends Client
      * entities added after the purge was enacted will be overwritten by the
      * previous state. Be VERY careful when using this endpoint.
      *
-     *
      * @return mixed|\Psr\Http\Message\ResponseInterface
      *   The response.
      */
     public function restore()
     {
         $endpoint = "/{$this->api_version}/entities/restore";
+        $request = $this->createRequest('POST', $endpoint, ['json' => []]);
+        $response = $this->send($request);
+        return $response;
+    }
+
+    /**
+     * Reindex
+     *
+     * Schedules a reindex process.
+     *
+     * @return \Psr\Http\Message\ResponseInterface
+     *
+     * @throws \GuzzleHttp\Exception\RequestException
+     */
+    public function reindex()
+    {
+        $endpoint = "/{$this->api_version}/reindex";
         $request = $this->createRequest('POST', $endpoint, ['json' => []]);
         $response = $this->send($request);
         return $response;
