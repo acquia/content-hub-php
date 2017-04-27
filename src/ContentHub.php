@@ -326,6 +326,21 @@ class ContentHub extends Client
     }
 
     /**
+     * Retrieves active ElasticSearch mapping of entities.
+     *
+     * @return \Psr\Http\Message\ResponseInterface
+     *
+     * @throws \GuzzleHttp\Exception\RequestException
+     */
+    public function mapping()
+    {
+        $endpoint = "/{$this->api_version}/mapping";
+        $response = $this->get($endpoint);
+        $data = $response->json();
+        return $data;
+    }
+
+    /**
      * Lists Entities from the Content Hub.
      *
      * Example of how to structure the $options parameter:
