@@ -248,10 +248,8 @@ class ContentHub extends Client
      */
     public function purge()
     {
-        $json = [];
-        $body = json_encode($json);
         $endpoint = "/{$this->api_version}/entities/purge";
-        $request = new Request('POST', $endpoint, [], $body);
+        $request = new Request('POST', $endpoint, [], '');
         $response = $this->send($request);
         return $response;
     }
@@ -268,10 +266,8 @@ class ContentHub extends Client
      */
     public function restore()
     {
-        $json = [];
-        $body = json_encode($json);
         $endpoint = "/{$this->api_version}/entities/restore";
-        $request = new Request('POST', $endpoint, [], $body);
+        $request = new Request('POST', $endpoint, [], '');
         $response = $this->send($request);
         return $response;
     }
@@ -286,10 +282,8 @@ class ContentHub extends Client
      */
     public function reindex()
     {
-        $json = [];
-        $body = json_encode($json);
         $endpoint = "/{$this->api_version}/reindex";
-        $request = new Request('POST', $endpoint, [], $body);
+        $request = new Request('POST', $endpoint, [], '');
         $response = $this->send($request);
         return $response;
     }
@@ -299,18 +293,19 @@ class ContentHub extends Client
      *
      * This is forward search request to Elastic Search.
      *
+     * @param string $query
+     *   An elastic search query.
+     *
      * @return \Psr\Http\Message\ResponseInterface
      *
      * @throws \GuzzleHttp\Exception\RequestException
      */
-    public function history()
+    public function history($query)
     {
-        $json = [];
-        $body = json_encode($json);
+        $query = empty($query) ? '{"query": {"match_all": {}}}' : $query;
         $endpoint = "/{$this->api_version}/history";
-        $request = new Request('POST', $endpoint, [], $body);
-        $response = $this->send($request);
-        return $response;
+        $request = new Request('POST', $endpoint, [], $query);
+        return $this->getResponseJson($request);
     }
 
     /**
@@ -322,7 +317,7 @@ class ContentHub extends Client
      */
     public function mapping()
     {
-        $endpoint = "/{$this->api_version}/mapping";
+        $endpoint = "/{$this->api_version}/_mapping";
         $request = new Request('GET', $endpoint);
         return $this->getResponseJson($request);
     }
