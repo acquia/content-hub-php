@@ -268,7 +268,7 @@ class ContentHub extends Client
     public function purge()
     {
         $endpoint = "/{$this->api_version}/entities/purge";
-        $request = $this->createRequest('POST', $endpoint, ['json' => []]);
+        $request = $this->createRequest('POST', $endpoint, ['json' => '']);
         $response = $this->send($request);
         return $response;
     }
@@ -286,7 +286,7 @@ class ContentHub extends Client
     public function restore()
     {
         $endpoint = "/{$this->api_version}/entities/restore";
-        $request = $this->createRequest('POST', $endpoint, ['json' => []]);
+        $request = $this->createRequest('POST', $endpoint, ['json' => '']);
         $response = $this->send($request);
         return $response;
     }
@@ -303,7 +303,7 @@ class ContentHub extends Client
     public function reindex()
     {
         $endpoint = "/{$this->api_version}/reindex";
-        $request = $this->createRequest('POST', $endpoint, ['json' => []]);
+        $request = $this->createRequest('POST', $endpoint, ['json' => '']);
         $response = $this->send($request);
         return $response;
     }
@@ -313,14 +313,18 @@ class ContentHub extends Client
      *
      * This is forward search request to Elastic Search.
      *
+     * @param string $query
+     *   An elastic search query.
+     *
      * @return \Psr\Http\Message\ResponseInterface
      *
      * @throws \GuzzleHttp\Exception\RequestException
      */
-    public function history()
+    public function history($query)
     {
+        $query = empty($query) ? '{"query": {"match_all": {}}}' : $query;
         $endpoint = "/{$this->api_version}/history";
-        $request = $this->createRequest('POST', $endpoint, ['json' => []]);
+        $request = $this->createRequest('POST', $endpoint, ['json' => $query]);
         $response = $this->send($request);
         return $response;
     }
@@ -334,7 +338,7 @@ class ContentHub extends Client
      */
     public function mapping()
     {
-        $endpoint = "/{$this->api_version}/mapping";
+        $endpoint = "/{$this->api_version}/_mapping";
         $response = $this->get($endpoint);
         $data = $response->json();
         return $data;
