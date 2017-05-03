@@ -316,23 +316,29 @@ class ContentHub extends Client
      * @param string $query
      *   An elastic search query.
      *
-     * @return \Psr\Http\Message\ResponseInterface
+     * @return array
+     *   The history logs array.
      *
      * @throws \GuzzleHttp\Exception\RequestException
      */
     public function history($query)
     {
-        $query = empty($query) ? '{"query": {"match_all": {}}}' : $query;
+        // If no specific ElasticSearch query is given, use a simple query.
+        $json = empty($query) ? '{"query": {"match_all": {}}}' : $query;
+        $query = json_decode($json, TRUE);
+
+        // Execute request.
         $endpoint = "/{$this->api_version}/history";
         $request = $this->createRequest('POST', $endpoint, ['json' => $query]);
         $response = $this->send($request);
-        return $response;
+        return $response->json();
     }
 
     /**
      * Retrieves active ElasticSearch mapping of entities.
      *
-     * @return \Psr\Http\Message\ResponseInterface
+     * @return array
+     *   The fields mapping array.
      *
      * @throws \GuzzleHttp\Exception\RequestException
      */
@@ -340,8 +346,7 @@ class ContentHub extends Client
     {
         $endpoint = "/{$this->api_version}/_mapping";
         $response = $this->get($endpoint);
-        $data = $response->json();
-        return $data;
+        return $response->json();
     }
 
     /**
