@@ -37,4 +37,20 @@ class File extends Entity
         $this->transformer->arrayStringToString($data['attributes'], 'size');
     }
 
+    /**
+     * Localize "listEntities".
+     *
+     * @param mixed $data Data
+     */
+    public function localizeListEntities(&$data)
+    {
+        if (!isset($data['attributes']['filename'])) {
+            return;
+        }
+
+        foreach ($data['attributes']['filename'] as $language => $value) {
+            $data['attributes']['name'][$language] = is_array($value) ? reset($value) : $value;
+        }
+    }
+
 }
