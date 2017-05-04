@@ -14,10 +14,6 @@ class Node extends Entity {
    */
   public function localizeListEntities(&$data)
   {
-    if (!isset($data['attributes']['title'])) {
-        return;
-    }
-
     $this->transformer->multipleToSingle($data['attributes'], 'title');
   }
 }

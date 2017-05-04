@@ -30,10 +30,6 @@ class TaxonomyTerm extends Entity
      */
     public function localizeListEntities(&$data)
     {
-        if (!isset($data['attributes']['name'])) {
-            return;
-        }
-
         $this->transformer->multipleToSingle($data['attributes'], 'name');
     }
 

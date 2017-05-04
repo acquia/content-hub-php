@@ -44,10 +44,6 @@ class File extends Entity
      */
     public function localizeListEntities(&$data)
     {
-        if (!isset($data['attributes']['filename'])) {
-            return;
-        }
-
         $this->transformer->rename($data['attributes'], 'filename', 'name');
         $this->transformer->multipleToSingle($data['attributes'], 'name');
     }
