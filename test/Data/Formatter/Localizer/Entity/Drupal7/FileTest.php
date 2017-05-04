@@ -70,4 +70,40 @@ class FileTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $data);
     }
 
+    /**
+     * Tests the localizeListEntities() method.
+     *
+     * @covers ::localizeListEntities
+     */
+    public function testLocalizeListEntities()
+    {
+        $config = [];
+        $localizer = new Localizer($config);
+        $data = [
+            'attributes' => [
+                'filename' => [
+                    'und' => 'my_file_name',
+                    'en' => [
+                        'my_filename_1',
+                        'my_filename_2',
+                    ],
+                ],
+            ],
+        ];
+        $localizerConfig = [
+            'dataType' => 'ListEntities',
+        ];
+        $localizer->localizeListEntities($data, $localizerConfig);
+
+        $expected = [
+            'attributes' => [
+                'name' => [
+                    'und' => 'my_file_name',
+                    'en' => 'my_filename_1',
+                ],
+            ],
+        ];
+        $this->assertEquals($expected, $data);
+    }
+
 }

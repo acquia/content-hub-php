@@ -89,4 +89,32 @@ class GeneralTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $data);
     }
 
+    /**
+     * Tests the multipleToSingle() method.
+     *
+     * @covers ::multipleToSingle
+     */
+    public function testMultipleToSingle()
+    {
+        $transformer = new Transformer();
+        $data = [
+            'oldName' => [
+                'und' => 'value_und',
+                'en' => [
+                    'my_value_1',
+                    'my_value_2',
+                ],
+            ],
+        ];
+        $transformer->multipleToSingle($data, 'oldName');
+
+        $expected = [
+            'oldName' => [
+                'und' => 'value_und',
+                'en' =>  'my_value_1',
+            ],
+        ];
+        $this->assertEquals($expected, $data);
+    }
+
 }

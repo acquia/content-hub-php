@@ -35,4 +35,39 @@ class NodeTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $data);
     }
 
+    /**
+     * Tests the localizeListEntities() method.
+     *
+     * @covers ::localizeListEntities
+     */
+    public function testLocalizeListEntities()
+    {
+        $config = [];
+        $localizer = new Localizer($config);
+        $data = [
+            'attributes' => [
+                'title' => [
+                    'und' => 'my_title',
+                    'en' => [
+                        'my_title_1',
+                        'my_title_2',
+                    ],
+                ],
+            ],
+        ];
+        $localizerConfig = [
+            'dataType' => 'ListEntities',
+        ];
+        $localizer->localizeListEntities($data, $localizerConfig);
+
+        $expected = [
+            'attributes' => [
+                'title' => [
+                    'und' => 'my_title',
+                    'en' => 'my_title_1',
+                ],
+            ],
+        ];
+        $this->assertEquals($expected, $data);
+    }
 }
