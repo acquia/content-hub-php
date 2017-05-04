@@ -36,4 +36,25 @@ class General
         $data[$toIndex] = $data[$fromIndex];
     }
 
+    /**
+     * Multiple to Single.
+     *
+     * @param array  $data Data to convert from multiple to single
+     * @param string $fromIndex From index
+     * @param string $toIndex To index
+     */
+    public function multipleToSingle(&$data, $fromIndex, $toIndex)
+    {
+        if (!isset($data[$fromIndex])) {
+            return;
+        }
+
+        foreach ($data[$fromIndex] as $language => $value) {
+            $data[$toIndex][$language] = is_array($value) ? reset($value) : $value;
+        }
+
+        if ($fromIndex !== $toIndex) {
+            unset($data[$fromIndex]);
+        }
+    }
 }

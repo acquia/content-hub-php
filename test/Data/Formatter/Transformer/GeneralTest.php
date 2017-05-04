@@ -89,4 +89,60 @@ class GeneralTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $data);
     }
 
+    /**
+     * Tests the multipleToSingle() method, index does not exist.
+     *
+     * @covers ::multipleToSingle
+     */
+    public function testMultipleToSingleDifferentIndex()
+    {
+        $transformer = new Transformer();
+        $data = [
+            'oldName' => [
+                'und' => 'value_und',
+                'en' => [
+                    'my_value_1',
+                    'my_value_2',
+                ],
+            ],
+        ];
+        $transformer->multipleToSingle($data, 'oldName', 'newName');
+
+        $expected = [
+            'newName' => [
+                'und' => 'value_und',
+                'en' =>  'my_value_1',
+            ],
+        ];
+        $this->assertEquals($expected, $data);
+    }
+
+    /**
+     * Tests the multipleToSingle() method.
+     *
+     * @covers ::multipleToSingle
+     */
+    public function testMultipleToSingleSameIndex()
+    {
+        $transformer = new Transformer();
+        $data = [
+            'oldName' => [
+                'und' => 'value_und',
+                'en' => [
+                    'my_value_1',
+                    'my_value_2',
+                ],
+            ],
+        ];
+        $transformer->multipleToSingle($data, 'oldName', 'oldName');
+
+        $expected = [
+            'oldName' => [
+                'und' => 'value_und',
+                'en' =>  'my_value_1',
+            ],
+        ];
+        $this->assertEquals($expected, $data);
+    }
+
 }

@@ -34,9 +34,7 @@ class TaxonomyTerm extends Entity
             return;
         }
 
-        foreach ($data['attributes']['name'] as $language => $value) {
-            $data['attributes']['name'][$language] = is_array($value) ? reset($value) : $value;
-        }
+        $this->transformer->multipleToSingle($data['attributes'], 'name', 'name');
     }
 
 }

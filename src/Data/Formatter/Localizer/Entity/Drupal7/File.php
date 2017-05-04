@@ -48,10 +48,7 @@ class File extends Entity
             return;
         }
 
-        foreach ($data['attributes']['filename'] as $language => $value) {
-            $data['attributes']['name'][$language] = is_array($value) ? reset($value) : $value;
-            unset($data['attributes']['filename']);
-        }
+        $this->transformer->multipleToSingle($data['attributes'], 'filename', 'name');
     }
 
 }

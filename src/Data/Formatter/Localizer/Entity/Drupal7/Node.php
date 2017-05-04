@@ -15,11 +15,9 @@ class Node extends Entity {
   public function localizeListEntities(&$data)
   {
     if (!isset($data['attributes']['title'])) {
-      return;
+        return;
     }
 
-    foreach ($data['attributes']['title'] as $language => $value) {
-      $data['attributes']['title'][$language] = is_array($value) ? reset($value) : $value;
-    }
+    $this->transformer->multipleToSingle($data['attributes'], 'title', 'title');
   }
 }
