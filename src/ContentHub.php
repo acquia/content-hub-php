@@ -262,15 +262,15 @@ class ContentHub extends Client
      * can be restored at any time. Any subsequent purges overwrite the existing
      * backup. Be VERY careful when using this endpoint.
      *
-     * @return mixed|\Psr\Http\Message\ResponseInterface
-     *   The response.
+     * @return array
+     *   The response array.
      */
     public function purge()
     {
         $endpoint = "/{$this->api_version}/entities/purge";
         $request = $this->createRequest('POST', $endpoint, ['json' => '']);
         $response = $this->send($request);
-        return $response;
+        return $response->json();
     }
 
     /**
@@ -280,15 +280,15 @@ class ContentHub extends Client
      * entities added after the purge was enacted will be overwritten by the
      * previous state. Be VERY careful when using this endpoint.
      *
-     * @return mixed|\Psr\Http\Message\ResponseInterface
-     *   The response.
+     * @return array
+     *   The response array.
      */
     public function restore()
     {
         $endpoint = "/{$this->api_version}/entities/restore";
         $request = $this->createRequest('POST', $endpoint, ['json' => '']);
         $response = $this->send($request);
-        return $response;
+        return $response->json();
     }
 
     /**
@@ -296,7 +296,8 @@ class ContentHub extends Client
      *
      * Schedules a reindex process.
      *
-     * @return \Psr\Http\Message\ResponseInterface
+     * @return array
+     *   The response array.
      *
      * @throws \GuzzleHttp\Exception\RequestException
      */
@@ -305,7 +306,7 @@ class ContentHub extends Client
         $endpoint = "/{$this->api_version}/reindex";
         $request = $this->createRequest('POST', $endpoint, ['json' => '']);
         $response = $this->send($request);
-        return $response;
+        return $response->json();
     }
 
     /**
