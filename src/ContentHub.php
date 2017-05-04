@@ -250,8 +250,7 @@ class ContentHub extends Client
     {
         $endpoint = "/{$this->api_version}/entities/purge";
         $request = new Request('POST', $endpoint, [], '');
-        $response = $this->send($request);
-        return $response;
+        return $this->getResponseJson($request);
     }
 
     /**
@@ -268,8 +267,7 @@ class ContentHub extends Client
     {
         $endpoint = "/{$this->api_version}/entities/restore";
         $request = new Request('POST', $endpoint, [], '');
-        $response = $this->send($request);
-        return $response;
+        return $this->getResponseJson($request);
     }
     /**
      * Reindex a subscription.
@@ -284,8 +282,7 @@ class ContentHub extends Client
     {
         $endpoint = "/{$this->api_version}/reindex";
         $request = new Request('POST', $endpoint, [], '');
-        $response = $this->send($request);
-        return $response;
+        return $this->getResponseJson($request);
     }
 
     /**
