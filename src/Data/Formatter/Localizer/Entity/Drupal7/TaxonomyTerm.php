@@ -34,7 +34,7 @@ class TaxonomyTerm extends Entity
             return;
         }
 
-        $this->transformer->multipleToSingle($data['attributes'], 'name', 'name');
+        $this->transformer->multipleToSingle($data['attributes'], 'name');
     }
 
 }

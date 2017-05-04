@@ -48,7 +48,8 @@ class File extends Entity
             return;
         }
 
-        $this->transformer->multipleToSingle($data['attributes'], 'filename', 'name');
+        $this->transformer->rename($data['attributes'], 'filename', 'name');
+        $this->transformer->multipleToSingle($data['attributes'], 'name');
     }
 
 }

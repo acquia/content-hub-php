@@ -18,6 +18,6 @@ class Node extends Entity {
         return;
     }
 
-    $this->transformer->multipleToSingle($data['attributes'], 'title', 'title');
+    $this->transformer->multipleToSingle($data['attributes'], 'title');
   }
 }
