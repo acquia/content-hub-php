@@ -105,8 +105,8 @@ class Adapter
             return 'Mixed';
         }
 
-        // Shouldn't reach here.
-        throw new DataAdapterException('The data adapter could not determine the data\'s schema ID.');
+        // Could not detect schema, "guess" current localized schema.
+        return $this->config['schemaId'];
     }
 
     /**
