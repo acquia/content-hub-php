@@ -29,7 +29,7 @@ class ContentHub extends Client
      * @param array  $config
      * @param string $api_version
      */
-    public function __construct($apiKey, $secretKey, $origin, array $config = [], $api_version = NULL)
+    public function __construct($apiKey, $secretKey, $origin, array $config = [], $api_version = 'v1')
     {
         // "base_url" parameter changed to "base_uri" in Guzzle6, so the following line
         // is there to make sure it does not disrupt previous configuration.
@@ -42,7 +42,7 @@ class ContentHub extends Client
         $config['headers']['X-Acquia-Plexus-Client-Id'] = $origin;
 
         // Define the API Version.
-        $this->api_version = !empty($api_version) ? $api_version : 'v1';
+        $this->api_version = $api_version;
 
         // Add the authentication handler
         // @see https://github.com/acquia/http-hmac-spec
