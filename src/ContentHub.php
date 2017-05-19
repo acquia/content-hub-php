@@ -30,9 +30,9 @@ class ContentHub extends Client
      * @param string $secretKey
      * @param string $origin
      * @param array  $config
-     * @param array  $api_version
+     * @param string  $api_version
      */
-    public function __construct($apiKey, $secretKey, $origin, array $config = [], $api_version = NULL)
+    public function __construct($apiKey, $secretKey, $origin, array $config = [], $api_version = 'v1')
     {
         if (!isset($config['defaults'])) {
             $config['defaults'] = [];
@@ -60,7 +60,7 @@ class ContentHub extends Client
         parent::__construct($config);
 
         // Define the API Version.
-        $this->api_version = !empty($api_version) ? $api_version : 'v1';
+        $this->api_version = $api_version;
 
         // Set the Adapter.
         $this->adapter = new Adapter($adapterConfig);
