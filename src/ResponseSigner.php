@@ -7,6 +7,7 @@
 namespace Acquia\ContentHubClient;
 
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
 
 class ResponseSigner extends Response {
 
@@ -64,9 +65,6 @@ class ResponseSigner extends Response {
            'Content-Type' => $this->defaultContentType,
         ];
         parent::__construct($content = '', $status, $headers);
-
-        // Set the date.
-        $this->headers->set('Date', gmdate("D, d M Y H:i:s T"));
 
         // Setting up the keys.
         $this->apiKey = $apiKey;
@@ -148,6 +146,10 @@ class ResponseSigner extends Response {
      */
     protected function getTimestamp()
     {
+        $request = Request::createFromGlobals();
+        $request_date = $request->headers->get('Date');
+        $date = new \DateTime($request_date);
+        $this->setDate($date);
         return $this->headers->get('Date');
     }
 
