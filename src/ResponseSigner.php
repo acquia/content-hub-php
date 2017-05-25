@@ -146,10 +146,6 @@ class ResponseSigner extends Response {
      */
     protected function getTimestamp()
     {
-        //$request = Request::createFromGlobals();
-        //$request_date = $request->headers->get('Date');
-        //$date = new \DateTime($request_date);
-        //$this->setDate($date);
         $this->headers->set('Date', gmdate("D, d M Y H:i:s T"));
         return $this->headers->get('Date');
     }
@@ -215,4 +211,12 @@ class ResponseSigner extends Response {
         $this->headers->set('X-Acquia-Plexus-Authorization', $signedMessage);
     }
 
+    /**
+     * Signs and sends the response.
+     */
+    public function send()
+    {
+        $this->signResponse();
+        parent::send();
+    }    
 }
