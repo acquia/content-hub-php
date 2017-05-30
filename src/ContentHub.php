@@ -292,15 +292,21 @@ class ContentHub extends Client
      *
      * @param string $query
      *   An elastic search query.
+     * @param array $options
+     *   An array with the number of items to show in the list and offset.
      *
      * @return \Psr\Http\Message\ResponseInterface
      *
      * @throws \GuzzleHttp\Exception\RequestException
      */
-    public function history($query)
+    public function history($query, $options = [])
     {
+        $options = $options + [
+          'size' => 20,
+          'from' => 0
+        ];
         $query = empty($query) ? '{"query": {"match_all": {}}}' : $query;
-        $endpoint = "/{$this->api_version}/history";
+        $endpoint = "/{$this->api_version}/history?size={$options['size']}&from={$options['from']}";
         $request = new Request('POST', $endpoint, [], $query);
         return $this->getResponseJson($request);
     }
