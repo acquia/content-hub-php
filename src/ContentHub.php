@@ -324,7 +324,7 @@ class ContentHub extends Client
      *
      * @throws \GuzzleHttp\Exception\RequestException
      */
-    public function history($query, $options = [])
+    public function logs($query, $options = [])
     {
         // If no specific ElasticSearch query is given, use a simple query.
         $options = $options + [
