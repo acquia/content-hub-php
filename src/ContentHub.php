@@ -299,7 +299,7 @@ class ContentHub extends Client
      *
      * @throws \GuzzleHttp\Exception\RequestException
      */
-    public function history($query, $options = [])
+    public function logs($query, $options = [])
     {
         $options = $options + [
           'size' => 20,

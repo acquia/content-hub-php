@@ -454,7 +454,7 @@ class ContentHubTest extends \PHPUnit_Framework_TestCase
         $client = $this->getClient($responses);
 
         // Get History.
-        $response = $client->history('');
+        $response = $client->logs('');
         $this->assertEquals($data['hits']['total'], $response['hits']['total']);
         $this->assertEquals($data['hits']['hits'], $response['hits']['hits']);
     }
