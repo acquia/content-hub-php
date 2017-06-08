@@ -17,14 +17,22 @@ class ContentHub extends Client
     private $adapter;
 
     /**
+     * Defines the Content Hub API Version.
+     *
+     * @var string
+     */
+    private $api_version;
+
+    /**
      * Overrides \GuzzleHttp\Client::__construct()
      *
      * @param string $apiKey
      * @param string $secretKey
      * @param string $origin
      * @param array  $config
+     * @param string  $api_version
      */
-    public function __construct($apiKey, $secretKey, $origin, array $config = [])
+    public function __construct($apiKey, $secretKey, $origin, array $config = [], $api_version = 'v1')
     {
         if (!isset($config['defaults'])) {
             $config['defaults'] = [];
@@ -51,6 +59,9 @@ class ContentHub extends Client
 
         parent::__construct($config);
 
+        // Define the API Version.
+        $this->api_version = $api_version;
+
         // Set the Adapter.
         $this->adapter = new Adapter($adapterConfig);
 
@@ -72,7 +83,8 @@ class ContentHub extends Client
      */
     public function ping()
     {
-        return $this->get('/ping');
+        $endpoint = "/{$this->api_version}/ping";
+        return $this->get($endpoint);
     }
 
     /**
@@ -110,7 +122,8 @@ class ContentHub extends Client
         $json = [
             'name' => $name,
         ];
-        $request = $this->createRequest('POST', '/register', ['json' => $json]);
+        $endpoint = "/{$this->api_version}/register";
+        $request = $this->createRequest('POST', $endpoint, ['json' => $json]);
         $response = $this->send($request);
         return $response->json();
     }
@@ -151,7 +164,8 @@ class ContentHub extends Client
         $json = [
             'resource' => $resource,
         ];
-        $request = $this->createRequest('POST', '/entities', ['json' => $json]);
+        $endpoint = "/{$this->api_version}/entities";
+        $request = $this->createRequest('POST', $endpoint, ['json' => $json]);
         $response = $this->send($request);
         return $response;
     }
@@ -167,7 +181,8 @@ class ContentHub extends Client
      */
     public function readEntity($uuid)
     {
-        $response = $this->get('entities/' . $uuid);
+        $endpoint = "/{$this->api_version}/entities/{$uuid}";
+        $response = $this->get($endpoint);
         $data = $response->json();
         $config = [
             'dataType' => 'Entity',
@@ -194,7 +209,8 @@ class ContentHub extends Client
         $json = [
             'resource' => $resource,
         ];
-        $request = $this->createRequest('PUT', '/entities/'. $uuid, ['json' => $json]);
+        $endpoint = "/{$this->api_version}/entities/{$uuid}";
+        $request = $this->createRequest('PUT', $endpoint, ['json' => $json]);
         $response = $this->send($request);
         return $response;
     }
@@ -217,7 +233,8 @@ class ContentHub extends Client
         $json = [
             'resource' => $resource,
         ];
-        $request = $this->createRequest('PUT', '/entities', ['json' => $json]);
+        $endpoint = "/{$this->api_version}/entities";
+        $request = $this->createRequest('PUT', $endpoint, ['json' => $json]);
         $response = $this->send($request);
         return $response;
     }
@@ -233,25 +250,110 @@ class ContentHub extends Client
      */
     public function deleteEntity($uuid)
     {
-        return $this->delete('entities/' . $uuid);
+        $endpoint = "/{$this->api_version}/entities/{$uuid}";
+        return $this->delete($endpoint);
     }
 
     /**
      * Purges all entities from the Content Hub.
      *
      * This method should be used carefully as it deletes all the entities for
-     * the current subscription from the Content Hub.
+     * the current subscription from the Content Hub. This creates a backup that
+     * can be restored at any time. Any subsequent purges overwrite the existing
+     * backup. Be VERY careful when using this endpoint.
+     *
+     * @return array
+     *   The response array.
      */
     public function purge()
     {
-        $list = $this->listEntities();
-        while ($list["total"] != 0) {
-            foreach ($list["data"] as $entity) {
-                $this->deleteEntity($entity["uuid"]);
-            }
-            $list = $this->listEntities();
-        }
-        return $list;
+        $endpoint = "/{$this->api_version}/entities/purge";
+        $request = $this->createRequest('POST', $endpoint, ['json' => '']);
+        $response = $this->send($request);
+        return $response->json();
+    }
+
+    /**
+     * Restores the state of entities before the previous purge.
+     *
+     * Only to be used if a purge has been called previously. This means new
+     * entities added after the purge was enacted will be overwritten by the
+     * previous state. Be VERY careful when using this endpoint.
+     *
+     * @return array
+     *   The response array.
+     */
+    public function restore()
+    {
+        $endpoint = "/{$this->api_version}/entities/restore";
+        $request = $this->createRequest('POST', $endpoint, ['json' => '']);
+        $response = $this->send($request);
+        return $response->json();
+    }
+
+    /**
+     * Reindex a subscription.
+     *
+     * Schedules a reindex process.
+     *
+     * @return array
+     *   The response array.
+     *
+     * @throws \GuzzleHttp\Exception\RequestException
+     */
+    public function reindex()
+    {
+        $endpoint = "/{$this->api_version}/reindex";
+        $request = $this->createRequest('POST', $endpoint, ['json' => '']);
+        $response = $this->send($request);
+        return $response->json();
+    }
+
+    /**
+     * Obtains Customer-Facing-Logs for the subscription.
+     *
+     * This is forward search request to Elastic Search.
+     *
+     * @param string $query
+     *   An elastic search query.
+     * @param array $options
+     *   An array with the number of items to show in the list and offset.
+     *
+     * @return array
+     *   The history logs array.
+     *
+     * @throws \GuzzleHttp\Exception\RequestException
+     */
+    public function logs($query, $options = [])
+    {
+        // If no specific ElasticSearch query is given, use a simple query.
+        $options = $options + [
+            'size' => 20,
+            'from' => 0
+        ];
+        $json = empty($query) ? '{"query": {"match_all": {}}}' : $query;
+        $query = json_decode($json, TRUE);
+
+        // Execute request.
+        $endpoint = "/{$this->api_version}/history?size={$options['size']}&from={$options['from']}";
+        $request = $this->createRequest('POST', $endpoint, ['json' => $query]);
+        $response = $this->send($request);
+        return $response->json();
+    }
+
+    /**
+     * Retrieves active ElasticSearch mapping of entities.
+     *
+     * @return array
+     *   The fields mapping array.
+     *
+     * @throws \GuzzleHttp\Exception\RequestException
+     */
+    public function mapping()
+    {
+        $endpoint = "/{$this->api_version}/_mapping";
+        $response = $this->get($endpoint);
+        return $response->json();
     }
 
     /**
@@ -286,7 +388,7 @@ class ContentHub extends Client
             'filters' => [],
         ];
 
-        $url = 'entities?limit={limit}&start={start}';
+        $url = "/{$this->api_version}/entities?limit={limit}&start={start}";
 
         $url .= isset($variables['type']) ? '&type={type}' :'';
         $url .= isset($variables['origin']) ? '&origin={origin}' :'';
@@ -321,7 +423,7 @@ class ContentHub extends Client
      */
     public function searchEntity($query)
     {
-        $url = '/_search';
+        $url = "/{$this->api_version}/_search";
         $request = $this->createRequest('GET', $url, ['json' => (array) $query]);
         $response = $this->send($request);
         return $response->json();
@@ -338,7 +440,8 @@ class ContentHub extends Client
      */
     public function getClientByName($name)
     {
-        $response = $this->get('/settings/clients/' . $name);
+        $endpoint = "/{$this->api_version}/settings/clients/{$name}";
+        $response = $this->get($endpoint);
         $data = $response->json();
         return $data;
     }
@@ -350,7 +453,8 @@ class ContentHub extends Client
      */
     public function getSettings()
     {
-        $response = $this->get('settings');
+        $endpoint = "/{$this->api_version}/settings";
+        $response = $this->get($endpoint);
         $data = $response->json();
         return new Settings($data);
     }
@@ -367,7 +471,8 @@ class ContentHub extends Client
         $json = [
             'url' => $webhook_url
         ];
-        $request = $this->createRequest('POST', '/settings/webhooks', ['json' => $json]);
+        $endpoint = "/{$this->api_version}/settings/webhooks";
+        $request = $this->createRequest('POST', $endpoint, ['json' => $json]);
         $response = $this->send($request);
         return $response->json();
     }
@@ -384,7 +489,8 @@ class ContentHub extends Client
      */
     public function deleteWebhook($uuid)
     {
-        return $this->delete('/settings/webhooks/' . $uuid);
+        $endpoint = "/{$this->api_version}/settings/webhooks/{$uuid}";
+        return $this->delete($endpoint);
     }
 
     /**
@@ -396,7 +502,8 @@ class ContentHub extends Client
      */
     public function regenerateSharedSecret()
     {
-        $request = $this->createRequest('POST', '/settings/secret', ['json' => []]);
+        $endpoint = "/{$this->api_version}/settings/secret";
+        $request = $this->createRequest('POST', $endpoint, ['json' => []]);
         $response = $this->send($request);
         return $response->json();
     }
