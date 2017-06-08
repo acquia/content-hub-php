@@ -127,6 +127,134 @@ class ContentHubTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
+    public function setResponseTrue() {
+        return [
+            'success' => true,
+            'request_id' => '00000000-0000-0000-0000-000000000000'
+        ];
+    }
+
+    public function setHistoryLogs() {
+        return [
+            '_shards' => [
+                'failed' => 0,
+                'successful' => 5,
+                'total' => 5,
+            ],
+            'hits' =>[
+                'hits' => [
+                    0 => [
+                        '_id' => '7257fb6e-2fba-4919-6311-656385295b2f',
+                        '_index' => '00000000-0000-4000-8000-000000000000_history_index',
+                        '_score' => 1,
+                        '_source' => [
+                            'client' => '12340000-0000-4000-6012-000000000000',
+                            'entity' => 'eadc61e3-b847-4310-946a-511cca7bb14b',
+                            'id' => '7257fb6e-2fba-4919-6311-656385295b2f',
+                            'request_id' => '71b983d5-169d-48d9-6f62-c474cbdd5454',
+                            'status' => 'succeeded',
+                            'subscription' => '00000000-0000-4000-8000-000000000000',
+                            'timestamp' => '2017-03-09T13:49:23Z',
+                            'type' => 'create',
+                        ],
+                        '_type' => 'history',
+                    ],
+                ],
+                'total' => 1,
+            ],
+            'timed_out' => false,
+            'took' => 63,
+        ];
+    }
+
+    public function setMapping() {
+        return [
+            'entity' => [
+                'dynamic' => 'strict',
+                'properties' => [
+                    'data' => [
+                        'dynamic' => 'strict',
+                        'properties' => [
+                            'assets' => [
+                                'dynamic' => 'strict',
+                                'properties' => [
+                                    'replace-token' => [
+                                        'type' => 'string',
+                                    ],
+                                    'url' => [
+                                        'type' => 'string',
+                                    ],
+                                ],
+                            ],
+                            'attributes' => [
+                                'dynamic' => 'true',
+                                'properties' => [
+                                    'title' => [
+                                        'dynamic' => 'strict',
+                                        'properties' => [
+                                            'metadata' => [
+                                                'type' => 'string',
+                                            ],
+                                            'type' => [
+                                                'type' => 'string',
+                                            ],
+                                            'value' => [
+                                                'dynamic' => 'true',
+                                                'properties' => [
+                                                    'und' => [
+                                                        'type' => 'string',
+                                                    ],
+                                                ],
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                                'type' => 'object',
+                            ],
+                            'created' => [
+                                'type' => 'date',
+                            ],
+                            'metadata' => [
+                                'dynamic' => 'true',
+                                'index' => 'no',
+                                'type' => 'object',
+                            ],
+                            'modified' => [
+                                'type' => 'date',
+                            ],
+                            'origin' => [
+                                'type' => 'string',
+                            ],
+                            'type' => [
+                                'type' => 'string',
+                            ],
+                            'uuid' => [
+                                'type' => 'string',
+                            ],
+                        ],
+                    ],
+                    'id' => [
+                        'type' => 'string',
+                    ],
+                    'origin' => [
+                        'index' => 'not_analyzed',
+                        'type' => 'string',
+                    ],
+                    'revision' => [
+                        'type' => 'long',
+                    ],
+                    'subscription' => [
+                        'type' => 'string',
+                    ],
+                    'uuid' => [
+                        'index' => 'not_analyzed',
+                        'type' => 'string',
+                    ],
+                ],
+            ],
+        ];
+    }
+
     public function testPing()
     {
         // Setup
@@ -276,5 +404,71 @@ class ContentHubTest extends \PHPUnit_Framework_TestCase
         ];
         $response = $client->listEntities($options);
         $this->assertEquals($data, $response);
+    }
+
+    public function testPurge() {
+        // Setup
+        $data = $this->setResponseTrue();
+        $responses = [
+          new Response(200, [], json_encode($data)),
+        ];
+        $client = $this->getClient($responses);
+
+        // Purge entities.
+        $response = $client->purge();
+        $this->assertTrue($response['success']);
+    }
+
+    public function testRestore() {
+        // Setup
+        $data = $this->setResponseTrue();
+        $responses = [
+          new Response(200, [], json_encode($data)),
+        ];
+        $client = $this->getClient($responses);
+
+        // Restore entities.
+        $response = $client->restore();
+        $this->assertTrue($response['success']);
+    }
+
+    public function testReindex() {
+        // Setup
+        $data = $this->setResponseTrue();
+        $responses = [
+          new Response(200, [], json_encode($data)),
+        ];
+        $client = $this->getClient($responses);
+
+        // Reindex.
+        $response = $client->reindex();
+        $this->assertTrue($response['success']);
+    }
+
+    public function testHistory() {
+        // Setup
+        $data = $this->setHistoryLogs();
+        $responses = [
+          new Response(200, [], json_encode($data)),
+        ];
+        $client = $this->getClient($responses);
+
+        // Get History.
+        $response = $client->logs('');
+        $this->assertEquals($data['hits']['total'], $response['hits']['total']);
+        $this->assertEquals($data['hits']['hits'], $response['hits']['hits']);
+    }
+
+    public function testMapping() {
+        // Setup
+        $data = $this->setMapping();
+        $responses = [
+          new Response(200, [], json_encode($data)),
+        ];
+        $client = $this->getClient($responses);
+
+        // Purge entities
+        $response = $client->mapping();
+        $this->assertEquals($data['entity'], $response['entity']);
     }
 }
