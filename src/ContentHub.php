@@ -11,7 +11,7 @@ use Acquia\ContentHubClient\Data\Adapter;
 class ContentHub extends Client
 {
     // Override VERSION inherited from GuzzleHttp::ClientInterface
-    const VERSION = '0.6.8';
+    const VERSION = '0.6.9';
     const LIBRARYNAME = 'AcquiaContentHubPHPLib';
 
     private $adapter;
