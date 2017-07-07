@@ -44,7 +44,7 @@ class ContentHub extends Client
         }
 
         // Setting up the User Header string
-        $user_agent_string = $this::LIBRARYNAME . '/' . $this::VERSION . ' ' . default_user_agent();
+        $user_agent_string = $this::LIBRARYNAME . '/' . $this::VERSION . ' ' . \GuzzleHttp\default_user_agent();
         if (isset($config['client-user-agent'])) {
             $user_agent_string = $config['client-user-agent'] . ' ' . $user_agent_string;
         }
