@@ -190,4 +190,35 @@ class Attribute extends \ArrayObject
         return array_keys($this->handlers);
     }
 
+    /**
+     * Converts a TYPE_ARRAY_* attribute to a single TYPE (cardinality = 1).
+     *
+     * It only works if the attribute is of TYPE_ARRAY_* and if it only contains
+     * a single value to prevent data loss.
+     *
+     * @return $this
+     */
+    public function setCardinalitySingle()
+    {
+        // If this attribute has more than one single element then it obviously
+        // has cardinality greater than 1 or unlimited so just return it as is.
+        if (count($this->getValue()) > 1) {
+            return $this;
+        }
+
+        $attributeType = $this->getType();
+        $singularAttributeType = preg_replace('/^array\<|\>$/', '', $attributeType);
+
+        if ($attributeType === $singularAttributeType) {
+            return $this;
+        }
+
+        $this['type'] = $singularAttributeType;
+        $languages = array_keys($this->getValues());
+        foreach ($languages as $language) {
+            $value = $this->getValue($language);
+            $this->setValue(reset($value), $language);
+        }
+        return $this;
+    }
 }
