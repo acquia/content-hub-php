@@ -9,9 +9,15 @@ use Psr\Http\Message\RequestInterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Request;
+use Acquia\ContentHubClient\Data\Adapter;
 
 class ContentHub extends Client
 {
+    // Override VERSION inherited from GuzzleHttp::ClientInterface
+    const VERSION = '0.7.0';
+    const LIBRARYNAME = 'AcquiaContentHubPHPLib';
+
+    private $adapter;
 
     /**
      * Defines the Content Hub API Version.
@@ -37,9 +43,23 @@ class ContentHub extends Client
             $config['base_uri'] = $config['base_url'];
         }
 
+        // Setting up the User Header string
+        $user_agent_string = $this::LIBRARYNAME . '/' . $this::VERSION . ' ' . \GuzzleHttp\default_user_agent();
+        if (isset($config['client-user-agent'])) {
+            $user_agent_string = $config['client-user-agent'] . ' ' . $user_agent_string;
+        }
+
         // Setting up the headers.
         $config['headers']['Content-Type'] = 'application/json';
         $config['headers']['X-Acquia-Plexus-Client-Id'] = $origin;
+        $config['headers']['User-Agent'] = $user_agent_string;
+
+        // Setting up Adapter Configuration.
+        $adapterConfig = isset($config['adapterConfig']) ? $config['adapterConfig'] : [];
+        unset($config['adapterConfig']);
+
+        // Set the Adapter.
+        $this->adapter = new Adapter($adapterConfig);
 
         // Define the API Version.
         $this->api_version = $api_version;
@@ -170,7 +190,11 @@ class ContentHub extends Client
         $endpoint = "/{$this->api_version}/entities/{$uuid}";
         $request = new Request('GET', $endpoint);
         $data = $this->getResponseJson($request);
-        return new Entity($data['data']['data']);
+        $config = [
+            'dataType' => 'Entity',
+        ];
+        $translatedData = $this->adapter->translate($data['data']['data'], $config);
+        return new Entity($translatedData);
     }
 
     /**
@@ -302,8 +326,8 @@ class ContentHub extends Client
     public function logs($query, $options = [])
     {
         $options = $options + [
-          'size' => 20,
-          'from' => 0
+            'size' => 20,
+            'from' => 0
         ];
         $query = empty($query) ? '{"query": {"match_all": {}}}' : $query;
         $endpoint = "/{$this->api_version}/history?size={$options['size']}&from={$options['from']}";
@@ -371,7 +395,12 @@ class ContentHub extends Client
 
         // Now make the request.
         $request = new Request('GET', $url);
-        return $this->getResponseJson($request);
+        $items = $this->getResponseJson($request);
+        $config = [
+            'dataType' => 'ListEntities',
+        ];
+        $translatedData = $this->adapter->translate($items, $config);
+        return $translatedData;
     }
 
     /**

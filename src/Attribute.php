@@ -14,11 +14,13 @@ class Attribute extends \ArrayObject
      */
     const TYPE_INTEGER         = 'integer';
     const TYPE_STRING          = 'string';
+    const TYPE_KEYWORD         = 'keyword';
     const TYPE_BOOLEAN         = 'boolean';
     const TYPE_NUMBER          = 'number';
     const TYPE_REFERENCE       = 'reference';
     const TYPE_ARRAY_INTEGER   = 'array<integer>';
     const TYPE_ARRAY_STRING    = 'array<string>';
+    const TYPE_ARRAY_KEYWORD   = 'array<keyword>';
     const TYPE_ARRAY_BOOLEAN   = 'array<boolean>';
     const TYPE_ARRAY_NUMBER    = 'array<number>';
     const TYPE_ARRAY_REFERENCE = 'array<reference>';
@@ -38,11 +40,13 @@ class Attribute extends \ArrayObject
     {
         $this->setTypeHandler(new TypeHandler(self::TYPE_INTEGER, 'integer'))
              ->setTypeHandler(new TypeHandler(self::TYPE_STRING, 'string'))
+             ->setTypeHandler(new TypeHandler(self::TYPE_KEYWORD, 'string'))
              ->setTypeHandler(new TypeHandler(self::TYPE_BOOLEAN, 'boolean'))
              ->setTypeHandler(new TypeHandler(self::TYPE_NUMBER, 'float'))
              ->setTypeHandler(new TypeHandler(self::TYPE_REFERENCE, 'string'))
              ->setTypeHandler(new TypeHandler(self::TYPE_ARRAY_INTEGER, 'integer'))
              ->setTypeHandler(new TypeHandler(self::TYPE_ARRAY_STRING, 'string'))
+             ->setTypeHandler(new TypeHandler(self::TYPE_ARRAY_KEYWORD, 'string'))
              ->setTypeHandler(new TypeHandler(self::TYPE_ARRAY_BOOLEAN, 'boolean'))
              ->setTypeHandler(new TypeHandler(self::TYPE_ARRAY_NUMBER, 'float'))
              ->setTypeHandler(new TypeHandler(self::TYPE_ARRAY_REFERENCE, 'string'))
@@ -190,4 +194,35 @@ class Attribute extends \ArrayObject
         return array_keys($this->handlers);
     }
 
+    /**
+     * Converts a TYPE_ARRAY_* attribute to a single TYPE (cardinality = 1).
+     *
+     * It only works if the attribute is of TYPE_ARRAY_* and if it only contains
+     * a single value to prevent data loss.
+     *
+     * @return $this
+     */
+    public function setCardinalitySingle()
+    {
+        // If this attribute has more than one single element then it obviously
+        // has cardinality greater than 1 or unlimited so just return it as is.
+        if (count($this->getValue()) > 1) {
+            return $this;
+        }
+
+        $attributeType = $this->getType();
+        $singularAttributeType = preg_replace('/^array\<|\>$/', '', $attributeType);
+
+        if ($attributeType === $singularAttributeType) {
+            return $this;
+        }
+
+        $this['type'] = $singularAttributeType;
+        $languages = array_keys($this->getValues());
+        foreach ($languages as $language) {
+            $value = $this->getValue($language);
+            $this->setValue(reset($value), $language);
+        }
+        return $this;
+    }
 }
