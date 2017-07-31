@@ -4,6 +4,7 @@ namespace Acquia\ContentHubClient;
 
 use Acquia\Hmac\Digest as Digest;
 use Acquia\Hmac\Guzzle\HmacAuthMiddleware;
+use Acquia\Hmac\Key;
 use Acquia\Hmac\RequestSigner;
 use Psr\Http\Message\RequestInterface;
 use GuzzleHttp\Client;
@@ -25,6 +26,12 @@ class ContentHub extends Client
      * @var string
      */
     private $api_version;
+
+    /**
+     * @var \Acquia\Hmac\KeyInterface
+     *   A sample key.
+     */
+    protected $authKey;
 
     /**
      * Overrides \GuzzleHttp\Client::__construct()
@@ -64,15 +71,24 @@ class ContentHub extends Client
         // Define the API Version.
         $this->api_version = $api_version;
 
-        // Add the authentication handler
-        // @see https://github.com/acquia/http-hmac-spec
-        $requestSigner = new RequestSigner(new Digest\Version1('sha256'));
-        $middleware = new HmacAuthMiddleware($requestSigner, $apiKey, $secretKey);
+        // A key consists of your UUID and a MIME base64 encoded shared secret.
+        $this->authKey = new Key($apiKey, $secretKey);
 
+        // Set our default HandlerStack if nothing is provided
         if (!isset($config['handler'])) {
             $config['handler'] = HandlerStack::create();
         }
-        $config['handler']->push($middleware);
+
+        // Add the authentication handler
+        // @see https://github.com/acquia/http-hmac-spec
+        if (isset($config['auth_middleware'])) {
+            if ($config['auth_middleware'] !== false) {
+                $config['handler']->push($config['auth_middleware']);
+            }
+        } else {
+            $middleware = new HmacAuthMiddleware($this->authKey, 'ContentHub');
+            $config['handler']->push($middleware);
+        }
 
         parent::__construct($config);
     }
