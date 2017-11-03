@@ -327,10 +327,11 @@ class ContentHub extends Client
     {
         $options = $options + [
             'size' => 20,
-            'from' => 0
+            'from' => 0,
+            'sort' => 'timestamp:desc'
         ];
         $query = empty($query) ? '{"query": {"match_all": {}}}' : $query;
-        $endpoint = "/{$this->api_version}/history?size={$options['size']}&from={$options['from']}";
+        $endpoint = "/{$this->api_version}/history?size={$options['size']}&from={$options['from']}&sort={$options['sort']}";
         $request = new Request('POST', $endpoint, [], $query);
         return $this->getResponseJson($request);
     }
