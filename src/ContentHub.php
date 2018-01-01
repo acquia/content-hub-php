@@ -134,7 +134,7 @@ class ContentHub extends Client
     }
 
     /**
-     * Sends request to asynchronously create an entity.
+     * Sends request to create an entity.
      *
      * The entity does not need to be passed to this method, but only the resource URL.
      *
@@ -143,37 +143,45 @@ class ContentHub extends Client
      * @param  string $resource
      *   This string should contain the URL where Plexus can read the entity's CDF.
      *
+     * @param  object $entities
+     *   This optionally sends entities to Content Hub synchronously.
+     *
      * @return \Psr\Http\Message\ResponseInterface
      *
      * @throws \GuzzleHttp\Exception\RequestException
      */
-    public function createEntity($resource)
+    public function createEntity($resource, $entities = NULL)
     {
-      return $this->createEntities($resource);
+      return $this->createEntities($resource, $entities);
     }
 
     /**
-     * Sends request to asynchronously create entities.
+     * Sends request to create entities.
      *
      * The entity does not need to be passed to this method, but only the resource URL.
      *
      * @param  string $resource
      *   This string should contain the URL where Plexus can read the entities' CDF.
      *
+     * @param  object $entities
+     *   This optionally sends entities to Content Hub synchronously.
+     *
      * @return \Psr\Http\Message\ResponseInterface
      *
      * @throws \GuzzleHttp\Exception\RequestException
      */
-    public function createEntities($resource)
+    public function createEntities($resource, $entities = NULL)
     {
         $json = [
             'resource' => $resource,
         ];
+        if (!empty($entities)) {
+            $json['data'] = $entities;
+        }
         $body = json_encode($json);
         $endpoint = "/{$this->api_version}/entities";
         $request = new Request('POST', $endpoint, [], $body);
-        $response = $this->send($request);
-        return $response;
+        return $this->getResponseJson($request);
     }
 
     /**
