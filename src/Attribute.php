@@ -221,7 +221,8 @@ class Attribute extends \ArrayObject
         $languages = array_keys($this->getValues());
         foreach ($languages as $language) {
             $value = $this->getValue($language);
-            $this->setValue(reset($value), $language);
+            $value = is_array($value) ? reset($value) : $value;
+            $this->setValue($value, $language);
         }
         return $this;
     }
