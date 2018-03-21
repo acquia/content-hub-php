@@ -2,9 +2,6 @@
 
 namespace Acquia\ContentHubClient;
 
-use Acquia\Hmac\Digest as Digest;
-use Acquia\Hmac\Guzzle\HmacAuthMiddleware;
-use Acquia\Hmac\RequestSigner;
 use Psr\Http\Message\RequestInterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
@@ -35,7 +32,7 @@ class ContentHub extends Client
      * @param array  $config
      * @param string $api_version
      */
-    public function __construct($apiKey, $secretKey, $origin, array $config = [], $api_version = 'v1')
+    public function __construct($apiKey, $secretKey, $origin, array $config = [], $api_version = 'v1', $middlewares)
     {
         // "base_url" parameter changed to "base_uri" in Guzzle6, so the following line
         // is there to make sure it does not disrupt previous configuration.
@@ -66,13 +63,12 @@ class ContentHub extends Client
 
         // Add the authentication handler
         // @see https://github.com/acquia/http-hmac-spec
-        $requestSigner = new RequestSigner(new Digest\Version1('sha256'));
-        $middleware = new HmacAuthMiddleware($requestSigner, $apiKey, $secretKey);
-
         if (!isset($config['handler'])) {
             $config['handler'] = HandlerStack::create();
         }
-        $config['handler']->push($middleware);
+        foreach ($middlewares AS $middleware) {
+          $config['handler']->push($middleware);
+        }
 
         parent::__construct($config);
     }
