@@ -29,10 +29,11 @@ class ContentHub extends Client
      * @param string $apiKey
      * @param string $secretKey
      * @param string $origin
+     * @param array $middlewares
      * @param array  $config
      * @param string $api_version
      */
-    public function __construct($apiKey, $secretKey, $origin, array $config = [], $api_version = 'v1', $middlewares)
+    public function __construct($apiKey, $secretKey, $origin, array $middlewares, array $config = [], $api_version = 'v1')
     {
         // "base_url" parameter changed to "base_uri" in Guzzle6, so the following line
         // is there to make sure it does not disrupt previous configuration.
@@ -67,7 +68,7 @@ class ContentHub extends Client
             $config['handler'] = HandlerStack::create();
         }
         foreach ($middlewares AS $middleware) {
-          $config['handler']->push($middleware);
+          $config['handler']->push($middleware->getMiddleware());
         }
 
         parent::__construct($config);
