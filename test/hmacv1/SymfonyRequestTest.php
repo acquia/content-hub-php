@@ -1,14 +1,14 @@
 <?php
 
-namespace Drupal\acquia_contenthub\hmacv1\Test;
+namespace Acquia\ContentHubClient\test\hmacv1;
 
-use Drupal\acquia_contenthub\hmacv1\Request\Symfony;
+use Acquia\ContentHubClient\hmacv1\Request\Symfony;
 use Symfony\Component\HttpFoundation\Request;
 
 class SymfonyRequestTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @return \Drupal\acquia_contenthub\hmacv1\Request\Guzzle5
+     * @return \Acquia\ContentHubClient\hmacv1\Request\Guzzle5
      */
     public function getRequest(array $headers = array(), $method = 'GET', $body = null)
     {

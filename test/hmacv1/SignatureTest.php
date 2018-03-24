@@ -1,15 +1,15 @@
 <?php
 
-namespace Drupal\acquia_contenthub\hmacv1\Test;
+namespace Acquia\ContentHubClient\test\hmacv1;
 
-use Drupal\acquia_contenthub\hmacv1\Signature;
+use Acquia\ContentHubClient\hmacv1\Signature;
 
 class SignatureTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @param null|int $timestamp
      *
-     * @return \Drupal\acquia_contenthub\hmacv1\Signature
+     * @return \Acquia\ContentHubClient\hmacv1\Signature
      */
     public function getSignature($timestamp = null)
     {

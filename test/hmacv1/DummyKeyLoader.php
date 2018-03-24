@@ -1,8 +1,8 @@
 <?php
 
-namespace Drupal\acquia_contenthub\hmacv1\Test;
+namespace Acquia\ContentHubClient\test\hmacv1;
 
-use Drupal\acquia_contenthub\hmacv1\KeyLoaderInterface;
+use Acquia\ContentHubClient\hmacv1\KeyLoaderInterface;
 
 class DummyKeyLoader implements KeyLoaderInterface
 {

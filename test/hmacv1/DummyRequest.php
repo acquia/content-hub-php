@@ -1,8 +1,8 @@
 <?php
 
-namespace Drupal\acquia_contenthub\hmacv1\Test;
+namespace Acquia\ContentHubClient\test\hmacv1;
 
-use Drupal\acquia_contenthub\hmacv1\Request\RequestInterface;
+use Acquia\ContentHubClient\hmacv1\Request\RequestInterface;
 
 class DummyRequest implements RequestInterface
 {

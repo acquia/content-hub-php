@@ -1,8 +1,8 @@
 <?php
 
-namespace Drupal\acquia_contenthub\hmacv1\Test;
+namespace Acquia\ContentHubClient\test\hmacv1;
 
-use Drupal\acquia_contenthub\hmacv1\KeyInterface;
+use Acquia\ContentHubClient\hmacv1\KeyInterface;
 
 class DummyKey implements KeyInterface
 {

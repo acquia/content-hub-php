@@ -1,9 +1,9 @@
 <?php
 
-namespace Drupal\acquia_contenthub\hmacv1\Test;
+namespace Acquia\ContentHubClient\test\hmacv1;
 
-use Drupal\acquia_contenthub\hmacv1\RequestSigner;
-use Drupal\acquia_contenthub\hmacv1\Digest\Version1 as Digest;
+use Acquia\ContentHubClient\hmacv1\RequestSigner;
+use Acquia\ContentHubClient\hmacv1\Digest\Version1 as Digest;
 
 class DigestVersion1Test extends \PHPUnit_Framework_TestCase
 {

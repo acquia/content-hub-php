@@ -1,9 +1,9 @@
 <?php
 
-namespace Drupal\acquia_contenthub\hmacv1\Test;
+namespace Acquia\ContentHubClient\test\hmacv1;
 
-use Drupal\acquia_contenthub\hmacv1\Guzzle\HmacAuthMiddleware;
-use Drupal\acquia_contenthub\hmacv1\RequestSigner;
+use Acquia\ContentHubClient\hmacv1\Guzzle\HmacAuthMiddleware;
+use Acquia\ContentHubClient\hmacv1\RequestSigner;
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
@@ -14,7 +14,7 @@ use GuzzleHttp\Psr7\Response;
 class GuzzleAuthMiddlewareTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @return \Drupal\acquia_contenthub\hmacv1\Guzzle\HmacAuthMiddleware
+     * @return \Acquia\ContentHubClient\hmacv1\Guzzle\HmacAuthMiddleware
      */
     public function getMiddleware()
     {

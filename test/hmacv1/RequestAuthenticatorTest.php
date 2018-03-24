@@ -1,9 +1,9 @@
 <?php
 
-namespace Drupal\acquia_contenthub\hmacv1\Test;
+namespace Acquia\ContentHubClient\test\hmacv1;
 
-use Drupal\acquia_contenthub\hmacv1\RequestAuthenticator;
-use Drupal\acquia_contenthub\hmacv1\RequestSigner;
+use Acquia\ContentHubClient\hmacv1\RequestAuthenticator;
+use Acquia\ContentHubClient\hmacv1\RequestSigner;
 
 class RequestAuthenticatorTest extends \PHPUnit_Framework_TestCase
 {
@@ -23,13 +23,13 @@ class RequestAuthenticatorTest extends \PHPUnit_Framework_TestCase
         $authenticator = new RequestAuthenticator($signer, 0);
         $key = $authenticator->authenticate($request, new DummyKeyLoader());
 
-        $this->assertInstanceOf('Drupal\acquia_contenthub\hmacv1\Test\DummyKey', $key);
+        $this->assertInstanceOf('Acquia\ContentHubClient\test\hmacv1\DummyKey', $key);
         $this->assertEquals('1', $key->getId());
         $this->assertEquals('secret-key', $key->getSecret());
     }
 
     /**
-     * @expectedException \Drupal\acquia_contenthub\hmacv1\Exception\InvalidSignatureException
+     * @expectedException \Acquia\ContentHubClient\hmacv1\Exception\InvalidSignatureException
      */
     public function testInvalidSignature()
     {
@@ -49,7 +49,7 @@ class RequestAuthenticatorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Drupal\acquia_contenthub\hmacv1\Exception\TimestampOutOfRangeException
+     * @expectedException \Acquia\ContentHubClient\hmacv1\Exception\TimestampOutOfRangeException
      */
     public function testExpiredRequest()
     {
@@ -67,7 +67,7 @@ class RequestAuthenticatorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Drupal\acquia_contenthub\hmacv1\Exception\TimestampOutOfRangeException
+     * @expectedException \Acquia\ContentHubClient\hmacv1\Exception\TimestampOutOfRangeException
      */
     public function testFutureRequest()
     {
@@ -86,7 +86,7 @@ class RequestAuthenticatorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Drupal\acquia_contenthub\hmacv1\Exception\KeyNotFoundException
+     * @expectedException \Acquia\ContentHubClient\hmacv1\Exception\KeyNotFoundException
      */
     public function testKeyNotFound()
     {

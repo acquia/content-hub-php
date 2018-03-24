@@ -1,14 +1,14 @@
 <?php
 
-namespace Drupal\acquia_contenthub\hmacv1\Test;
+namespace Acquia\ContentHubClient\test\hmacv1;
 
-use Drupal\acquia_contenthub\hmacv1\Request\Guzzle;
+use Acquia\ContentHubClient\hmacv1\Request\Guzzle;
 use GuzzleHttp\Psr7\Request;
 
 class GuzzleRequestTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @return \Drupal\acquia_contenthub\hmacv1\Request\Guzzle
+     * @return \Acquia\ContentHubClient\hmacv1\Request\Guzzle
      */
     public function getRequest(array $headers = array(), $method = 'GET')
     {

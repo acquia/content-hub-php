@@ -1,8 +1,8 @@
 <?php
 
-namespace Drupal\acquia_contenthub\hmacv1\Test;
+namespace Acquia\ContentHubClient\test\hmacv1;
 
-use Drupal\acquia_contenthub\hmacv1\RequestSigner;
+use Acquia\ContentHubClient\hmacv1\RequestSigner;
 
 class RequestSignerTest extends \PHPUnit_Framework_TestCase
 {
@@ -58,7 +58,7 @@ class RequestSignerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Drupal\acquia_contenthub\hmacv1\Exception\MalformedRequestException
+     * @expectedException \Acquia\ContentHubClient\hmacv1\Exception\MalformedRequestException
      */
     public function testMissingContentType()
     {
@@ -69,7 +69,7 @@ class RequestSignerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Drupal\acquia_contenthub\hmacv1\Exception\MalformedRequestException
+     * @expectedException \Acquia\ContentHubClient\hmacv1\Exception\MalformedRequestException
      */
     public function testMissingAuthorizationHeader()
     {
@@ -78,7 +78,7 @@ class RequestSignerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Drupal\acquia_contenthub\hmacv1\Exception\MalformedRequestException
+     * @expectedException \Acquia\ContentHubClient\hmacv1\Exception\MalformedRequestException
      */
     public function testInvalidAuthorizationHeader()
     {
@@ -90,7 +90,7 @@ class RequestSignerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Drupal\acquia_contenthub\hmacv1\Exception\MalformedRequestException
+     * @expectedException \Acquia\ContentHubClient\hmacv1\Exception\MalformedRequestException
      */
     public function testInvalidProvider()
     {
@@ -102,7 +102,7 @@ class RequestSignerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Drupal\acquia_contenthub\hmacv1\Exception\MalformedRequestException
+     * @expectedException \Acquia\ContentHubClient\hmacv1\Exception\MalformedRequestException
      */
     public function testMissingTimestampHeader()
     {
@@ -114,7 +114,7 @@ class RequestSignerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Drupal\acquia_contenthub\hmacv1\Exception\MalformedRequestException
+     * @expectedException \Acquia\ContentHubClient\hmacv1\Exception\MalformedRequestException
      */
     public function testMissingMultiTimestampHeader()
     {
@@ -127,7 +127,7 @@ class RequestSignerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Drupal\acquia_contenthub\hmacv1\Exception\MalformedRequestException
+     * @expectedException \Acquia\ContentHubClient\hmacv1\Exception\MalformedRequestException
      */
     public function testInvalidSignature()
     {
@@ -151,7 +151,7 @@ class RequestSignerTest extends \PHPUnit_Framework_TestCase
         $signer->setTimestampHeaders(array('Date1'));
         $signature = $signer->getSignature($request);
 
-        $this->assertInstanceOf('Drupal\acquia_contenthub\hmacv1\Signature', $signature);
+        $this->assertInstanceOf('Acquia\ContentHubClient\hmacv1\Signature', $signature);
         $this->assertEquals('1', $signature->getId());
         $this->assertEquals('abcd', $signature->getSignature());
         $this->assertEquals(strtotime($date), $signature->getTimestamp());
