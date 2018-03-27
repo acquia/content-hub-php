@@ -27,7 +27,7 @@ class ContentHub extends Client
      * Overrides \GuzzleHttp\Client::__construct()
      *
      * @param string $origin
-     * @param array $middlewares
+     * @param array  $middlewares
      * @param array  $config
      * @param string $api_version
      */
