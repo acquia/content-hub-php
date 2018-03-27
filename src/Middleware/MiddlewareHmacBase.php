@@ -1,14 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: japerry
- * Date: 3/23/18
- * Time: 10:26 PM
- */
 
 namespace Acquia\ContentHubClient\Middleware;
-
-
 
 abstract class MiddlewareHmacBase {
 
