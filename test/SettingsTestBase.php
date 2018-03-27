@@ -2,27 +2,19 @@
 
 namespace Acquia\ContentHubClient\test;
 
-use Acquia\ContentHubClient\ContentHub;
 use Acquia\ContentHubClient\User;
-use GuzzleHttp\Handler\MockHandler;
-use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 
-class SettingsTest extends \PHPUnit_Framework_TestCase
+abstract class SettingsTestBase extends \PHPUnit_Framework_TestCase
 {
     /**
      * @param array $responses Responses
      *
      * @return \Acquia\ContentHubClient\ContentHub
      */
-    private function getClient(array $responses = [])
-    {
-      $mock = new MockHandler($responses);
-      $stack = HandlerStack::create($mock);
-      return new ContentHub('public', 'secret', 'origin', ['handler' => $stack]);
-    }
+    abstract protected function getClient(array $responses = []);
 
-    private function setData()
+    protected function setData()
     {
         return [
             "uuid" => "someuser",
