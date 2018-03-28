@@ -40,6 +40,11 @@ $url = 'https://us-east-1.content-hub.acquia.com';
 $apiKey    = 'AAAAAAAAAAAAAAAAAAAA';
 $secretKey = 'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB';
 
+// For versions => 1.3, the api key is passed via the HMAC middleware.
+$middleware = new MiddlewareHmacV1($apiKey, $secretKey, 'V1');
+$client = new ContentHub('', $middleware, ['base_url' => $url]);
+
+// For versions < 1.3, use the following client callback.
 $client = new ContentHub($apiKey, $secretKey, '', ['base_url' => $url]);
 
 // Register the application (or client site) with Content Hub. The parameter
@@ -76,12 +81,14 @@ $client->deleteWebhook($webhook['uuid']);
 <?php
 
 use Acquia\ContentHubClient\ContentHub;
+use Acquia\ContentHubClient\Middleware\MiddlewareHmacV1;
 use Acquia\ContentHubClient\Entities;
 use Acquia\ContentHubClient\Entity;
 use Acquia\ContentHubClient\Attribute;
 use Acquia\ContentHubClient\Asset;
 
-$client = new ContentHub($apiKey, $secretKey, $clientId, ['base_url' => $url]);
+$middleware = new MiddlewareHmacV1($apiKey, $secretKey, 'V1');
+$client = new ContentHub($clientId, $middleware, ['base_url' => $url]);
 
 // The unique identifier of the entity, usually a randomly generated UUID.
 // See https://github.com/ramsey/uuid to simplify UUID generation in PHP.
