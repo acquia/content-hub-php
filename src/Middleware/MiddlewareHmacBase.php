@@ -2,7 +2,16 @@
 
 namespace Acquia\ContentHubClient\Middleware;
 
+use Drupal\Core\Logger\LoggerChannelFactoryInterface;
+
 abstract class MiddlewareHmacBase {
+
+  /**
+   * Logger.
+   *
+   * @var \Drupal\Core\Logger\LoggerChannelFactoryInterface
+   */
+  protected $loggerFactory;
 
   /**
    * The api key.
@@ -25,7 +34,15 @@ abstract class MiddlewareHmacBase {
    */
   protected $version;
 
-  public function __construct($api_key, $secret_key, $version) {
+  /**
+   * MiddlewareHmacBase constructor.
+   * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $logger_factory
+   * @param $api_key
+   * @param $secret_key
+   * @param $version
+   */
+  public function __construct(LoggerChannelFactoryInterface $logger_factory, $api_key, $secret_key, $version) {
+    $this->loggerFactory = $logger_factory;
     $this->apiKey = $api_key;
     $this->secretKey = $secret_key;
     $this->version = $version;

@@ -10,6 +10,11 @@ interface MiddlewareHmacInterface {
   public function getMiddleware();
 
   /**
+   * @return mixed response based on the library's response signer.
+   */
+  public function getResponseSigner($request);
+
+  /**
    *
    * @return string Api Key
    */
@@ -21,4 +26,14 @@ interface MiddlewareHmacInterface {
    */
   public function setSecretKey($secret);
 
+  /**
+   * Extracts HMAC signature from the request.
+   *
+   * @param Request $request
+   *   The Request to evaluate signature.
+   *
+   * @return string
+   *   The HMAC signature for this request.
+   */
+  public function authenticate($request);
 }
