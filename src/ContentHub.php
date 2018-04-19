@@ -2,6 +2,7 @@
 
 namespace Acquia\ContentHubClient;
 
+use Acquia\ContentHubClient\Middleware\MiddlewareHmacInterface;
 use Psr\Http\Message\RequestInterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
@@ -14,7 +15,14 @@ class ContentHub extends Client
     const VERSION = '1.3.0';
     const LIBRARYNAME = 'AcquiaContentHubPHPLib';
 
-    private $adapter;
+  /**
+   * The hmac middleware for this client.
+   *
+   * @var \Acquia\ContentHubClient\Middleware\MiddlewareHmacInterface
+   */
+  protected $hmacMiddleware;
+
+  private $adapter;
 
     /**
      * Defines the Content Hub API Version.
@@ -66,10 +74,23 @@ class ContentHub extends Client
             $config['handler'] = HandlerStack::create();
         }
         foreach ($middlewares AS $middleware) {
+          if ($middleware instanceof MiddlewareHmacInterface) {
+            $this->hmacMiddleware = $middleware;
+          }
           $config['handler']->push($middleware->getMiddleware());
         }
 
         parent::__construct($config);
+    }
+
+  /**
+   * Get the hmac middleware.
+   *
+   * @return \Acquia\ContentHubClient\Middleware\MiddlewareHmacInterface
+   */
+    public function getHmacMiddleware()
+    {
+      return $this->hmacMiddleware;
     }
 
     /**

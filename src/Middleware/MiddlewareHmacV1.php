@@ -43,6 +43,23 @@ class MiddlewareHmacV1  extends MiddlewareHmacBase implements MiddlewareHmacInte
     $headers = array_map('current', $request->headers->all());
     $authorization_header = isset($headers['authorization']) ? $headers['authorization'] : '';
 
+    $signature = $this->getSignature($request);
+
+    $authorization = 'Acquia ContentHub:' . $signature;
+
+    if ($authorization !== $authorization_header) {
+      $this->loggerFactory->get('acquia_contenthub')->debug('HMAC validation failed. [authorization = %authorization]. [authorization_header = %authorization_header]', [
+        '%authorization' => $authorization,
+        '%authorization_header' => $authorization_header,
+      ]);
+    }
+
+    return $authorization == $authorization_header;
+  }
+
+  public function getSignature($request) {
+    $headers = array_map('current', $request->headers->all());
+
     $http_verb = $request->getMethod();
 
     // Adding the Request Query string.
@@ -63,17 +80,6 @@ class MiddlewareHmacV1  extends MiddlewareHmacBase implements MiddlewareHmacInte
     ];
     $message = implode("\n", $message_array);
     $s = hash_hmac('sha256', $message, $this->secretKey, TRUE);
-    $signature = base64_encode($s);
-
-    $authorization = 'Acquia ContentHub:' . $signature;
-
-    if ($authorization !== $authorization_header) {
-      $this->loggerFactory->get('acquia_contenthub')->debug('HMAC validation failed. [authorization = %authorization]. [authorization_header = %authorization_header]', [
-        '%authorization' => $authorization,
-        '%authorization_header' => $authorization_header,
-      ]);
-    }
-
-    return $authorization == $authorization_header;
+    return base64_encode($s);
   }
 }
