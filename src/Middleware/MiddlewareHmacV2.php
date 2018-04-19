@@ -2,11 +2,11 @@
 
 namespace Acquia\ContentHubClient\Middleware;
 
+use Acquia\Hmac\AuthorizationHeader;
 use Acquia\Hmac\Guzzle\HmacAuthMiddleware;
 use Acquia\Hmac\KeyLoader;
 use Acquia\Hmac\ResponseSigner;
 use GuzzleHttp\Psr7\Response;
-use GuzzleHttp\Psr7\Request;
 use Acquia\Hmac\RequestAuthenticator;
 use Acquia\Hmac\Exception\KeyNotFoundException;
 
@@ -68,5 +68,10 @@ class MiddlewareHmacV2  extends MiddlewareHmacBase implements MiddlewareHmacInte
       return FALSE;
     }
     return TRUE;
+  }
+
+  public function getSignature($request, $secret) {
+    $authHeader = AuthorizationHeader::createFromRequest($request);
+    return $authHeader->getSignature();
   }
 }

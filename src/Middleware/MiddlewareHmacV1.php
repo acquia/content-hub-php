@@ -57,7 +57,10 @@ class MiddlewareHmacV1  extends MiddlewareHmacBase implements MiddlewareHmacInte
     return $authorization == $authorization_header;
   }
 
-  public function getSignature($request) {
+  public function getSignature($request, $secret = NULL) {
+    if (empty($secret)) {
+      $secret = $this->secretKey;
+    }
     $headers = array_map('current', $request->headers->all());
 
     $http_verb = $request->getMethod();
@@ -79,7 +82,7 @@ class MiddlewareHmacV1  extends MiddlewareHmacBase implements MiddlewareHmacInte
       $path,
     ];
     $message = implode("\n", $message_array);
-    $s = hash_hmac('sha256', $message, $this->secretKey, TRUE);
+    $s = hash_hmac('sha256', $message, $secret, TRUE);
     return base64_encode($s);
   }
 }
