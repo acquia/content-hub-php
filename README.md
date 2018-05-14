@@ -42,7 +42,7 @@ $secretKey = 'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB';
 
 // For versions => 1.3, the api key is passed via the HMAC middleware.
 $middleware = new MiddlewareHmacV1($apiKey, $secretKey, 'V1');
-$client = new ContentHub('', $middleware, ['base_url' => $url]);
+$client = new ContentHub('', $middleware, ['base_uri' => $url]);
 
 // For versions < 1.3, use the following client callback.
 $client = new ContentHub($apiKey, $secretKey, '', ['base_url' => $url]);
@@ -88,11 +88,11 @@ use Acquia\ContentHubClient\Attribute;
 use Acquia\ContentHubClient\Asset;
 
 $middleware = new MiddlewareHmacV1($apiKey, $secretKey, 'V1');
-$client = new ContentHub($clientId, $middleware, ['base_url' => $url]);
+$client = new ContentHub($clientId, $middleware, ['base_uri' => $url]);
 
 // The unique identifier of the entity, usually a randomly generated UUID.
 // See https://github.com/ramsey/uuid to simplify UUID generation in PHP.
-$uuid = '00000000-0000-0000-0000-000000000000'
+$uuid = '00000000-0000-0000-0000-000000000000';
 
 // Build the entity, add required metadata
 $entity = new Entity();
