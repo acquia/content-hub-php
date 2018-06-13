@@ -290,8 +290,14 @@ class Entity extends \ArrayObject
      *
      * @return $this
      */
-    public function setAttributeValue($name, $value, $lang = Attribute::LANGUAGE_DEFAULT) {
-        if ($this->getAttribute($name)) {
+    public function setAttributeValue($name, $value, $lang = Attribute::LANGUAGE_DEFAULT)
+    {
+        if (!$this->getAttribute($name)) {
+            $attribute = new Attribute(Attribute::TYPE_STRING);
+            $attribute->setValue($value, $lang);
+            $this->setAttribute($name, $attribute);
+        }
+        else {
             $this['attributes'][$name]->setValue($value, $lang);
         }
         return $this;
