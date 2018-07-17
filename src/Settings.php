@@ -1,10 +1,9 @@
 <?php
-/**
- * @file
- * Handles the User data.
- */
 
 namespace Acquia\ContentHubClient;
+
+use Acquia\Hmac\Guzzle\HmacAuthMiddleware;
+use Acquia\Hmac\Key;
 
 /**
  * Settings for the current subscription.
@@ -12,59 +11,92 @@ namespace Acquia\ContentHubClient;
  * Class Settings
  * @package Acquia\ContentHubClient
  */
-class Settings extends \ArrayObject
+class Settings
 {
 
     /**
+     * The name of this settings group.
      *
-     * @param array $array
+     * @var string
      */
-    public function __construct(array $array = [])
+    protected $name;
+
+    /**
+     * The assigned UUID from ContentHub.
+     *
+     * @var string
+     */
+    protected $uuid;
+
+    /**
+     * The api key of these settings.
+     *
+     * @var string
+     */
+    protected $apiKey;
+
+    /**
+     * The shared secret.
+     *
+     * @var string
+     */
+    protected $sharedSecret;
+
+    /**
+     * The group of webhooks associated with these settings.
+     *
+     * @var array
+     */
+    protected $webhooks = [];
+
+    /**
+     * The group of clients associated with these settings.
+     *
+     * @var array
+     */
+    protected $clients = [];
+
+    /**
+     * The URL of the end point to consult.
+     *
+     * @var string
+     */
+    protected $url;
+
+  /**
+     * Constructs a Settings object.
+     *
+     * @param $name
+     * @param $uuid
+     * @param $api_key
+     * @param $shared_secret
+     */
+    public function __construct($name, $uuid, $api_key, $shared_secret, $url)
     {
-        parent::__construct($array);
+        $this->name = $name;
+        $this->uuid = $uuid;
+        $this->apiKey = $api_key;
+        $this->sharedSecret = $shared_secret;
+        $this->url = $url;
     }
 
     /**
-     * Helper method to get the value of a property.
+     * Get the settings name.
      *
-     * @param string $key
-     * @param string $default
-     *
-     * @return mixed
+     * @return string
      */
-    protected function getValue($key, $default)
-    {
-        return isset($this[$key]) ? $this[$key] : $default;
+    public function getName() {
+        return $this->name;
     }
 
     /**
-     * Returns the UserId.
+     * Returns the Uuid.
      *
      * @return string
      */
     public function getUuid()
     {
-        return $this->getValue('uuid', '');
-    }
-
-    /**
-     * Returns the 'Created' property.
-     *
-     * @return string
-     */
-    public function getCreated()
-    {
-        return $this->getValue('created', '');
-    }
-
-    /**
-     * Returns the 'Modified' property.
-     *
-     * @return mixed
-     */
-    public function getModified()
-    {
-        return $this->getValue('modified', '');
+        return $this->uuid;
     }
 
     /**
@@ -74,7 +106,7 @@ class Settings extends \ArrayObject
      */
     public function getWebhooks()
     {
-        return $this->getValue('webhooks', []);
+        return $this->webhooks;
     }
 
     /**
@@ -102,7 +134,7 @@ class Settings extends \ArrayObject
      */
     public function getClients()
     {
-        return $this->getValue('clients', []);
+        return $this->clients;
     }
 
     /**
@@ -123,6 +155,10 @@ class Settings extends \ArrayObject
         return FALSE;
     }
 
+    public function getApiKey() {
+      return $this->apiKey;
+    }
+
     /**
      * Returns the Shared Secret used for Webhook verification.
      *
@@ -131,17 +167,17 @@ class Settings extends \ArrayObject
      */
     public function getSharedSecret()
     {
-        return $this->getValue('shared_secret', FALSE);
+        return $this->sharedSecret;
     }
 
-    /**
-     * Returns the 'success' parameter.
-     *
-     * @return bool
-     */
-    public function success()
+    public function getUrl() {
+        return $this->url;
+    }
+
+    public function getMiddleware()
     {
-        return (bool) $this->getValue('success', 0);
+        $key = new Key($this->getApiKey(), $this->getSharedSecret());
+        return new HmacAuthMiddleware($key);
     }
 
-} 
+}

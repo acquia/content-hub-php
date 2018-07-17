@@ -17,7 +17,9 @@
         "php": ">=5.6",
         "guzzlehttp/guzzle": "~6.0",
         "symfony/serializer": "~2.7|^3.2",
-        "symfony/http-foundation": "~2.7|^3.2"
+        "symfony/http-foundation": "~2.7|^3.2",
+        "acquia/http-hmac-php": "~4.0",
+        "psr/log": "~1.0"
     },
     "require-dev": {
         "fabpot/php-cs-fixer": "~1.0",
