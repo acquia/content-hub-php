@@ -38,7 +38,7 @@ class ContentHubClient extends Client
             $config['base_uri'] = "{$config['base_url']}/$api_version";
         }
         else {
-          $config['base_uri'] = "/$api_version";
+          $config['base_uri'] = "{$config['base_uri']}/$api_version";
         }
 
         // Setting up the User Header string
@@ -76,7 +76,7 @@ class ContentHubClient extends Client
         $config = $this->getConfig();
         // Create a new client because ping is not behind hmac.
         $client = new Client(['base_uri' => $config['base_uri']]);
-        return self::getResponseJson($client->get("/ping"));
+        return $this->getResponseJson($client->get("/ping"));
     }
 
     /**

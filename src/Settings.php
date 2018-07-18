@@ -64,7 +64,7 @@ class Settings
    * @param string $api_key
    * @param string $secret_key
    * @param string $url
-   * @param null $shared_secret
+   * @param null|string $shared_secret
    */
     public function __construct($name, $uuid, $api_key, $secret_key, $url, $shared_secret = NULL)
     {
