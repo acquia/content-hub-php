@@ -14,16 +14,24 @@ class ContentHubClient extends Client
     const VERSION = '2.0.0';
     const LIBRARYNAME = 'AcquiaContentHubPHPLib';
 
-  /**
-   * Overrides \GuzzleHttp\Client::__construct()
-   *
-   * @param \Acquia\ContentHubClient\Settings $settings
-   * @param \Acquia\Hmac\Guzzle\HmacAuthMiddleware $middleware
-   * @param array $config
-   * @param string $api_version
-   */
-    public function __construct(Settings $settings, HmacAuthMiddleware $middleware, array $config = [], $api_version = 'v1')
+    /**
+     * The settings.
+     *
+     * @var \Acquia\ContentHubClient\Settings
+     */
+    protected $settings;
+
+    /**
+     * Overrides \GuzzleHttp\Client::__construct()
+     *
+     * @param array $config
+     * @param \Acquia\ContentHubClient\Settings $settings
+     * @param \Acquia\Hmac\Guzzle\HmacAuthMiddleware $middleware
+     * @param string $api_version
+     */
+    public function __construct(array $config = [], Settings $settings, HmacAuthMiddleware $middleware, $api_version = 'v1')
     {
+        $this->settings = $settings;
         // "base_url" parameter changed to "base_uri" in Guzzle6, so the following line
         // is there to make sure it does not disrupt previous configuration.
         if (!isset($config['base_uri']) && isset($config['base_url'])) {
@@ -65,8 +73,10 @@ class ContentHubClient extends Client
      */
     public function ping()
     {
-        return $this->get("/ping");
-
+        $config = $this->getConfig();
+        // Create a new client because ping is not behind hmac.
+        $client = new Client(['base_uri' => $config['base_uri']]);
+        return self::getResponseJson($client->get("/ping"));
     }
 
     /**
@@ -117,8 +127,14 @@ class ContentHubClient extends Client
         $config = [
           'base_url' => $settings->getUrl()
         ];
-        return new static($settings, $settings->getMiddleware(), $config);
-
+        $client = new static($config, $settings, $settings->getMiddleware());
+        // We need the shared secret to be fully functional, so an additional
+        // request is required to get that.
+        $remote = $client->getRemoteSettings();
+        // Now that we have the shared secret, reinstantiate everything and
+        // return a new instance of this class.
+        $settings = new Settings($settings->getName(), $settings->getUuid(), $settings->getApiKey(), $settings->getSecretKey(), $settings->getUrl(), $remote['shared_secret']);
+        return new static($config, $settings, $settings->getMiddleware());
     }
 
   /**
@@ -147,12 +163,8 @@ class ContentHubClient extends Client
      *
      * @param  string                               $uuid
      *
-     * @return array
-     *   An array of the following format, as an example:
-     *    [
-     *        'name' => $name,
-     *        'uuid' => '11111111-1111-1111-1111-111111111111'
-     *    ]
+     * @return \Acquia\ContentHubClient\CDFObject|array
+     *   A CDFObject representing the entity or an array if there was no data.
      *
      * @throws \GuzzleHttp\Exception\RequestException
      *
@@ -160,9 +172,17 @@ class ContentHubClient extends Client
      */
     public function getEntity($uuid)
     {
-        $response = $this->get("/entities/{$uuid}");
-        return $this->getResponseJson($response);
-
+        $return = $this->getResponseJson($this->get("/entities/{$uuid}"));
+        if (!empty($return['data']['data'])) {
+          $data = $return['data']['data'];
+          $object = new CDFObject($data['type'], $data['uuid'], $data['created'], $data['modified'], $data['origin']);
+          foreach ($data['attributes'] as $key => $attribute) {
+            $cdfAttribute = new CDFAttribute($key, $attribute['type'], $attribute['value']);
+            $object->addAttribute($cdfAttribute);
+          }
+          return $object;
+        }
+        return $return;
     }
 
   /**
@@ -273,7 +293,7 @@ class ContentHubClient extends Client
      *
      * @throws \GuzzleHttp\Exception\RequestException
      */
-    public function logs($query, $query_options = [])
+    public function logs($query = '', $query_options = [])
     {
         $query_options = $query_options + [
             'size' => 20,
@@ -375,15 +395,46 @@ class ContentHubClient extends Client
         return $this->getResponseJson($this->get("/settings/clients/{$name}"));
     }
 
+    public function getClients()
+    {
+      $data = $this->getResponseJson($this->get("/settings"));
+      return $data['clients'];
+    }
+
+    public function getWebHooks()
+    {
+        $data = $this->getResponseJson($this->get("/settings"));
+        return $data['webhooks'];
+    }
+
+    public function getWebHook($url)
+    {
+        $webhooks = $this->getWebHooks();
+        foreach ($webhooks as $webhook) {
+            if ($webhook['url'] == $url) {
+                return $webhook;
+            }
+        }
+        return [];
+    }
+
+    /**
+     * Get the settings that were used to instantiate this client.
+     *
+     * @return \Acquia\ContentHubClient\Settings
+     */
+    public function getSettings() {
+      return $this->settings;
+    }
+
     /**
      * Obtains the Settings for the active subscription.
      *
      * @return Settings
      */
-    public function getSettings()
+    public function getRemoteSettings()
     {
-        $data = $this->getResponseJson($this->get("/settings"));
-        return new Settings($data);
+        return $this->getResponseJson($this->get("/settings"));
     }
 
     /**
@@ -432,11 +483,14 @@ class ContentHubClient extends Client
    * @param \Psr\Http\Message\ResponseInterface $response
    *
    * @return mixed
-   *
+   * @throws \Exception
    */
     public static function getResponseJson(ResponseInterface $response)
     {
-        $body = (string) $response->getBody();
-        return json_decode($body, TRUE);
+        if ($response->getStatusCode() == '200') {
+            $body = (string) $response->getBody();
+            return json_decode($body, TRUE);
+        }
+        throw new \Exception($response->getReasonPhrase(), $response->getStatusCode());
     }
 }

@@ -40,21 +40,7 @@ class Settings
      *
      * @var string
      */
-    protected $sharedSecret;
-
-    /**
-     * The group of webhooks associated with these settings.
-     *
-     * @var array
-     */
-    protected $webhooks = [];
-
-    /**
-     * The group of clients associated with these settings.
-     *
-     * @var array
-     */
-    protected $clients = [];
+    protected $secretKey;
 
     /**
      * The URL of the end point to consult.
@@ -63,21 +49,31 @@ class Settings
      */
     protected $url;
 
-  /**
-     * Constructs a Settings object.
+    /**
+     * The shared secret.
      *
-     * @param $name
-     * @param $uuid
-     * @param $api_key
-     * @param $shared_secret
+     * @var string|null
      */
-    public function __construct($name, $uuid, $api_key, $shared_secret, $url)
+    protected $sharedSecret;
+
+  /**
+   * Constructs a Settings object.
+   *
+   * @param string $name
+   * @param string $uuid
+   * @param string $api_key
+   * @param string $secret_key
+   * @param string $url
+   * @param null $shared_secret
+   */
+    public function __construct($name, $uuid, $api_key, $secret_key, $url, $shared_secret = NULL)
     {
         $this->name = $name;
         $this->uuid = $uuid;
         $this->apiKey = $api_key;
-        $this->sharedSecret = $shared_secret;
+        $this->secretKey = $secret_key;
         $this->url = $url;
+        $this->sharedSecret = $shared_secret;
     }
 
     /**
@@ -99,62 +95,6 @@ class Settings
         return $this->uuid;
     }
 
-    /**
-     * Returns an array of Webhooks registered for this particular subscription.
-     *
-     * @return array
-     */
-    public function getWebhooks()
-    {
-        return $this->webhooks;
-    }
-
-    /**
-     * Returns a Webhook, given a URL.
-     *
-     * @param $webhook_url
-     *
-     * @return array|bool
-     */
-    public function getWebhook($webhook_url)
-    {
-        $webhooks = $this->getWebhooks();
-        foreach ($webhooks as $webhook) {
-            if ($webhook['url'] == $webhook_url) {
-                return $webhook;
-            }
-        }
-        return FALSE;
-    }
-
-    /**
-     * Returns an array of Clients for this particular subscription.
-     *
-     * @return array
-     */
-    public function getClients()
-    {
-        return $this->clients;
-    }
-
-    /**
-     * Gets a Client, given a name.
-     *
-     * @param $name
-     *   The client name.
-     * @return array|bool
-     */
-    public function getClient($name)
-    {
-        $clients = $this->getClients();
-        foreach ($clients as $client) {
-            if ($client['name'] == $name) {
-                return $client;
-            }
-        }
-        return FALSE;
-    }
-
     public function getApiKey() {
       return $this->apiKey;
     }
@@ -165,9 +105,9 @@ class Settings
      * @return string|bool
      *   The shared secret if it is set, FALSE otherwise.
      */
-    public function getSharedSecret()
+    public function getSecretKey()
     {
-        return $this->sharedSecret;
+        return $this->secretKey;
     }
 
     public function getUrl() {
@@ -176,8 +116,15 @@ class Settings
 
     public function getMiddleware()
     {
-        $key = new Key($this->getApiKey(), $this->getSharedSecret());
+        $key = new Key($this->getApiKey(), $this->getSecretKey());
         return new HmacAuthMiddleware($key);
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getSharedSecret() {
+        return $this->sharedSecret;
     }
 
 }
