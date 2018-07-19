@@ -92,6 +92,43 @@ class ContentHubClient extends Client
     }
 
     /**
+     * Checks Plexus to see if the client name is already in use.
+     *
+     * @param $name
+     * @param $url
+     * @param $api_key
+     * @param $secret
+     * @param string $api_version
+     *
+     * @return string $client_name
+     *   The human-readable name for the client.
+     */
+    public static function getClientName($name, $url, $api_key, $secret, $api_version = 'v1') {
+        $config = [
+            'base_uri' => "$url/$api_version",
+            'headers' => [
+                'Content-Type' => 'application/json',
+                'User-Agent' => self::LIBRARYNAME . '/' . self::VERSION . ' ' . \GuzzleHttp\default_user_agent(),
+            ],
+            'handler' => HandlerStack::create(),
+        ];
+
+        // Add the authentication handler
+        // @see https://github.com/acquia/http-hmac-spec
+        $key = new Key($api_key, $secret);
+        $middleware = new HmacAuthMiddleware($key);
+        $config['handler']->push($middleware);
+        $client = new Client($config);
+        $options['body'] = json_encode(['name' => $name]);
+        try {
+            $values = self::getResponseJson($client->get("/settings/clients/{$name}"));
+            return isset($values['name']) ? $values['name'] : NULL;
+        }
+        catch (\GuzzleHttp\Exception\RequestException $ch_error) {
+            return FALSE;
+        }
+    }
+    /**
      * Registers a new client for the active subscription.
      *
      * This method also returns the UUID for the new client being registered.
