@@ -107,18 +107,19 @@ class ContentHubClient extends Client
     }
 
     /**
-     * Checks Plexus to see if the client name is already in use.
+     * Registers a new client for the active subscription.
      *
-     * @param $name
-     * @param $url
-     * @param $api_key
-     * @param $secret
-     * @param string $api_version
+     * This method also returns the UUID for the new client being registered.
      *
-     * @return string $client_name
+     * @param string $name
      *   The human-readable name for the client.
+     *
+     * @return \Acquia\ContentHubClient\ContentHubClient
+     *
+     * @throws \GuzzleHttp\Exception\RequestException
      */
-    public static function getClientName($name, $url, $api_key, $secret, $api_version = 'v1') {
+    public static function register(LoggerInterface $logger, $name, $url, $api_key, $secret, $api_version = 'v1')
+    {
         $config = [
             'base_uri' => "$url/$api_version",
             'headers' => [
@@ -136,34 +137,57 @@ class ContentHubClient extends Client
         $client = new Client($config);
         $options['body'] = json_encode(['name' => $name]);
         try {
-            $values = self::getResponseJson($client->get("/settings/clients/{$name}"));
-            return isset($values['name']) ? $values['name'] : NULL;
+            $response = $client->post("/register", $options);
+            $values = self::getResponseJson($response);
+            $settings = new Settings($values['name'], $values['uuid'], $api_key, $secret, $url);
+            $config = [
+                'base_url' => $settings->getUrl()
+            ];
+            $client = new static($config, $logger, $settings, $settings->getMiddleware());
+            // @todo remove this once shared secret is returned on the register
+            // endpoint.
+            // We need the shared secret to be fully functional, so an additional
+            // request is required to get that.
+            $remote = $client->getRemoteSettings();
+            // Now that we have the shared secret, reinstantiate everything and
+            // return a new instance of this class.
+            $settings = new Settings($settings->getName(), $settings->getUuid(), $settings->getApiKey(), $settings->getSecretKey(), $settings->getUrl(), $remote['shared_secret']);
+            return new static($config, $logger, $settings, $settings->getMiddleware());
         }
-        catch (\GuzzleHttp\Exception\RequestException $ch_error) {
-            return FALSE;
+        catch (\Exception $exception) {
+            if ($exception instanceof ClientException || $exception instanceof BadResponseException) {
+              $logger->error(sprintf('Error registering client with name="%s" (Error Code = %d: %s)', $name, $exception->getResponse()->getStatusCode(), $exception->getResponse()->getReasonPhrase()));
+              return;
+            }
+            if ($exception instanceof RequestException) {
+              $logger->error(sprintf('Could not get authorization from Content Hub to register client %s. Are your credentials inserted correctly? (Error message = %s)', $name, $exception->getMessage()));
+              return;
+            }
+            $logger->error(sprintf("An unknown exception was caught. Message: %s", $exception->getMessage()));
+            return;
         }
     }
+
     /**
-     * Registers a new client for the active subscription.
+     * Checks Plexus to see if the client name is already in use.
      *
-     * This method also returns the UUID for the new client being registered.
+     * @param $name
+     * @param $url
+     * @param $api_key
+     * @param $secret
+     * @param string $api_version
      *
-     * @param string $name
+     * @return string $client_name
      *   The human-readable name for the client.
-     *
-     * @return \Acquia\ContentHubClient\ContentHubClient
-     *
-     * @throws \GuzzleHttp\Exception\RequestException
      */
-    public static function register(LoggerInterface $logger, $name, $url, $api_key, $secret, $api_version = 'v1')
-    {
+    public static function clientNameExists($name, $url, $api_key, $secret, $api_version = 'v1') {
         $config = [
-          'base_uri' => "$url/$api_version",
-          'headers' => [
-            'Content-Type' => 'application/json',
-            'User-Agent' => self::LIBRARYNAME . '/' . self::VERSION . ' ' . \GuzzleHttp\default_user_agent(),
-          ],
-          'handler' => HandlerStack::create(),
+            'base_uri' => "$url/$api_version",
+            'headers' => [
+                'Content-Type' => 'application/json',
+                'User-Agent' => self::LIBRARYNAME . '/' . self::VERSION . ' ' . \GuzzleHttp\default_user_agent(),
+            ],
+            'handler' => HandlerStack::create(),
         ];
 
         // Add the authentication handler
@@ -173,38 +197,8 @@ class ContentHubClient extends Client
         $config['handler']->push($middleware);
         $client = new Client($config);
         $options['body'] = json_encode(['name' => $name]);
-        try {
-          $response = $client->post("/register", $options);
-          $values = self::getResponseJson($response);
-          $settings = new Settings($values['name'], $values['uuid'], $api_key, $secret, $url);
-          $config = [
-            'base_url' => $settings->getUrl()
-          ];
-          $client = new static($config, $logger, $settings, $settings->getMiddleware());
-          // @todo remove this once shared secret is returned on the register
-          // endpoint.
-          // We need the shared secret to be fully functional, so an additional
-          // request is required to get that.
-          $remote = $client->getRemoteSettings();
-          // Now that we have the shared secret, reinstantiate everything and
-          // return a new instance of this class.
-          $settings = new Settings($settings->getName(), $settings->getUuid(), $settings->getApiKey(), $settings->getSecretKey(), $settings->getUrl(), $remote['shared_secret']);
-          return new static($config, $logger, $settings, $settings->getMiddleware());
-        }
-        catch (\Exception $e) {
-          // Obtain the class name.
-          $exception = implode('', array_slice(explode('\\', get_class($e)), -1));
-          switch ($exception) {
-            case 'ClientException':
-            case 'BadResponseException':
-              $logger->error(sprintf('Error registering client with name="%s" (Error Code = %d: %s)', $name, $e->getResponse()
-                ->getStatusCode(), $e->getResponse()->getReasonPhrase()));
-              break;
-            case 'RequestException':
-              $logger->error(sprintf('Could not get authorization from Content Hub to register client %s. Are your credentials inserted correctly? (Error message = %s)', $name, $e->getMessage()));
-              break;
-          }
-        }
+        $response = $client->get("/settings/clients/{$name}");
+        return $response->getStatusCode() == 404;
     }
 
   /**
@@ -457,8 +451,6 @@ class ContentHubClient extends Client
      * @param string $name
      *
      * @return mixed
-     *
-     * @throws \GuzzleHttp\Exception\RequestException
      */
     public function getClientByName($name)
     {
