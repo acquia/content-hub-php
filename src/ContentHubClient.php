@@ -5,8 +5,15 @@ namespace Acquia\ContentHubClient;
 use Acquia\Hmac\Guzzle\HmacAuthMiddleware;
 use Acquia\Hmac\Key;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\BadResponseException;
+use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Log\LoggerInterface;
 
 class ContentHubClient extends Client
 {
@@ -22,6 +29,13 @@ class ContentHubClient extends Client
     protected $settings;
 
     /**
+     * The logger responsible for tracking request failures.
+     *
+     * @var \Psr\Log\LoggerInterface
+     */
+    protected $logger;
+
+    /**
      * Overrides \GuzzleHttp\Client::__construct()
      *
      * @param array $config
@@ -29,8 +43,9 @@ class ContentHubClient extends Client
      * @param \Acquia\Hmac\Guzzle\HmacAuthMiddleware $middleware
      * @param string $api_version
      */
-    public function __construct(array $config = [], Settings $settings, HmacAuthMiddleware $middleware, $api_version = 'v1')
+    public function __construct(array $config = [], LoggerInterface $logger, Settings $settings, HmacAuthMiddleware $middleware, $api_version = 'v1')
     {
+        $this->logger = $logger;
         $this->settings = $settings;
         // "base_url" parameter changed to "base_uri" in Guzzle6, so the following line
         // is there to make sure it does not disrupt previous configuration.
@@ -103,7 +118,7 @@ class ContentHubClient extends Client
      *
      * @throws \GuzzleHttp\Exception\RequestException
      */
-    public static function register($name, $url, $api_key, $secret, $api_version = 'v1')
+    public static function register(LoggerInterface $logger, $name, $url, $api_key, $secret, $api_version = 'v1')
     {
         $config = [
           'base_uri' => "$url/$api_version",
@@ -121,20 +136,38 @@ class ContentHubClient extends Client
         $config['handler']->push($middleware);
         $client = new Client($config);
         $options['body'] = json_encode(['name' => $name]);
-        $response = $client->post("/register", $options);
-        $values = self::getResponseJson($response);
-        $settings = new Settings($values['name'], $values['uuid'], $api_key, $secret, $url);
-        $config = [
-          'base_url' => $settings->getUrl()
-        ];
-        $client = new static($config, $settings, $settings->getMiddleware());
-        // We need the shared secret to be fully functional, so an additional
-        // request is required to get that.
-        $remote = $client->getRemoteSettings();
-        // Now that we have the shared secret, reinstantiate everything and
-        // return a new instance of this class.
-        $settings = new Settings($settings->getName(), $settings->getUuid(), $settings->getApiKey(), $settings->getSecretKey(), $settings->getUrl(), $remote['shared_secret']);
-        return new static($config, $settings, $settings->getMiddleware());
+        try {
+          $response = $client->post("/register", $options);
+          $values = self::getResponseJson($response);
+          $settings = new Settings($values['name'], $values['uuid'], $api_key, $secret, $url);
+          $config = [
+            'base_url' => $settings->getUrl()
+          ];
+          $client = new static($config, $logger, $settings, $settings->getMiddleware());
+          // @todo remove this once shared secret is returned on the register
+          // endpoint.
+          // We need the shared secret to be fully functional, so an additional
+          // request is required to get that.
+          $remote = $client->getRemoteSettings();
+          // Now that we have the shared secret, reinstantiate everything and
+          // return a new instance of this class.
+          $settings = new Settings($settings->getName(), $settings->getUuid(), $settings->getApiKey(), $settings->getSecretKey(), $settings->getUrl(), $remote['shared_secret']);
+          return new static($config, $logger, $settings, $settings->getMiddleware());
+        }
+        catch (\Exception $e) {
+          // Obtain the class name.
+          $exception = implode('', array_slice(explode('\\', get_class($e)), -1));
+          switch ($exception) {
+            case 'ClientException':
+            case 'BadResponseException':
+              $logger->error(sprintf('Error registering client with name="%s" (Error Code = %d: %s)', $name, $e->getResponse()
+                ->getStatusCode(), $e->getResponse()->getReasonPhrase()));
+              break;
+            case 'RequestException':
+              $logger->error(sprintf('Could not get authorization from Content Hub to register client %s. Are your credentials inserted correctly? (Error message = %s)', $name, $e->getMessage()));
+              break;
+          }
+        }
     }
 
   /**
@@ -487,10 +520,120 @@ class ContentHubClient extends Client
    */
     public static function getResponseJson(ResponseInterface $response)
     {
-        if ($response->getStatusCode() == '200') {
-            $body = (string) $response->getBody();
-            return json_decode($body, TRUE);
-        }
-        throw new \Exception($response->getReasonPhrase(), $response->getStatusCode());
+        $body = (string) $response->getBody();
+        return json_decode($body, TRUE);
     }
+
+    public function __call($method, $args) {
+        try {
+            return parent::__call($method, $args);
+        }
+        catch (\Exception $e) {
+            $exceptionResponse = $this->getExceptionMessage($method, $args, $e);
+        }
+        $this->logger->error((string) $exceptionResponse->getBody());
+        return $exceptionResponse;
+    }
+
+  /**
+   * Obtains the appropriate exception message for the selected exception.
+   *
+   * This is the place to set up exception messages per request.
+   *
+   * @param string $method
+   *   The Request to Plexus, as defined in the content-hub-php library.
+   * @param array $args
+   *   The Request arguments.
+   * @param \Exception $exception
+   *   The Exception object.
+   *
+   * @return ResponseInterface The text to write in the messages.
+   * The text to write in the messages.
+   */
+  protected function getExceptionMessage($method, array $args, \Exception $exception) {
+    if ($exception instanceof ServerException) {
+      return $this->getErrorResponse(500, sprintf('Could not reach the Content Hub. Please verify your hostname and Credentials. [Error message: %s]', $exception->getMessage()));
+    }
+    if ($exception instanceof ConnectException) {
+      return $this->getErrorResponse(500, sprintf('Could not reach the Content Hub. Please verify your hostname URL. [Error message: %s]', $exception->getMessage()));
+    }
+    if ($exception instanceof ClientException || $exception instanceof BadResponseException) {
+      $response = $exception->getResponse();
+      switch ($method) {
+        case 'getClientByName':
+          // All good, means the client name is available.
+          if ($response->getStatusCode() == 404) {
+            return $response;
+          }
+          return $this->getErrorResponse($response->getStatusCode(), sprintf('Error trying to connect to the Content Hub" (Error Code = %d: %s)', $response->getStatusCode(), $response->getReasonPhrase()));
+
+        case 'addWebhook':
+          return $this->getErrorResponse($response->getStatusCode(), sprintf('There was a problem trying to register Webhook URL = %s. Please try again. (Error Code = %d: %s)', $args[0], $response->getStatusCode(), $response->getReasonPhrase()));
+
+        case 'deleteWebhook':
+          // This function only requires one argument (webhook_uuid), but
+          // we are using the second one to pass the webhook_url.
+          $webhook_url = isset($args[1]) ? $args[1] : $args[0];
+          return $this->getErrorResponse($response->getStatusCode(), sprintf('There was a problem trying to <b>unregister</b> Webhook URL = %s. Please try again. (Error Code = %d: @%s)', $webhook_url, $response->getStatusCode(), $response->getReasonPhrase()));
+
+        case 'purge':
+          return $this->getErrorResponse($response->getStatusCode(), sprintf('Error purging entities from the Content Hub [Error Code = %d: %s]', $response->getStatusCode(), $response->getReasonPhrase()));
+
+        case 'readEntity':
+          return $this->getErrorResponse($response->getStatusCode(), sprintf('Error reading entity with UUID="%s" from Content Hub (Error Code = %d: %s)', $args[0], $response->getStatusCode(), $response->getReasonPhrase()));
+
+        case 'createEntity':
+          return $this->getErrorResponse($response->getStatusCode(), sprintf('Error trying to create an entity in Content Hub (Error Code = %d: %s)', $response->getStatusCode(), $response->getReasonPhrase()));
+
+        case 'createEntities':
+          return $this->getErrorResponse($response->getStatusCode(), sprintf('Error trying to create entities in Content Hub (Error Code = %d: %s)', $response->getStatusCode(), $response->getReasonPhrase()));
+
+        case 'updateEntity':
+          return $this->getErrorResponse($response->getStatusCode(), sprintf('Error trying to update an entity with UUID="%s" in Content Hub (Error Code = %d: %s)', $args[1], $response->getStatusCode(), $response->getReasonPhrase()));
+
+        case 'updateEntities':
+          return $this->getErrorResponse($response->getStatusCode(), sprintf('Error trying to update some entities in Content Hub (Error Code = %d: %s)', $response->getStatusCode(), $response->getReasonPhrase()));
+
+        case 'deleteEntity':
+          return $this->getErrorResponse($response->getStatusCode(), sprintf('Error trying to delete entity with UUID="@uuid" in Content Hub (Error Code = @error_code: @error_message)', $args[0], $response->getStatusCode(), $response->getReasonPhrase()));
+
+        case 'searchEntity':
+          return $this->getErrorResponse($response->getStatusCode(), sprintf('Error trying to make a search query to Content Hub. Are your credentials inserted correctly? (Error Code = %d: %s)', $response->getStatusCode(), $response->getReasonPhrase()));
+
+        default:
+          return $response;
+      }
+    }
+    if ($exception instanceof RequestException) {
+      switch ($method) {
+        // Customize the error message per request here.
+        case 'createEntity':
+          return $this->getErrorResponse(500, sprintf('Error trying to create an entity in Content Hub (Error Message: %s)', $exception->getMessage()));
+
+        case 'createEntities':
+          return $this->getErrorResponse(500, sprintf('Error trying to create entities in Content Hub (Error Message = %s)', $exception->getMessage()));
+
+        case 'updateEntity':
+          return $this->getErrorResponse(500, sprintf('Error trying to update entity with UUID="%s" in Content Hub (Error Message = %s)', $args[1], $exception->getMessage()));
+
+        case 'updateEntities':
+          return $this->getErrorResponse(500, sprintf('Error trying to update some entities in Content Hub (Error Message = %s)', $exception->getMessage()));
+
+        case 'deleteEntity':
+          return $this->getErrorResponse(500, sprintf('Error trying to delete entity with UUID="%s" in Content Hub (Error Message = %s)', $args[0], $exception->getMessage()));
+
+        case 'searchEntity':
+          return $this->getErrorResponse(500, sprintf('Error trying to make a search query to Content Hub. Are your credentials inserted correctly? (Error Message = %s)', $exception->getMessage()));
+
+        default:
+          return $this->getErrorResponse(500, sprintf('Error trying to connect to the Content Hub. Are your credentials inserted correctly? (Error Message = %s)', $exception->getMessage()));
+      }
+    }
+    return $this->getErrorResponse(500, sprintf('Error trying to connect to the Content Hub (Error Message = %s)', $exception->getMessage()));
+  }
+
+  protected function getErrorResponse($code, $reason) {
+    return new Response($code, [], json_encode([]), '1.1', $reason);
+  }
+
 }
