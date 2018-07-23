@@ -15,6 +15,7 @@ class CDFAttribute {
   const TYPE_BOOLEAN         = 'boolean';
   const TYPE_NUMBER          = 'number';
   const TYPE_REFERENCE       = 'reference';
+  const TYPE_OBJECT          = 'object';
   const TYPE_ARRAY_INTEGER   = 'array<integer>';
   const TYPE_ARRAY_STRING    = 'array<string>';
   const TYPE_ARRAY_KEYWORD   = 'array<keyword>';
@@ -46,11 +47,12 @@ class CDFAttribute {
    *   The attribute's data type.
    * @param mixed $value
    *   The value of the attribute.
+   * @param string $language
+   *   The language of the initial value.
    *
-   * @throws \Exception
-   *   Unsupported data type exception.
+   * @throws \Exception Unsupported data type exception.
    */
-  public function __construct($id, $type, $value) {
+  public function __construct($id, $type, $value, $language = 'und') {
     $r = new ReflectionClass(__CLASS__);
     if (!in_array($type, $r->getConstants())) {
       // @todo validate value against data type?
@@ -58,7 +60,7 @@ class CDFAttribute {
     }
     $this->id = $id;
     $this->type = $type;
-    $this->value = $value;
+    $this->value[$language] = $value;
   }
 
   /**
@@ -80,6 +82,10 @@ class CDFAttribute {
    */
   public function getValue() {
     return $this->value;
+  }
+
+  public function setValue($value, $langauge = 'und') {
+    $this->value[$langauge] = $value;
   }
 
   /**
