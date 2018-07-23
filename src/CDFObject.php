@@ -114,7 +114,11 @@ class CDFObject {
     }
   }
 
-  public function addAttribute(CDFAttribute $attribute) {
+  public function addAttribute($id, $type, $value, $language = 'und', $class = '\Acquia\ContentHubClient\CDFAttribute') {
+    if (!is_subclass_of($class, '\Acquia\ContentHubClient\CDFAttribute')) {
+      throw new \Exception(sprintf("The %s class must be a subclass of \Acquia\ContentHubClient\CDFAttribute", $class));
+    }
+    $attribute = new $class($id, $type, $value, $language);
     $this->attributes[$attribute->getId()] = $attribute;
   }
 
