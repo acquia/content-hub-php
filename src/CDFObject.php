@@ -108,6 +108,11 @@ class CDFObject {
     return $this->attributes;
   }
 
+  /**
+   * @param $id
+   *
+   * @return \Acquia\ContentHubClient\CDFAttribute
+   */
   public function getAttribute($id) {
     if (!empty($this->attributes[$id])) {
       return $this->attributes[$id];
@@ -115,7 +120,7 @@ class CDFObject {
   }
 
   public function addAttribute($id, $type, $value, $language = 'und', $class = '\Acquia\ContentHubClient\CDFAttribute') {
-    if (!is_subclass_of($class, '\Acquia\ContentHubClient\CDFAttribute')) {
+    if ($class != '\Acquia\ContentHubClient\CDFAttribute' && !is_subclass_of($class, '\Acquia\ContentHubClient\CDFAttribute')) {
       throw new \Exception(sprintf("The %s class must be a subclass of \Acquia\ContentHubClient\CDFAttribute", $class));
     }
     $attribute = new $class($id, $type, $value, $language);
