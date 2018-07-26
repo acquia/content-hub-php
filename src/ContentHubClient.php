@@ -198,7 +198,7 @@ class ContentHubClient extends Client
         $client = new Client($config);
         $options['body'] = json_encode(['name' => $name]);
         $response = $client->get("/settings/clients/{$name}");
-        return $response->getStatusCode() == 404;
+        return $response->getStatusCode() != 404;
     }
 
   /**
@@ -527,7 +527,40 @@ class ContentHubClient extends Client
         return $this->delete("/settings/webhooks/{$uuid}");
     }
 
-    /**
+  /**
+   * Updates a webhook from the active subscription.
+   *
+   * @param $uuid
+   *   The UUID of the webhook to update
+   *
+   * @return \Psr\Http\Message\ResponseInterface
+   *
+   * @throws \GuzzleHttp\Exception\RequestException
+   */
+  public function updateWebhook($uuid, $url)
+  {
+    $options['body'] = json_encode(['url' => $url]);
+    return $this->put("/settings/webhooks/{$uuid}", $options) ;
+  }
+
+  /**
+   * Deletes a webhook from the active subscription.
+   *
+   * @param $uuid
+   *   The UUID of the webhook to delete
+   *
+   * @return \Psr\Http\Message\ResponseInterface
+   *
+   * @throws \GuzzleHttp\Exception\RequestException
+   */
+   public function deleteClient()
+   {
+     $settings = $this->getSettings();
+     return $this->delete("/settings/client/uuid/{$settings->getUuid()}");
+   }
+
+
+  /**
      * Regenerates a Shared Secret for the Subscription.
      *
      * @return array
