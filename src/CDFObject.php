@@ -40,6 +40,16 @@ class CDFObject {
   protected $attributes = [];
 
   /**
+   * @var bool
+   */
+  protected $processed = FALSE;
+
+  /**
+   * @var mixed
+   */
+  protected $object;
+
+  /**
    * CDFObject constructor.
    *
    * @param string $type
@@ -104,6 +114,27 @@ class CDFObject {
     $this->metadata = $metadata;
   }
 
+  public function getModuleDependencies() {
+    return !empty($this->metadata['dependencies']['module']) ? $this->metadata['dependencies']['module'] : [];
+  }
+
+  public function getDependencies() {
+    if (!empty($this->metadata['dependencies'])) {
+      $dependencies = $this->metadata['dependencies'];
+      unset($dependencies['module']);
+      return $dependencies;
+    }
+    return [];
+  }
+
+  public function hasProcessedDependencies() {
+    return $this->processed;
+  }
+
+  public function markProcessedDependencies() {
+    $this->processed = TRUE;
+  }
+
   public function getAttributes() {
     return $this->attributes;
   }
@@ -119,12 +150,24 @@ class CDFObject {
     }
   }
 
-  public function addAttribute($id, $type, $value, $language = 'und', $class = '\Acquia\ContentHubClient\CDFAttribute') {
+  public function addAttribute($id, $type, $value = NULL, $language = 'und', $class = '\Acquia\ContentHubClient\CDFAttribute') {
     if ($class != '\Acquia\ContentHubClient\CDFAttribute' && !is_subclass_of($class, '\Acquia\ContentHubClient\CDFAttribute')) {
       throw new \Exception(sprintf("The %s class must be a subclass of \Acquia\ContentHubClient\CDFAttribute", $class));
     }
     $attribute = new $class($id, $type, $value, $language);
     $this->attributes[$attribute->getId()] = $attribute;
+  }
+
+  public function setApplicationObject($object) {
+    $this->object = $object;
+  }
+
+  public function getApplicationObject() {
+    return $this->object;
+  }
+
+  public function hasApplicationObject() {
+    return (bool) $this->object;
   }
 
   public function toArray() {

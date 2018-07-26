@@ -19,8 +19,11 @@ class CDFDataAttribute extends CDFAttribute {
   }
 
   public function getValue() {
-    $value = parent::getValue();
-    return base64_decode($value);
+    $values = parent::getValue();
+    foreach ($values as $key => $value) {
+      $values[$key] = base64_decode($value);
+    }
+    return $values;
   }
 
   /**
