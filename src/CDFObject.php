@@ -156,6 +156,13 @@ class CDFObject {
     }
     $attribute = new $class($id, $type, $value, $language);
     $this->attributes[$attribute->getId()] = $attribute;
+    // Keep track of the class used for this attribute.
+    if ($class != '\Acquia\ContentHubClient\CDFAttribute') {
+      $this->metadata['attributes'][$attribute->getId()]['class'] = $class;
+    }
+    else {
+      unset($this->metadata['attributes'][$attribute->getId()]);
+    }
   }
 
   public function setApplicationObject($object) {
