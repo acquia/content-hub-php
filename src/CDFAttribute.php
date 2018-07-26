@@ -52,7 +52,7 @@ class CDFAttribute {
    *
    * @throws \Exception Unsupported data type exception.
    */
-  public function __construct($id, $type, $value = NULL, $language = 'und') {
+  public function __construct($id, $type, $value, $language = 'und') {
     $r = new ReflectionClass(__CLASS__);
     if (!in_array($type, $r->getConstants())) {
       // @todo validate value against data type?
@@ -60,9 +60,7 @@ class CDFAttribute {
     }
     $this->id = $id;
     $this->type = $type;
-    if ($value) {
-      $this->value[$language] = $value;
-    }
+    $this->value[$language] = $value;
   }
 
   /**
