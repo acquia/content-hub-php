@@ -108,6 +108,11 @@ class CDFObject {
     return $this->attributes;
   }
 
+  /**
+   * @param $id
+   *
+   * @return \Acquia\ContentHubClient\CDFAttribute
+   */
   public function getAttribute($id) {
     if (!empty($this->attributes[$id])) {
       return $this->attributes[$id];

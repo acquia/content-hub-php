@@ -18,7 +18,7 @@
         "guzzlehttp/guzzle": "~6.0",
         "symfony/serializer": "~2.7|^3.2",
         "symfony/http-foundation": "~2.7|^3.2",
-        "acquia/http-hmac-php": "~4.0",
+        "acquia/http-hmac-php": "~3.4|~4.0",
         "psr/log": "~1.0"
     },
     "require-dev": {
