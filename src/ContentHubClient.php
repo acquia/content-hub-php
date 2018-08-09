@@ -243,10 +243,16 @@ class ContentHubClient extends Client
         $return = $this->getResponseJson($this->get("/entities/{$uuid}"));
         if (!empty($return['data']['data'])) {
           $data = $return['data']['data'];
-          $object = new CDFObject($data['type'], $data['uuid'], $data['created'], $data['modified'], $data['origin']);
+          $object = new CDFObject($data['type'], $data['uuid'], $data['created'], $data['modified'], $data['origin'], $data['metadata']);
           foreach ($data['attributes'] as $key => $attribute) {
-            $cdfAttribute = new CDFAttribute($key, $attribute['type'], $attribute['value']);
-            $object->addAttribute($cdfAttribute);
+            $object_attribute = $object->getAttribute($key);
+            if (!$object_attribute) {
+              $object->addAttribute($key, $attribute['type']);
+              $object_attribute = $object->getAttribute($key);
+            }
+            foreach ($attribute['value'] as $langcode => $value) {
+              $object_attribute->setValue($value, $langcode);
+            }
           }
           return $object;
         }
@@ -285,10 +291,23 @@ class ContentHubClient extends Client
           'resource' => "",
         ];
         foreach ($objects as $object) {
-          $json['entities'][] = $object->toArray();
+          $json['data']['entities'][] = $object->toArray();
         }
         $options['body'] = json_encode($json);
+        file_put_contents('/tmp/put.cdf', json_encode($json, JSON_PRETTY_PRINT));
         return $this->put("/entities", $options);
+    }
+
+    public function postEntities(CDFObject ...$objects)
+    {
+        $json = [
+            'resource' => "",
+        ];
+        foreach ($objects as $object) {
+            $json['data']['entities'][] = $object->toArray();
+        }
+        $options['body'] = json_encode($json);
+        return $this->post("/entities", $options);
     }
 
     /**

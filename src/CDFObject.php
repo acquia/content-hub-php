@@ -65,7 +65,7 @@ class CDFObject {
     $this->created = $created;
     $this->modified = $modified;
     $this->origin = $origin;
-    $this->metadata = $metadata;
+    $this->setMetadata($metadata);
   }
 
   /**
@@ -119,12 +119,7 @@ class CDFObject {
   }
 
   public function getDependencies() {
-    if (!empty($this->metadata['dependencies'])) {
-      $dependencies = $this->metadata['dependencies'];
-      unset($dependencies['module']);
-      return $dependencies;
-    }
-    return [];
+    return !empty($this->metadata['dependencies']['entity']) ? $this->metadata['dependencies']['entity'] : [];
   }
 
   public function hasProcessedDependencies() {
