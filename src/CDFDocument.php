@@ -26,6 +26,7 @@ class CDFDocument {
   }
 
   public function setCDFEntities(CDFObject ...$entities) {
+    unset($this->entities);
     foreach ($entities as $entity) {
       $this->entities[$entity->getUuid()] = $entity;
     }
@@ -45,6 +46,21 @@ class CDFDocument {
 
   public function hasEntity($uuid) {
     return !empty($this->entities[$uuid]);
+  }
+
+  public function mergeDocuments(CDFDocument $document) {
+    foreach ($document->getEntities() as $entity) {
+      $this->addCDFEntity($entity);
+    }
+  }
+
+  public function toString() {
+    $entities = [];
+    foreach ($this->getEntities() as $entity) {
+      $entities[] = $entity->toArray();
+    }
+    $output = ['entities' => $entities];
+    return json_encode($output, JSON_PRETTY_PRINT);
   }
 
 }

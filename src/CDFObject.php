@@ -45,11 +45,6 @@ class CDFObject {
   protected $processed = FALSE;
 
   /**
-   * @var mixed
-   */
-  protected $object;
-
-  /**
    * CDFObject constructor.
    *
    * @param string $type
@@ -158,18 +153,6 @@ class CDFObject {
     else {
       unset($this->metadata['attributes'][$attribute->getId()]);
     }
-  }
-
-  public function setApplicationObject($object) {
-    $this->object = $object;
-  }
-
-  public function getApplicationObject() {
-    return $this->object;
-  }
-
-  public function hasApplicationObject() {
-    return (bool) $this->object;
   }
 
   public function toArray() {

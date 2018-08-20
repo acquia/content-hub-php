@@ -244,20 +244,81 @@ class ContentHubClient extends Client
         if (!empty($return['data']['data'])) {
           $data = $return['data']['data'];
           $object = new CDFObject($data['type'], $data['uuid'], $data['created'], $data['modified'], $data['origin'], $data['metadata']);
-          foreach ($data['attributes'] as $key => $attribute) {
-            $object_attribute = $object->getAttribute($key);
-            if (!$object_attribute) {
-              $object->addAttribute($key, $attribute['type']);
-              $object_attribute = $object->getAttribute($key);
+          foreach ($data['attributes'] as $attribute_name => $values) {
+            if (!$attribute = $object->getAttribute($attribute_name)) {
+              $class = !empty($object->getMetadata()['attributes'][$attribute_name]) ? $object->getMetadata()['attributes'][$attribute_name]['class'] : FALSE;
+              if ($class && class_exists($class)) {
+                $object->addAttribute($attribute_name, $values['type'], NULL, 'und', $class);
+              }
+              else {
+                $object->addAttribute($attribute_name, $values['type'], NULL);
+              }
+              $attribute = $object->getAttribute($attribute_name);
             }
-            foreach ($attribute['value'] as $langcode => $value) {
-              $object_attribute->setValue($value, $langcode);
-            }
+            $value_property = (new \ReflectionClass($attribute))->getProperty('value');
+            $value_property->setAccessible(TRUE);
+            $value_property->setValue($attribute, $values['value']);
           }
           return $object;
         }
         return $return;
     }
+
+  /**
+   * Searches for entities.
+   *
+   * @param  array $uuids
+   *   An array of UUIDs.
+   *
+   * @return \Acquia\ContentHubClient\CDFDocument
+   *
+   * @throws \GuzzleHttp\Exception\RequestException
+   */
+  public function getEntities(array $uuids)
+  {
+    $chunks = array_chunk($uuids, 50);
+    $objects = [];
+    foreach ($chunks as $chunk) {
+      $query = [
+        'size' => 50,
+        'query' => [
+          'constant_score' => [
+            'filter' => [
+              'terms' => [
+                'uuid' => $chunk,
+              ],
+            ],
+          ],
+        ],
+      ];
+      $options['body'] = json_encode((array) $query);
+      $results = $this->getResponseJson($this->get("/_search", $options));
+      if (is_array($results) && isset($results['hits']['total']) && $results['hits']['total'] > 0) {
+        foreach ($results['hits']['hits'] as $key => $item) {
+          $entity = $item['_source']['data'];
+          $object = new CDFObject($entity['type'], $entity['uuid'], $entity['created'], $entity['modified'], $entity['origin'], $entity['metadata']);
+          foreach ($entity['attributes'] as $attribute_name => $values) {
+            if (!$attribute = $object->getAttribute($attribute_name)) {
+              $class = !empty($object->getMetadata()['attributes'][$attribute_name]) ? $object->getMetadata()['attributes'][$attribute_name]['class'] : FALSE;
+              if ($class && class_exists($class)) {
+                $object->addAttribute($attribute_name, $values['type'], NULL, 'und', $class);
+              }
+              else {
+                $object->addAttribute($attribute_name, $values['type'], NULL);
+              }
+              $attribute = $object->getAttribute($attribute_name);
+            }
+            $value_property = (new \ReflectionClass($attribute))->getProperty('value');
+            $value_property->setAccessible(TRUE);
+            $value_property->setValue($attribute, $values['value']);
+          }
+          $objects[] = $object;
+        }
+      }
+    }
+    $document = new CDFDocument(...$objects);
+    return $document;
+  }
 
   /**
    * Updates an entity asynchronously.
