@@ -221,9 +221,9 @@ class ContentHub extends Client
      *   An array of UUIDs.
      *
      * @return \Acquia\ContentHubClient\Entity[]
-     *   An array of Content Hub Entity objects.
+     *   An array of Content Hub Entity objects keyed by UUID.
      */
-    public function readEntities($uuids)
+    public function readEntities(array $uuids)
     {
         $url = "/{$this->api_version}/_search";
         $chunks = array_chunk($uuids, 50);
