@@ -172,6 +172,28 @@ class ContentHub extends Client
     }
 
     /**
+     * Sends request to synchronously update entities.
+     *
+     * The CDF is sent in the payload.
+     *
+     * @param array $entities
+     *   An array of entities.
+     *
+     * @return mixed|\Psr\Http\Message\ResponseInterface
+     *
+     * @throws \GuzzleHttp\Exception\RequestException
+     */
+    public function putEntities($entities) {
+        $body = json_encode([
+          'data' => $entities
+        ]);
+        $endpoint = "/{$this->api_version}/entities";
+        $request = new Request('PUT', $endpoint, [], $body);
+        $response = $this->send($request);
+        return $response;
+    }
+
+    /**
      * Returns an entity by UUID.
      *
      * @param  string                               $uuid
