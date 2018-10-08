@@ -676,7 +676,7 @@ class ContentHubClient extends Client
         catch (\Exception $e) {
             $exceptionResponse = $this->getExceptionMessage($method, $args, $e);
         }
-        $this->logger->error((string) $exceptionResponse->getBody());
+        $this->logger->error((string) $exceptionResponse->getReasonPhrase());
         return $exceptionResponse;
     }
 
