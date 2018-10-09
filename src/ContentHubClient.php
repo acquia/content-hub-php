@@ -4,6 +4,7 @@ namespace Acquia\ContentHubClient;
 
 use Acquia\Hmac\Guzzle\HmacAuthMiddleware;
 use Acquia\Hmac\Key;
+use foo\bar\Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\ClientException;
@@ -156,15 +157,18 @@ class ContentHubClient extends Client
         }
         catch (\Exception $exception) {
             if ($exception instanceof ClientException || $exception instanceof BadResponseException) {
-              $logger->error(sprintf('Error registering client with name="%s" (Error Code = %d: %s)', $name, $exception->getResponse()->getStatusCode(), $exception->getResponse()->getReasonPhrase()));
-              return;
+              $message = sprintf('Error registering client with name="%s" (Error Code = %d: %s)', $name, $exception->getResponse()->getStatusCode(), $exception->getResponse()->getReasonPhrase());
+              $logger->error($message);
+              throw new RequestException($message, $exception->getRequest(), $exception->getResponse());
             }
             if ($exception instanceof RequestException) {
-              $logger->error(sprintf('Could not get authorization from Content Hub to register client %s. Are your credentials inserted correctly? (Error message = %s)', $name, $exception->getMessage()));
-              return;
+              $message = sprintf('Could not get authorization from Content Hub to register client %s. Are your credentials inserted correctly? (Error message = %s)', $name, $exception->getMessage());
+              $logger->error($message);
+              throw new RequestException($message, $exception->getRequest(), $exception->getResponse());
             }
-            $logger->error(sprintf("An unknown exception was caught. Message: %s", $exception->getMessage()));
-            return;
+            $message = sprintf("An unknown exception was caught. Message: %s", $exception->getMessage());
+            $logger->error($message);
+            throw new Exception($message);
         }
     }
 
@@ -177,8 +181,8 @@ class ContentHubClient extends Client
      * @param $secret
      * @param string $api_version
      *
-     * @return string $client_name
-     *   The human-readable name for the client.
+     * @return boolean
+     *   Whether the clientName from the request matches the name passed to it.
      */
     public static function clientNameExists($name, $url, $api_key, $secret, $api_version = 'v1') {
         $config = [
@@ -197,11 +201,13 @@ class ContentHubClient extends Client
         $config['handler']->push($middleware);
         $client = new Client($config);
         $options['body'] = json_encode(['name' => $name]);
+        // Attempt to fetch the client name, if it works
         try {
-            $response = $client->get("/settings/clients/{$name}");
+          $client->get("/settings/clients/{$name}");
+          return TRUE;
         }
         catch (\GuzzleHttp\Exception\ClientException $error) {
-            return $error->getResponse()->getStatusCode() != 404;
+          return $error->getResponse()->getStatusCode() != 404;
         }
     }
 
@@ -623,24 +629,43 @@ class ContentHubClient extends Client
      */
     public function updateWebhook($uuid, $url)
     {
-        $options['body'] = json_encode(['url' => $url]);
-        return $this->put("/settings/webhooks/{$uuid}", $options) ;
+      $options['body'] = json_encode(['url' => $url]);
+      return $this->put("/settings/webhooks/{$uuid}", $options) ;
     }
 
     /**
-     * Deletes a webhook from the active subscription.
+     * Deletes a client from the active subscription.
      *
      * @param $uuid
-     *   The UUID of the webhook to delete
+     *   The UUID of the client to delete, blank for current client.
      *
      * @return \Psr\Http\Message\ResponseInterface
      *
      * @throws \GuzzleHttp\Exception\RequestException
      */
-    public function deleteClient()
+    public function deleteClient($client_uuid = NULL)
     {
         $settings = $this->getSettings();
-        return $this->delete("/settings/client/uuid/{$settings->getUuid()}");
+        $uuid = isset($client_uuid) ? $client_uuid : $settings->getUuid();
+        return $this->delete("/settings/client/uuid/{$uuid}");
+    }
+
+    /**
+     * Updates a client from the active subscription.
+     *
+     * @param $uuid
+     *   The UUID of the client to update.
+     * @param $name
+     *   The new name for the client we're updating.
+     *
+     * @return \Psr\Http\Message\ResponseInterface
+     *
+     * @throws \GuzzleHttp\Exception\RequestException
+     */
+    public function updateClient($uuid, $name)
+    {
+      $options['body'] = json_encode(['name' => $name]);
+      return $this->put("/settings/client/uuid/{$uuid}", $options) ;
     }
 
     /**
