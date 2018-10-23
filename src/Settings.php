@@ -83,6 +83,18 @@ class Settings {
     $this->webhook = $webhook;
   }
 
+  public function toArray() {
+    return [
+      'name' => $this->name,
+      'uuid' => $this->uuid,
+      'apiKey' => $this->apiKey,
+      'secretKey' => crypt($this->secretKey, \Drupal\Core\Site\Settings::getHashSalt()),
+      'url' => $this->url,
+      'sharedSecret' => $this->sharedSecret,
+      'webhook' => $this->webhook,
+    ];
+  }
+
   /**
    * Get the settings name.
    *
