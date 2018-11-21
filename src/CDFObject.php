@@ -4,6 +4,8 @@ namespace Acquia\ContentHubClient;
 
 class CDFObject {
 
+  const LANGUAGE_UNDETERMINED = 'und';
+
   /**
    * @var string
    */
@@ -140,7 +142,7 @@ class CDFObject {
     }
   }
 
-  public function addAttribute($id, $type, $value = NULL, $language = 'und', $class = '\Acquia\ContentHubClient\CDFAttribute') {
+  public function addAttribute($id, $type, $value = NULL, $language = self::LANGUAGE_UNDETERMINED, $class = '\Acquia\ContentHubClient\CDFAttribute') {
     if ($class != '\Acquia\ContentHubClient\CDFAttribute' && !is_subclass_of($class, '\Acquia\ContentHubClient\CDFAttribute')) {
       throw new \Exception(sprintf("The %s class must be a subclass of \Acquia\ContentHubClient\CDFAttribute", $class));
     }

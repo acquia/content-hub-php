@@ -254,7 +254,7 @@ class ContentHubClient extends Client
             if (!$attribute = $object->getAttribute($attribute_name)) {
               $class = !empty($object->getMetadata()['attributes'][$attribute_name]) ? $object->getMetadata()['attributes'][$attribute_name]['class'] : FALSE;
               if ($class && class_exists($class)) {
-                $object->addAttribute($attribute_name, $values['type'], NULL, 'und', $class);
+                $object->addAttribute($attribute_name, $values['type'], NULL, CDFObject::LANGUAGE_UNDETERMINED, $class);
               }
               else {
                 $object->addAttribute($attribute_name, $values['type'], NULL);
@@ -307,7 +307,7 @@ class ContentHubClient extends Client
             if (!$attribute = $object->getAttribute($attribute_name)) {
               $class = !empty($object->getMetadata()['attributes'][$attribute_name]) ? $object->getMetadata()['attributes'][$attribute_name]['class'] : FALSE;
               if ($class && class_exists($class)) {
-                $object->addAttribute($attribute_name, $values['type'], NULL, 'und', $class);
+                $object->addAttribute($attribute_name, $values['type'], NULL, CDFObject::LANGUAGE_UNDETERMINED, $class);
               }
               else {
                 $object->addAttribute($attribute_name, $values['type'], NULL);
@@ -361,7 +361,6 @@ class ContentHubClient extends Client
           $json['data']['entities'][] = $object->toArray();
         }
         $options['body'] = json_encode($json);
-        file_put_contents('/tmp/put.cdf', json_encode($json, JSON_PRETTY_PRINT));
         return $this->put("/entities", $options);
     }
 
@@ -678,6 +677,26 @@ class ContentHubClient extends Client
     public function regenerateSharedSecret()
     {
         return $this->getResponseJson($this->post("/settings/secret", ['body' => json_encode([])]));
+    }
+
+    public function getFilter($filter_id) {
+      return $this::getResponseJson($this->get("/filters/{$filter_id}"));
+    }
+
+    public function putFilter($query) {
+      $data = [
+        'data' => [
+          'query' => $query,
+        ]
+      ];
+      $options = ['body' => json_encode($data)];
+      return $this->getResponseJson($this->put("/filters", $options));
+    }
+
+    public function addFilterToWebhook($filter_id, $webhook_id) {
+      $data = ['filter_id' => $filter_id];
+      $options = ['body' => json_encode($data)];
+      return $this->getResponseJson($this->post("/settings/webhooks/{$webhook_id}/filters", $options));
     }
 
   /**
