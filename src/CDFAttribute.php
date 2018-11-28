@@ -86,8 +86,13 @@ class CDFAttribute {
     return $this->value;
   }
 
-  public function setValue($value, $langauge = CDFObject::LANGUAGE_UNDETERMINED) {
-    $this->value[$langauge] = $value;
+  public function setValue($value, $language = CDFObject::LANGUAGE_UNDETERMINED, $overwrite_all = FALSE) {
+    if ($overwrite_all) {
+      $this->value = $value;
+      return;
+    }
+
+    $this->value[$language] = $value;
   }
 
   /**

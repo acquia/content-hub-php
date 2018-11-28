@@ -142,14 +142,28 @@ class CDFObject {
     }
   }
 
-  public function addAttribute($id, $type, $value = NULL, $language = self::LANGUAGE_UNDETERMINED, $class = '\Acquia\ContentHubClient\CDFAttribute') {
-    if ($class != '\Acquia\ContentHubClient\CDFAttribute' && !is_subclass_of($class, '\Acquia\ContentHubClient\CDFAttribute')) {
-      throw new \Exception(sprintf("The %s class must be a subclass of \Acquia\ContentHubClient\CDFAttribute", $class));
+  /**
+   * @param string $id
+   *   Attribute ID.
+   * @param string $type
+   *   Attribute type.
+   * @param null $value
+   *   Attribute value
+   * @param string $language
+   *   Language
+   * @param string $class
+   *
+   * @throws \Exception
+   */
+  public function addAttribute($id, $type, $value = NULL, $language = self::LANGUAGE_UNDETERMINED, $class = CDFAttribute::class) {
+    if ($class != CDFAttribute::class && !is_subclass_of($class, CDFAttribute::class)) {
+      throw new \Exception(sprintf('The %s class must be a subclass of %s', $class, CDFAttribute::class));
     }
+
     $attribute = new $class($id, $type, $value, $language);
     $this->attributes[$attribute->getId()] = $attribute;
     // Keep track of the class used for this attribute.
-    if ($class != '\Acquia\ContentHubClient\CDFAttribute') {
+    if ($class != CDFAttribute::class) {
       $this->metadata['attributes'][$attribute->getId()]['class'] = $class;
     }
     else {
