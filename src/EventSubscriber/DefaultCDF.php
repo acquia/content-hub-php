@@ -30,7 +30,7 @@ class DefaultCDF implements EventSubscriberInterface {
       if (!$attribute = $object->getAttribute($attribute_name)) {
         $class = !empty($object->getMetadata()['attributes'][$attribute_name]) ? $object->getMetadata()['attributes'][$attribute_name]['class'] : FALSE;
         if ($class && class_exists($class)) {
-          $object->addAttribute($attribute_name, $values['type'], NULL, 'und', $class);
+          $object->addAttribute($attribute_name, $values['type'], NULL, CDFObject::LANGUAGE_UNDETERMINED, $class);
         }
         else {
           $object->addAttribute($attribute_name, $values['type'], NULL);
