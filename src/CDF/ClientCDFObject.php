@@ -2,7 +2,7 @@
 
 namespace Acquia\ContentHubClient\CDF;
 
-use Acquia\ContentHubClient\Attribute\CDFDataAttribute;
+use Acquia\ContentHubClient\CDFAttribute;
 use Acquia\ContentHubClient\Settings;
 
 class ClientCDFObject extends CDFObject {
@@ -24,7 +24,7 @@ class ClientCDFObject extends CDFObject {
     // Add all the client settings as attributes to the client object.
     $this->settings = new Settings($settings['name'], $settings['uuid'], $settings['apiKey'], $settings['secretKey'], $settings['url'], $settings['sharedSecret'], $settings['webhook']);
     $this->setMetadata($settings);
-    $this->addAttribute('clientname', CDFDataAttribute::TYPE_STRING, $this->settings->getName());
+    $this->addAttribute('clientname', CDFAttribute::TYPE_STRING, $this->settings->getName());
   }
 
   /**
