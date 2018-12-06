@@ -2,6 +2,8 @@
 
 namespace Acquia\ContentHubClient;
 
+use Acquia\ContentHubClient\CDF\CDFObject;
+use Acquia\ContentHubClient\Event\GetCDFTypeEvent;
 use Acquia\Hmac\Guzzle\HmacAuthMiddleware;
 use Acquia\Hmac\Key;
 use foo\bar\Exception;
@@ -15,6 +17,7 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ContentHubClient extends Client
 {
@@ -37,6 +40,13 @@ class ContentHubClient extends Client
     protected $logger;
 
     /**
+     * The Event Dispatcher.
+     *
+     * @var EventDispatcherInterface $dispatcher
+     */
+    protected $dispatcher;
+
+    /**
      * Overrides \GuzzleHttp\Client::__construct()
      *
      * @param array $config
@@ -44,10 +54,12 @@ class ContentHubClient extends Client
      * @param \Acquia\Hmac\Guzzle\HmacAuthMiddleware $middleware
      * @param string $api_version
      */
-    public function __construct(array $config = [], LoggerInterface $logger, Settings $settings, HmacAuthMiddleware $middleware, $api_version = 'v1')
+    public function __construct(array $config = [], LoggerInterface $logger, Settings $settings, HmacAuthMiddleware $middleware, EventDispatcherInterface $dispatcher, $api_version = 'v1')
     {
         $this->logger = $logger;
         $this->settings = $settings;
+        $this->dispatcher = $dispatcher;
+
         // "base_url" parameter changed to "base_uri" in Guzzle6, so the following line
         // is there to make sure it does not disrupt previous configuration.
         if (!isset($config['base_uri']) && isset($config['base_url'])) {
@@ -214,7 +226,7 @@ class ContentHubClient extends Client
   /**
    * Sends request to asynchronously create entities.
    *
-   * @param \Acquia\ContentHubClient\CDFObject[] $objects
+   * @param \Acquia\ContentHubClient\CDF\CDFObject[] $objects
    *   Individual CDFObjects to send to ContentHub.
    *
    * @return \Psr\Http\Message\ResponseInterface
@@ -237,7 +249,7 @@ class ContentHubClient extends Client
      *
      * @param  string                               $uuid
      *
-     * @return \Acquia\ContentHubClient\CDFObject|array
+     * @return \Acquia\ContentHubClient\CDF\CDFObjectInterface|array
      *   A CDFObject representing the entity or an array if there was no data.
      *
      * @throws \GuzzleHttp\Exception\RequestException
@@ -248,24 +260,7 @@ class ContentHubClient extends Client
     {
         $return = $this->getResponseJson($this->get("/entities/{$uuid}"));
         if (!empty($return['data']['data'])) {
-          $data = $return['data']['data'];
-          $object = new CDFObject($data['type'], $data['uuid'], $data['created'], $data['modified'], $data['origin'], $data['metadata']);
-          foreach ($data['attributes'] as $attribute_name => $values) {
-            if (!$attribute = $object->getAttribute($attribute_name)) {
-              $class = !empty($object->getMetadata()['attributes'][$attribute_name]) ? $object->getMetadata()['attributes'][$attribute_name]['class'] : FALSE;
-              if ($class && class_exists($class)) {
-                $object->addAttribute($attribute_name, $values['type'], NULL, 'und', $class);
-              }
-              else {
-                $object->addAttribute($attribute_name, $values['type'], NULL);
-              }
-              $attribute = $object->getAttribute($attribute_name);
-            }
-            $value_property = (new \ReflectionClass($attribute))->getProperty('value');
-            $value_property->setAccessible(TRUE);
-            $value_property->setValue($attribute, $values['value']);
-          }
-          return $object;
+          return $this->getCDFObject($return['data']['data']);
         }
         return $return;
     }
@@ -301,24 +296,7 @@ class ContentHubClient extends Client
       $results = $this->getResponseJson($this->get("/_search", $options));
       if (is_array($results) && isset($results['hits']['total']) && $results['hits']['total'] > 0) {
         foreach ($results['hits']['hits'] as $key => $item) {
-          $entity = $item['_source']['data'];
-          $object = new CDFObject($entity['type'], $entity['uuid'], $entity['created'], $entity['modified'], $entity['origin'], $entity['metadata']);
-          foreach ($entity['attributes'] as $attribute_name => $values) {
-            if (!$attribute = $object->getAttribute($attribute_name)) {
-              $class = !empty($object->getMetadata()['attributes'][$attribute_name]) ? $object->getMetadata()['attributes'][$attribute_name]['class'] : FALSE;
-              if ($class && class_exists($class)) {
-                $object->addAttribute($attribute_name, $values['type'], NULL, 'und', $class);
-              }
-              else {
-                $object->addAttribute($attribute_name, $values['type'], NULL);
-              }
-              $attribute = $object->getAttribute($attribute_name);
-            }
-            $value_property = (new \ReflectionClass($attribute))->getProperty('value');
-            $value_property->setAccessible(TRUE);
-            $value_property->setValue($attribute, $values['value']);
-          }
-          $objects[] = $object;
+          $objects[] = $this->getCDFObject($item['_source']['data']);
         }
       }
     }
@@ -327,11 +305,24 @@ class ContentHubClient extends Client
   }
 
   /**
+   * Retrieves a CDF Object
+   * @param $data
+   *
+   * @return \Acquia\ContentHubClient\CDF\CDFObjectInterface
+   * @throws \ReflectionException
+   */
+  protected function getCDFObject($data) {
+    $event = new GetCDFTypeEvent($data);
+    $this->dispatcher->dispatch(ContentHubLibraryEvents::GET_CDF_CLASS, $event);
+    return $event->getObject();
+  }
+
+  /**
    * Updates an entity asynchronously.
    *
    * The entity does not need to be passed to this method, but only the resource URL.
    *
-   * @param \Acquia\ContentHubClient\CDFObject $object
+   * @param \Acquia\ContentHubClient\CDF\CDFObject $object
    *   The CDFObject
    *
    * @return \Psr\Http\Message\ResponseInterface
@@ -346,7 +337,7 @@ class ContentHubClient extends Client
   /**
    * Updates many entities asynchronously.
    *
-   * @param \Acquia\ContentHubClient\CDFObject[] $objects
+   * @param \Acquia\ContentHubClient\CDF\CDFObject[] $objects
    *   The CDFObjects to update.
    *
    * @return \Psr\Http\Message\ResponseInterface

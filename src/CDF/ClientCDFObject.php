@@ -1,9 +1,8 @@
 <?php
 
-namespace Acquia\ContentHubClient\CDFObject;
+namespace Acquia\ContentHubClient\CDF;
 
 use Acquia\ContentHubClient\Attribute\CDFDataAttribute;
-use Acquia\ContentHubClient\CDFObject;
 use Acquia\ContentHubClient\Settings;
 
 class ClientCDFObject extends CDFObject {
@@ -17,15 +16,15 @@ class ClientCDFObject extends CDFObject {
    * ClientCDFObject constructor.
    *
    * @param string $uuid
-   * @param \Acquia\ContentHubClient\Settings $settings
+   * @param array $settings
    */
-  public function __construct(string $uuid, Settings $settings) {
+  public function __construct($uuid, array $settings) {
     parent::__construct('client', $uuid, date('c'), date('c'), $uuid);
 
     // Add all the client settings as attributes to the client object.
+    $this->settings = new Settings($settings['name'], $settings['uuid'], $settings['apiKey'], $settings['secretKey'], $settings['url'], $settings['sharedSecret'], $settings['webhook']);
+    $this->setMetadata($settings);
     $this->addAttribute('clientname', CDFDataAttribute::TYPE_STRING, $this->settings->getName());
-    $this->addAttribute('settings', CDFDataAttribute::TYPE_ARRAY_KEYWORD, $settings->toArray());
-    $this->addAttribute('webhook', CDFDataAttribute::TYPE_ARRAY_KEYWORD, $settings->toArray()['webhook']);
   }
 
   /**
@@ -49,9 +48,13 @@ class ClientCDFObject extends CDFObject {
   /**
    * Grabs the webhook for the client.
    *
-   * @return \Acquia\ContentHubClient\CDFAttribute
+   * @return array
    */
   public function getWebhook() {
-    return $this->getAttribute('webhook');
+    $metadata = $this->getMetadata();
+    if (isset($metadata['webhook'])) {
+      return $metadata['webhook'];
+    }
+    return [];
   }
 }

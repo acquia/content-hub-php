@@ -1,8 +1,8 @@
 <?php
 
-namespace Acquia\ContentHubClient;
+namespace Acquia\ContentHubClient\CDF;
 
-class CDFObject {
+class CDFObject implements CDFObjectInterface {
 
   /**
    * @var string

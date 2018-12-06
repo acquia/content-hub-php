@@ -1,13 +1,13 @@
 <?php
 
-
 namespace Acquia\ContentHubClient;
 
+use Acquia\ContentHubClient\CDF\CDFObject;
 
 class CDFDocument {
 
   /**
-   * @var \Acquia\ContentHubClient\CDFObject[]
+   * @var \Acquia\ContentHubClient\CDF\CDFObject[]
    */
   protected $entities;
 

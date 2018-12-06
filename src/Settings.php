@@ -88,7 +88,7 @@ class Settings {
       'name' => $this->name,
       'uuid' => $this->uuid,
       'apiKey' => $this->apiKey,
-      'secretKey' => crypt($this->secretKey, \Drupal\Core\Site\Settings::getHashSalt()),
+      'secretKey' => $this->secretKey,
       'url' => $this->url,
       'sharedSecret' => $this->sharedSecret,
       'webhook' => $this->webhook,
@@ -146,10 +146,10 @@ class Settings {
   }
 
   /**
-   * Returns the Shared Secret used for Webhook verification.
+   * Returns the API Secret Key used for Webhook verification.
    *
    * @return string|bool
-   *   The shared secret if it is set, FALSE otherwise.
+   *   The api secret key if it is set, FALSE otherwise.
    */
   public function getSecretKey() {
     return $this->secretKey;
