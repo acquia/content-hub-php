@@ -131,7 +131,7 @@ class ContentHubClient extends Client
      *
      * @throws \GuzzleHttp\Exception\RequestException
      */
-    public static function register(LoggerInterface $logger, $name, $url, $api_key, $secret, $api_version = 'v1')
+    public static function register(LoggerInterface $logger, EventDispatcherInterface $dispatcher, $name, $url, $api_key, $secret, $api_version = 'v1')
     {
         $config = [
             'base_uri' => "$url/$api_version",
@@ -156,7 +156,7 @@ class ContentHubClient extends Client
             $config = [
                 'base_url' => $settings->getUrl()
             ];
-            $client = new static($config, $logger, $settings, $settings->getMiddleware());
+            $client = new static($config, $logger, $settings, $settings->getMiddleware(), $dispatcher);
             // @todo remove this once shared secret is returned on the register
             // endpoint.
             // We need the shared secret to be fully functional, so an additional
@@ -165,7 +165,7 @@ class ContentHubClient extends Client
             // Now that we have the shared secret, reinstantiate everything and
             // return a new instance of this class.
             $settings = new Settings($settings->getName(), $settings->getUuid(), $settings->getApiKey(), $settings->getSecretKey(), $settings->getUrl(), $remote['shared_secret']);
-            return new static($config, $logger, $settings, $settings->getMiddleware());
+            return new static($config, $logger, $settings, $settings->getMiddleware(), $dispatcher);
         }
         catch (\Exception $exception) {
             if ($exception instanceof ClientException || $exception instanceof BadResponseException) {
