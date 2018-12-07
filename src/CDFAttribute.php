@@ -2,6 +2,7 @@
 
 namespace Acquia\ContentHubClient;
 
+use Acquia\ContentHubClient\CDF\CDFObject;
 use ReflectionClass;
 
 class CDFAttribute {
