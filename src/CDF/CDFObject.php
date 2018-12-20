@@ -87,6 +87,16 @@ class CDFObject implements CDFObjectInterface {
   }
 
   /**
+   * Sets "created" attribute.
+   *
+   * @param string $created
+   *   Date/time.
+   */
+  public function setCreated($created) {
+    $this->created = $created;
+  }
+
+  /**
    * @return string
    */
   public function getModified() {
@@ -94,10 +104,30 @@ class CDFObject implements CDFObjectInterface {
   }
 
   /**
+   * Sets "modified" attribute.
+   *
+   * @param string $modified
+   *   Date/time.
+   */
+  public function setModified($modified) {
+    $this->modified = $modified;
+  }
+
+  /**
    * @return string
    */
   public function getOrigin() {
     return $this->origin;
+  }
+
+  /**
+   * Sets "origin" attribute.
+   *
+   * @param string $origin
+   *   Origin.
+   */
+  public function setOrigin($origin) {
+    $this->origin = $origin;
   }
 
   /**
