@@ -654,8 +654,8 @@ class ContentHubClient extends Client
      */
     public function updateClient($uuid, $name)
     {
-      $options['body'] = json_encode(['name' => $name]);
-      return $this->put("/settings/client/uuid/{$uuid}", $options) ;
+        $options['body'] = json_encode(['name' => $name]);
+        return $this->put("/settings/client/uuid/{$uuid}", $options) ;
     }
 
     /**
@@ -670,34 +670,93 @@ class ContentHubClient extends Client
         return $this->getResponseJson($this->post("/settings/secret", ['body' => json_encode([])]));
     }
 
+    /**
+     * Gets filter by UUID.
+     *
+     * @param string $filter_id
+     *   The filter UUID.
+     *
+     * @return array
+     *
+     * @throws \GuzzleHttp\Exception\RequestException
+     */
     public function getFilter($filter_id) {
-      return $this::getResponseJson($this->get("/filters/{$filter_id}"));
+        return $this::getResponseJson($this->get("/filters/{$filter_id}"));
     }
 
-    public function putFilter($query) {
+    /**
+     * Gets filter by UUID.
+     *
+     * @param string $filter_name
+     *   The filter name.
+     *
+     * @return array
+     *
+     * @throws \GuzzleHttp\Exception\RequestException
+     */
+    public function getFilterByName($filter_name) {
+        return $this::getResponseJson($this->get("/filters/name/{$filter_name}"));
+    }
+
+    public function listFilters() {
+        return $this::getResponseJson($this->get("/filters"));
+    }
+
+
+    public function putFilter($query, $name) {
       $data = [
         'data' => [
           'query' => $query,
-        ]
+        ],
+        'name' => $name,
       ];
       $options = ['body' => json_encode($data)];
       return $this->getResponseJson($this->put("/filters", $options));
     }
 
+    /**
+     * List all filters attached to a particular webhook.
+     *
+     * @param string $webhook_id
+     *   The webhook UUID.
+     *
+     * @return array
+     *   An array of data including the filter UUID, if succeeds.
+     *
+     * @throws \GuzzleHttp\Exception\RequestException
+     *
+     */
+    public function listFiltersForWebhook($webhook_id) {
+      return $this::getResponseJson($this->get("/settings/webhooks/{$webhook_id}/filters"));
+    }
+
+    /**
+     * Attaches a filter to a webhook.
+     *
+     * @param string $filter_id
+     *   The filter UUID.
+     * @param string $webhook_id
+     *   The Webhook UUID.
+     *
+     * @return array
+     *   An array of data including the filter UUID, if succeeds.
+     *
+     * @throws \GuzzleHttp\Exception\RequestException
+     */
     public function addFilterToWebhook($filter_id, $webhook_id) {
       $data = ['filter_id' => $filter_id];
       $options = ['body' => json_encode($data)];
       return $this->getResponseJson($this->post("/settings/webhooks/{$webhook_id}/filters", $options));
     }
 
-  /**
-   * Gets a Json Response from a request.
-   *
-   * @param \Psr\Http\Message\ResponseInterface $response
-   *
-   * @return mixed
-   * @throws \Exception
-   */
+    /**
+     * Gets a Json Response from a request.
+     *
+     * @param \Psr\Http\Message\ResponseInterface $response
+     *
+     * @return mixed
+     * @throws \Exception
+     */
     public static function getResponseJson(ResponseInterface $response)
     {
         $body = (string) $response->getBody();
