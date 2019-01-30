@@ -698,12 +698,33 @@ class ContentHubClient extends Client
         return $this::getResponseJson($this->get("/filters/name/{$filter_name}"));
     }
 
+    /**
+     * List all filters in the subscription.
+     *
+     * @return array
+     *   An array of all filters in the subscription.
+     *
+     * @throws \GuzzleHttp\Exception\RequestException
+     */
     public function listFilters() {
         return $this::getResponseJson($this->get("/filters"));
     }
 
-
-    public function putFilter($query, $name) {
+    /**
+     * Puts a Filter into Content Hub.
+     *
+     * @param string $query
+     *   The query to add to the filter.
+     * @param string $name
+     *   The name of the filter.
+     *
+     * @return array
+     *   An array of data including the filter UUID, if succeeds.
+     *
+     * @throws \GuzzleHttp\Exception\RequestException
+     *
+     */
+    public function putFilter($query, $name = '') {
       $data = [
         'data' => [
           'query' => $query,
