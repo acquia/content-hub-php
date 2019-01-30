@@ -691,11 +691,16 @@ class ContentHubClient extends Client
      *   The filter name.
      *
      * @return array
+     *   The filter array.
      *
      * @throws \GuzzleHttp\Exception\RequestException
      */
     public function getFilterByName($filter_name) {
-        return $this::getResponseJson($this->get("/filters/name/{$filter_name}"));
+        $result = $this::getResponseJson($this->get("/filters?name={$filter_name}"));
+        if ($result['success'] == 1) {
+            return $result['data'];
+        }
+        return NULL;
     }
 
     /**
