@@ -54,7 +54,7 @@ class ContentHubClient extends Client
      * @param \Acquia\Hmac\Guzzle\HmacAuthMiddleware $middleware
      * @param string $api_version
      */
-    public function __construct(array $config = [], LoggerInterface $logger, Settings $settings, HmacAuthMiddleware $middleware, EventDispatcherInterface $dispatcher, $api_version = 'v1')
+    public function __construct(array $config = [], LoggerInterface $logger, Settings $settings, HmacAuthMiddleware $middleware, EventDispatcherInterface $dispatcher, $api_version = 'v2')
     {
         $this->logger = $logger;
         $this->settings = $settings;
@@ -131,7 +131,7 @@ class ContentHubClient extends Client
      *
      * @throws \GuzzleHttp\Exception\RequestException
      */
-    public static function register(LoggerInterface $logger, EventDispatcherInterface $dispatcher, $name, $url, $api_key, $secret, $api_version = 'v1')
+    public static function register(LoggerInterface $logger, EventDispatcherInterface $dispatcher, $name, $url, $api_key, $secret, $api_version = 'v2')
     {
         $config = [
             'base_uri' => "$url/$api_version",
@@ -196,7 +196,7 @@ class ContentHubClient extends Client
      * @return boolean
      *   Whether the clientName from the request matches the name passed to it.
      */
-    public static function clientNameExists($name, $url, $api_key, $secret, $api_version = 'v1') {
+    public static function clientNameExists($name, $url, $api_key, $secret, $api_version = 'v2') {
         $config = [
             'base_uri' => "$url/$api_version",
             'headers' => [
