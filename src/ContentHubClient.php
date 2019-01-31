@@ -741,6 +741,21 @@ class ContentHubClient extends Client
     }
 
     /**
+     * Deletes a filter, given its UUID.
+     *
+     * @param string $filter_uuid
+     *   The filter UUID.
+     *
+     * @return \Psr\Http\Message\ResponseInterface
+     *   The response.
+     *
+     * @throws \GuzzleHttp\Exception\RequestException
+     */
+    public function deleteFilter($filter_uuid) {
+      return $this->delete("/filters/{$filter_uuid}");
+    }
+
+    /**
      * List all filters attached to a particular webhook.
      *
      * @param string $webhook_id
