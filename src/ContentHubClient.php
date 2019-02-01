@@ -685,7 +685,7 @@ class ContentHubClient extends Client
     }
 
     /**
-     * Gets filter by UUID.
+     * Gets filter by Name.
      *
      * @param string $filter_name
      *   The filter name.
