@@ -6,7 +6,6 @@ use Acquia\ContentHubClient\CDF\CDFObject;
 use Acquia\ContentHubClient\Event\GetCDFTypeEvent;
 use Acquia\Hmac\Guzzle\HmacAuthMiddleware;
 use Acquia\Hmac\Key;
-use foo\bar\Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\ClientException;
@@ -180,7 +179,7 @@ class ContentHubClient extends Client
             }
             $message = sprintf("An unknown exception was caught. Message: %s", $exception->getMessage());
             $logger->error($message);
-            throw new Exception($message);
+            throw new \Exception($message);
         }
     }
 
