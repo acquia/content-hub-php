@@ -623,6 +623,25 @@ class ContentHubClient extends Client
     }
 
     /**
+     * Add entities to Intrest List.
+     *
+     * @param string $webhook_uuid
+     *   The UUID of the webhook
+     * @param array $uuids
+     *   Entity UUIDs to add to Interest List
+     *
+     * @return \Psr\Http\Message\ResponseInterface
+     *   The response.
+     *
+     * @throws \GuzzleHttp\Exception\RequestException
+     */
+    public function addEntitiesToInterestList($webhook_uuid, $uuids) 
+    {
+      $options['body'] = json_encode(['interests' => $uuids]);
+      return $this->post("/interest/webhook/{$webhook_uuid}", $options);
+    }
+
+    /**
      * Deletes a client from the active subscription.
      *
      * @param $uuid
