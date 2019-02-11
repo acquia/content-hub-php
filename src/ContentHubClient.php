@@ -625,7 +625,7 @@ class ContentHubClient extends Client
     /**
      * Add entities to Intrest List.
      *
-     * @param string $webhookUuid
+     * @param string $webhook_uuid
      *   The UUID of the webhook
      * @param array $uuids
      *   Entity UUIDs to add to Interest List
@@ -635,10 +635,10 @@ class ContentHubClient extends Client
      *
      * @throws \GuzzleHttp\Exception\RequestException
      */
-    public function addEntitiesToInterestList($webhookUuid, $uuids) 
+    public function addEntitiesToInterestList($webhook_uuid, $uuids) 
     {
       $options['body'] = json_encode(['interests' => $uuids]);
-      return $this->post("/interest/webhook/{$webhookUuid}", $options);
+      return $this->post("/interest/webhook/{$webhook_uuid}", $options);
     }
 
     /**
