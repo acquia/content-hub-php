@@ -50,6 +50,7 @@ class AttributeTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($numericAttribute['value'], $attribute->getValue());
 //        @todo: Ask if there should be a functionality like this:
 //        $this->assertEquals($numericAttribute['value'][CDFObject::LANGUAGE_UNDETERMINED], $attribute->getValue()['it']);
+//        test
     }
 
     public function testCreateNumericArrayAttribute()
