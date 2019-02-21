@@ -2,102 +2,14 @@
 
 namespace Acquia\ContentHubClient\test;
 
-use Acquia\ContentHubClient\CDF\CDFObject;
-use Acquia\ContentHubClient\CDFAttribute;
+use Acquia\ContentHubClient\Attribute;
 
 class AttributeTest extends \PHPUnit_Framework_TestCase
 {
-    private $attributeData;
-    private $attributeId;
-
-    public function setUp()
-    {
-        $this->attributeData = $this->getAttributeData();
-        $this->attributeId = $this->attributeData['attributes']['id'];
-    }
-
-    public function tearDown()
-    {
-        unset($this->attributeId);
-        unset($this->attributeData);
-    }
-
-    public function testCreateStringAttribute()
-    {
-        $title = $this->attributeData['attributes']['title'];
-
-        $attribute = new CDFAttribute($this->attributeId, CDFAttribute::TYPE_STRING);
-        $this->assertEquals('string', $attribute->getType());
-
-        foreach ($title['value'] as $language => $value) {
-            $attribute->setValue($value, $language);
-        }
-
-        $this->assertEquals($title['value'], $attribute->getValue());
-    }
-
-    public function testCreateNumericAttribute()
-    {
-        $numericAttribute = $this->attributeData['attributes']['num'];
-
-        $attribute = new CDFAttribute($this->attributeId, CDFAttribute::TYPE_NUMBER);
-        $this->assertEquals('number', $attribute->getType());
-
-        foreach ($numericAttribute['value'] as $language => $value) {
-            $attribute->setValue($value, $language);
-        }
-
-        $this->assertEquals($numericAttribute['value'], $attribute->getValue());
-//        @todo: Ask if there should be a functionality like this:
-//        $this->assertEquals($numericAttribute['value'][CDFObject::LANGUAGE_UNDETERMINED], $attribute->getValue()['it']);
-    }
-
-    public function testCreateNumericArrayAttribute()
-    {
-        $numericArrayAttribute = $this->attributeData['attributes']['num_array'];
-
-        $attribute = new CDFAttribute($this->attributeId, CDFAttribute::TYPE_ARRAY_NUMBER);
-        $this->assertEquals('array<number>', $attribute->getType());
-
-        foreach ($numericArrayAttribute['value'] as $language => $value) {
-            $attribute->setValue($value, $language);
-        }
-
-        $this->assertEquals($numericArrayAttribute['value'], $attribute->getValue());
-
-//        @todo: not sure if we need this
-//        $data_it = [
-//            '2.34',
-//            '3.23'
-//        ];
-//        $data['value']['it'] = [
-//            2.34,
-//            3.23
-//        ];
-//        $attribute->setValue($data_it, 'it');
-//        $this->assertEquals($data['value']['it'], $attribute->getValue('it'));
-//
-//        unset($data['value']['it']);
-//        $attribute->removeValue('it');
-//        $this->assertEquals($data['value'], $attribute->getValues());
-    }
-
-    public function testUnsupportedDataTypeAttribute()
-    {
-        try {
-            $dataType = 'unsupported_data_type';
-            $attribute = new CDFAttribute($this->attributeId, $dataType);
-            $this->fail(sprintf("It was expected an exception from \"%s\".", $dataType));
-        } catch (\Exception $e) {
-            $this->assertEquals(sprintf("Unsupported CDF Attribute data type \"%s\".", $dataType), $e->getMessage());
-        }
-    }
-
-    private function getAttributeData()
+    private function setAttributeData()
     {
         return [
             "attributes" => [
-                "id" => 1,
                 "num_array" => [
                     "type" => "array<number>",
                     "value" => [
@@ -120,18 +32,76 @@ class AttributeTest extends \PHPUnit_Framework_TestCase
                     "value" => [
                         'en' => 13.45,
                         'es' => 1.43,
-                        CDFObject::LANGUAGE_UNDETERMINED => 1.23
+                        'und' => 1.23
                     ]
                 ],
                 "title" => [
                     "type" => "string",
                     "value" => [
-                        "en" => "nothing",
-                        "es" => "nada",
-                        CDFObject::LANGUAGE_UNDETERMINED => "niente"
+                      "en" => "nothing",
+                      "es" => "nada",
+                      "und" => "niente"
                     ]
                 ]
             ],
         ];
+    }
+
+    public function testCreateAttribute()
+    {
+        $data = $this->setAttributeData()['attributes']['title'];
+
+        // Testing attribute with default type = string.
+        $attribute = new Attribute(Attribute::TYPE_STRING);
+        $this->assertEquals('string', $attribute->getType());
+        $attribute->setValues($data['value']);
+        $this->assertEquals($data['value']['en'], $attribute->getValue('en'));
+        $this->assertEquals($data['value']['es'], $attribute->getValue('es'));
+        $this->assertEquals($data['value']['und'], $attribute->getValue());
+
+        // Testing type 'number'
+        $data = $this->setAttributeData()['attributes']['num'];
+        $attribute = new Attribute(Attribute::TYPE_NUMBER);
+        $this->assertEquals('number', $attribute->getType());
+        $attribute->setValue($data['value']['en'], 'en');
+        $this->assertEquals($data['value']['en'], $attribute->getValue('en'));
+        $attribute->setValue((string) $data['value']['es'], 'es');
+        $this->assertEquals($data['value']['es'], $attribute->getValue('es'));
+        $attribute->setValue((string) $data['value']['und']);
+        $this->assertEquals($data['value']['und'], $attribute->getValue());
+        $this->assertEquals($data['value']['und'], $attribute->getValue('it'));
+        $this->assertEquals($data['value'], $attribute->getValues());
+
+        // Testing 'array<number>'
+        $data = $this->setAttributeData()['attributes']['num_array'];
+        $attribute = new Attribute(Attribute::TYPE_ARRAY_NUMBER);
+        $this->assertEquals('array<number>', $attribute->getType());
+        $attribute->setValues($data['value']);
+        $this->assertEquals($data['value']['en'], $attribute->getValue('en'));
+        $this->assertEquals($data['value']['hu'], $attribute->getValue('hu'));
+        $this->assertEquals($data['value']['und'], $attribute->getValue());
+        $data_it = [
+            '2.34',
+            '3.23'
+        ];
+        $data['value']['it'] = [
+            2.34,
+            3.23
+        ];
+        $attribute->setValue($data_it, 'it');
+        $this->assertEquals($data['value']['it'], $attribute->getValue('it'));
+
+        unset($data['value']['it']);
+        $attribute->removeValue('it');
+        $this->assertEquals($data['value'], $attribute->getValues());
+
+        // Test an unhandled type.
+        try {
+            $attribute = new Attribute('float');
+            $this->fail('It was expected an exception from "float" type.');
+        } catch (\Exception $e) {
+            $this->assertEquals('Type handler not registered for this type: float', $e->getMessage());
+        }
+
     }
 }
