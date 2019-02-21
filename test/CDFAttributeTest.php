@@ -5,7 +5,7 @@ namespace Acquia\ContentHubClient\test;
 use Acquia\ContentHubClient\CDF\CDFObject;
 use Acquia\ContentHubClient\CDFAttribute;
 
-class AttributeTest extends \PHPUnit_Framework_TestCase
+class CDFAttributeTest extends \PHPUnit_Framework_TestCase
 {
     private $attributeData;
     private $attributeId;
