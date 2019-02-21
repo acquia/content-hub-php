@@ -2,6 +2,8 @@
 
 namespace Acquia\ContentHubClient\CDF;
 
+use Acquia\ContentHubClient\CDFAttribute;
+
 class CDFObject implements CDFObjectInterface {
 
   const LANGUAGE_UNDETERMINED = 'und';
