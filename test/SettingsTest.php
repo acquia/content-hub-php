@@ -22,7 +22,7 @@ class SettingsTest extends PHPUnit_Framework_TestCase
     public function setUp()
     {
         parent::setUp();
-        $settingsParameters = $this->getSettingsData()['data'];
+        $settingsParameters = $this->getSettingsData();
         $this->settings = new Settings(
             $settingsParameters['name'],
             $settingsParameters['uuid'],
@@ -110,25 +110,25 @@ class SettingsTest extends PHPUnit_Framework_TestCase
     public function getSettingsData()
     {
         return [
-            'data' => [
-                'name' => 'testName',
-                'uuid' => '11111111-00000000-00000000-00000000',
-                'apiKey' => 'AAAAAA-AAAAAA-AAAAAA',
-                'secretKey' => 'BBBBBB-BBBBBB-BBBBBB',
-                'url' => 'https://test.url',
-                'sharedSecret' => null,
-                'webhook' => [
-                        'http://example1.com/webhooks' => '00000000-0000-0000-0000-000000000000',
-                        'http://example2.com/webhooks' => '11111111-0000-0000-0000-000000000000',
-                        ],
-                ],
+            'name' => 'testName',
+            'uuid' => '11111111-00000000-00000000-00000000',
+            'apiKey' => 'AAAAAA-AAAAAA-AAAAAA',
+            'secretKey' => 'BBBBBB-BBBBBB-BBBBBB',
+            'url' => 'https://test.url',
+            'sharedSecret' => null,
+            'webhook' => [
+                    'http://example1.com/webhooks' => '00000000-0000-0000-0000-000000000000',
+                    'http://example2.com/webhooks' => '11111111-0000-0000-0000-000000000000',
+                    ],
         ];
     }
 
     public function settingsDataProvider()
     {
         return [
-            $this->getSettingsData()
+            [
+                $this->getSettingsData()
+            ]
         ];
     }
 
