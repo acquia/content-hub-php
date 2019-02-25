@@ -3,13 +3,9 @@ sudo: required
 dist: trusty
 group: edge
 
-# Noticed hhvm is hardcoded to 3.18 for now. This is because (at this time):
-# 1) travis's default hhvm is 3.6, and its ucword function is implemented incorrectly to PHP specs.
-# 2) latest hhvm is 3.18.
 php:
-  - 7.0
+  - 7.1
   - 5.6
-  - hhvm-3.18
 
 before_script:
   - composer install
