@@ -119,6 +119,26 @@ class CDFDocumentTest extends TestCase
     }
 
     /**
+     * @dataProvider providerMergeDocuments
+     * @param $setOne
+     * @param $setTwo
+     */
+    public function testMergeDocumentsWithArrayDiff($setOne, $setTwo)
+    {
+        $this->cdfDocument->setCDFEntities(...$setOne);
+        $documentToMerge = new CDFDocument(...$setTwo);
+
+        $keysOne = array_keys($this->cdfDocument->getEntities());
+        $keysTwo = array_keys($documentToMerge->getEntities());
+
+        $this->assertEquals(array_diff($keysOne, $keysTwo), $keysOne);
+
+        $this->cdfDocument->mergeDocuments($documentToMerge);
+        $mergedKeys = array_keys($this->cdfDocument->getEntities());
+        $this->assertEquals($mergedKeys, array_merge($keysOne, $keysTwo));
+    }
+
+    /**
      * @dataProvider providerToString
      * @param $objectsList
      * @param $emptyObjectsJson
