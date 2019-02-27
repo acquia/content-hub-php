@@ -15,7 +15,7 @@ class CDFObjectTest extends TestCase
      */
     private $cdfObject;
 
-    public function setUp()
+    public function setUp() : void
     {
         parent::setUp();
         $objectParameters = $this->getObjectData();
@@ -29,7 +29,7 @@ class CDFObjectTest extends TestCase
         );
     }
 
-    public function tearDown()
+    public function tearDown() : void
     {
         parent::tearDown();
         unset($this->cdfObject);

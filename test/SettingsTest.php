@@ -10,16 +10,16 @@ namespace Acquia\ContentHubClient\test;
 
 
 use Acquia\ContentHubClient\Settings;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class SettingsTest extends PHPUnit_Framework_TestCase
+class SettingsTest extends TestCase
 {
     /**
      * @var Settings
      */
     private $settings;
 
-    public function setUp()
+    public function setUp() : void
     {
         parent::setUp();
         $settingsParameters = $this->getSettingsData();
@@ -34,7 +34,7 @@ class SettingsTest extends PHPUnit_Framework_TestCase
         );
     }
 
-    public function tearDown()
+    public function tearDown() : void
     {
         parent::tearDown();
         unset($this->settings);

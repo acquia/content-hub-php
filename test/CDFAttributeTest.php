@@ -4,19 +4,20 @@ namespace Acquia\ContentHubClient\test;
 
 use Acquia\ContentHubClient\CDF\CDFObject;
 use Acquia\ContentHubClient\CDFAttribute;
+use PHPUnit\Framework\TestCase;
 
-class CDFAttributeTest extends \PHPUnit_Framework_TestCase
+class CDFAttributeTest extends TestCase
 {
     private $attributeData;
     private $attributeId;
 
-    public function setUp()
+    public function setUp() : void
     {
         $this->attributeData = $this->getAttributeData();
         $this->attributeId = $this->attributeData['attributes']['id'];
     }
 
-    public function tearDown()
+    public function tearDown() : void
     {
         unset($this->attributeId);
         unset($this->attributeData);

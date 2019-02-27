@@ -11,22 +11,22 @@ namespace Acquia\ContentHubClient\test;
 
 use Acquia\ContentHubClient\CDF\CDFObject;
 use Acquia\ContentHubClient\CDFDocument;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class CDFDocumentTest extends PHPUnit_Framework_TestCase
+class CDFDocumentTest extends TestCase
 {
     /**
      * @var CDFDocument
      */
     protected $cdfDocument;
 
-    public function setUp()
+    public function setUp() : void
     {
         parent::setUp();
         $this->cdfDocument = new CDFDocument();
     }
 
-    public function tearDown()
+    public function tearDown() : void
     {
         parent::tearDown();
         unset($this->cdfDocument);
