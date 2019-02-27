@@ -144,17 +144,26 @@ class CDFObject implements CDFObjectInterface {
     }
   }
 
-  public function addAttribute($id, $type, $value = NULL, $language = self::LANGUAGE_UNDETERMINED, $class = '\Acquia\ContentHubClient\CDFAttribute') {
-    if ($class != '\Acquia\ContentHubClient\CDFAttribute' && !is_subclass_of($class, '\Acquia\ContentHubClient\CDFAttribute')) {
-      throw new \Exception(sprintf("The %s class must be a subclass of \Acquia\ContentHubClient\CDFAttribute", $class));
+    /**
+     * Factory could be used here in order to stick with Single responsibility principle.
+     *
+     * @param $id
+     * @param $type
+     * @param null $value
+     * @param string $language
+     * @param string $className
+     * @throws \Exception
+     */
+  public function addAttribute($id, $type, $value = NULL, $language = self::LANGUAGE_UNDETERMINED, $className = CDFAttribute::class) {
+    if ($className != CDFAttribute::class && !is_subclass_of($className, CDFAttribute::class)) {
+      throw new \Exception(sprintf("The %s class must be a subclass of \Acquia\ContentHubClient\CDFAttribute", $className));
     }
-    $attribute = new $class($id, $type, $value, $language);
+    $attribute = new $className($id, $type, $value, $language);
     $this->attributes[$attribute->getId()] = $attribute;
     // Keep track of the class used for this attribute.
-    if ($class != '\Acquia\ContentHubClient\CDFAttribute') {
-      $this->metadata['attributes'][$attribute->getId()]['class'] = $class;
-    }
-    else {
+    if ($className != CDFAttribute::class) {
+      $this->metadata['attributes'][$attribute->getId()]['class'] = $className;
+    } else {
       unset($this->metadata['attributes'][$attribute->getId()]);
     }
   }
