@@ -202,33 +202,33 @@ class CDFDocumentTest extends PHPUnit_Framework_TestCase
             ->method('getUuid')
             ->will($this->returnValue('55555555-0000-0000-0000-000000000000'));
 
-        $cdfObjectMockFirstToArray = [
-            'uuid' => '55555555-0000-0000-0000-000000000000',
+        $cdfArrayMock = [
+            'uuid' => '00000000-0000-0000-0000-000000000000',
             'type' => 'product',
             'created' => '2014-12-21T20:12:11+00:00Z',
             'modified' => '2014-12-21T20:12:11+00:00Z',
-            'origin' => '11111111-0000-0000-0000-000000000000',
+            'origin' => '00000000-0000-0000-0000-000000000000',
         ];
+        $cdfObjectMockFirstToArray = $cdfArrayMock;
+        $cdfObjectMockSecondToArray = $cdfArrayMock;
 
-        $cdfObjectMockSecondToArray = [
-            'uuid' => '66666666-0000-0000-0000-000000000000',
-            'type' => 'product',
-            'created' => '2014-12-21T20:12:11+00:00Z',
-            'modified' => '2014-12-21T20:12:11+00:00Z',
-            'origin' => '22222222-0000-0000-0000-000000000000',
-        ];
+        $cdfObjectMockFirstToArray['uuid'] = '55555555-0000-0000-0000-000000000000';
+        $cdfObjectMockFirstToArray['origin'] = '11111111-0000-0000-0000-000000000000';
+
+        $cdfObjectMockFirstToArray['uuid'] = '66666666-0000-0000-0000-000000000000';
+        $cdfObjectMockFirstToArray['origin'] = '22222222-0000-0000-0000-000000000000';
 
         $cdfObjectMockFirst->expects($this->any())
             ->method('toArray')
-            ->will($this->returnValue($cdfObjectMockFirstToArray));
+            ->willReturn($cdfObjectMockFirstToArray);
 
         $cdfObjectMockSecond->expects($this->any())
             ->method('getUuid')
-            ->will($this->returnValue('66666666-0000-0000-0000-000000000000'));
+            ->willReturn('66666666-0000-0000-0000-000000000000');
 
         $cdfObjectMockSecond->expects($this->any())
             ->method('toArray')
-            ->will($this->returnValue($cdfObjectMockSecondToArray));
+            ->willReturn($cdfObjectMockSecondToArray);
 
         return [
             [

@@ -20,7 +20,7 @@ class CDFDocument {
   }
 
   public function getCDFEntity($uuid) {
-    return ($this->hasEntity($uuid)) ? $this->entities[$uuid] : null;
+    return $this->entities[$uuid] ?? null;
   }
 
   public function setCDFEntities(CDFObject ...$entities) {
