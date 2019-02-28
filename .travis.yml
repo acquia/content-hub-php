@@ -4,8 +4,8 @@ dist: trusty
 group: edge
 
 php:
+  - 7.2
   - 7.1
-  - 5.6
 
 before_script:
   - composer install
