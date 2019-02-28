@@ -246,7 +246,7 @@ class CDFObjectTest extends TestCase
     {
         return [
             [
-                $this->getObjectData()
+                $this->getObjectData(),
             ],
         ];
     }

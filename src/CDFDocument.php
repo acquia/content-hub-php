@@ -26,7 +26,7 @@ class CDFDocument {
   public function setCDFEntities(CDFObject ...$entities) {
     $entitiesList = [];
     foreach ($entities as $entity) {
-        $entitiesList[$entity->getUuid()] = $entity;
+      $entitiesList[$entity->getUuid()] = $entity;
     }
     $this->entities = $entitiesList;
   }
