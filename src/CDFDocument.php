@@ -24,8 +24,6 @@ class CDFDocument {
   }
 
   public function setCDFEntities(CDFObject ...$entities) {
-    //unset($this->entities);
-    //With unset() if $entities list is empty, hasEntities() will give an error
     $entitiesList = [];
     foreach ($entities as $entity) {
         $entitiesList[$entity->getUuid()] = $entity;

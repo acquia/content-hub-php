@@ -227,15 +227,15 @@ class CDFObjectTest extends TestCase
                 'value' => [
                     'en' => [
                         6.66,
-                        3.23
+                        3.23,
                     ],
                     'hu' => [
                         4.66,
-                        4.23
+                        4.23,
                     ],
                     CDFObject::LANGUAGE_UNDETERMINED => [
                         1.22,
-                        1.11
+                        1.11,
                     ],
                 ],
             ]
