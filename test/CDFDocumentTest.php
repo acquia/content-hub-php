@@ -1,13 +1,6 @@
 <?php
-/**
-* Created by PhpStorm.
-* User: eugene
-* Date: 2/18/19
-* Time: 3:04 PM
-*/
 
 namespace Acquia\ContentHubClient\test;
-
 
 use Acquia\ContentHubClient\CDF\CDFObject;
 use Acquia\ContentHubClient\CDFDocument;
@@ -20,12 +13,18 @@ class CDFDocumentTest extends TestCase
    */
   protected $cdfDocument;
 
+  /**
+   *
+   */
   public function setUp() : void
   {
     parent::setUp();
     $this->cdfDocument = new CDFDocument();
   }
 
+  /**
+   *
+   */
   public function tearDown() : void
   {
     parent::tearDown();

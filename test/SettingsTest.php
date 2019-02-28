@@ -1,10 +1,4 @@
 <?php
-/**
-* Created by PhpStorm.
-* User: eugene
-* Date: 2/21/19
-* Time: 4:02 PM
-*/
 
 namespace Acquia\ContentHubClient\test;
 
@@ -19,6 +13,9 @@ class SettingsTest extends TestCase
    */
   private $settings;
 
+  /**
+   *
+   */
   public function setUp() : void
   {
     parent::setUp();
@@ -34,6 +31,9 @@ class SettingsTest extends TestCase
     );
   }
 
+  /**
+   *
+   */
   public function tearDown() : void
   {
     parent::tearDown();

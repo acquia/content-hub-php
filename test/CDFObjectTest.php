@@ -15,6 +15,9 @@ class CDFObjectTest extends TestCase
    */
   private $cdfObject;
 
+  /**
+   *
+   */
   public function setUp() : void
   {
     parent::setUp();
@@ -29,6 +32,9 @@ class CDFObjectTest extends TestCase
     );
   }
 
+  /**
+   *
+   */
   public function tearDown() : void
   {
     parent::tearDown();

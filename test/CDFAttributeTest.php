@@ -11,12 +11,18 @@ class CDFAttributeTest extends TestCase
   private $attributeData;
   private $attributeId;
 
+  /**
+   *
+   */
   public function setUp() : void
   {
     $this->attributeData = $this->getAttributeData();
     $this->attributeId = $this->attributeData['attributes']['id'];
   }
 
+  /**
+   *
+   */
   public function tearDown() : void
   {
     unset($this->attributeId);
