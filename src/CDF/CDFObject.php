@@ -144,16 +144,16 @@ class CDFObject implements CDFObjectInterface {
     }
   }
 
-    /**
-     * Factory could be used here in order to stick with Single responsibility principle.
-     *
-     * @param string $id
-     * @param string $type Type of attribute
-     * @param null $value Attribute value
-     * @param string $language
-     * @param string $className Class name of the created object
-     * @throws \Exception
-     */
+  /**
+   * Factory could be used here in order to stick with Single responsibility principle.
+   *
+   * @param string $id
+   * @param string $type Type of attribute
+   * @param null $value Attribute value
+   * @param string $language
+   * @param string $className Class name of the created object
+   * @throws \Exception
+   */
   public function addAttribute($id, $type, $value = NULL, $language = self::LANGUAGE_UNDETERMINED, $className = CDFAttribute::class) {
     if ($className !== CDFAttribute::class && !is_subclass_of($className, CDFAttribute::class)) {
       throw new \Exception(sprintf("The %s class must be a subclass of \Acquia\ContentHubClient\CDFAttribute", $className));
