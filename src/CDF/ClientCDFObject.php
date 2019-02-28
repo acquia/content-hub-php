@@ -17,6 +17,7 @@ class ClientCDFObject extends CDFObject {
    *
    * @param string $uuid
    * @param array $settings
+   * @throws \Exception
    */
   public function __construct($uuid, array $settings) {
     parent::__construct('client', $uuid, date('c'), date('c'), $uuid);

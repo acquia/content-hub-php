@@ -20,16 +20,15 @@ class CDFDocument {
   }
 
   public function getCDFEntity($uuid) {
-    if ($this->hasEntity($uuid)) {
-      return $this->entities[$uuid];
-    }
+    return $this->entities[$uuid] ?? null;
   }
 
   public function setCDFEntities(CDFObject ...$entities) {
-    unset($this->entities);
+    $entitiesList = [];
     foreach ($entities as $entity) {
-      $this->entities[$entity->getUuid()] = $entity;
+      $entitiesList[$entity->getUuid()] = $entity;
     }
+    $this->entities = $entitiesList;
   }
 
   public function addCDFEntity(CDFObject $object) {
