@@ -123,7 +123,7 @@ class CDFDocumentTest extends TestCase
      * @param $setOne
      * @param $setTwo
      */
-    public function testMergeDocumentsWithArrayDiff($setOne, $setTwo)
+    public function testMergeDocumentsByKeys($setOne, $setTwo)
     {
         $this->cdfDocument->setCDFEntities(...$setOne);
         $documentToMerge = new CDFDocument(...$setTwo);
@@ -136,6 +136,38 @@ class CDFDocumentTest extends TestCase
         $this->cdfDocument->mergeDocuments($documentToMerge);
         $mergedKeys = array_keys($this->cdfDocument->getEntities());
         $this->assertEquals($mergedKeys, array_merge($keysOne, $keysTwo));
+    }
+
+    /**
+     * @dataProvider providerMergeDocumentsNoOverlap
+     * @param $setOne
+     * @param $setTwo
+     * @param $elementFromSetTwo
+     */
+    public function testMergeDocumentsNoOverlap($setOne, $setTwo, $elementFromSetTwo)
+    {
+        $this->cdfDocument->setCDFEntities(...$setOne);
+        $documentToMerge = new CDFDocument(...$setTwo);
+
+        $this->assertFalse($this->cdfDocument->hasEntity($elementFromSetTwo->getUuid()));
+        $this->cdfDocument->mergeDocuments($documentToMerge);
+        $this->assertTrue($this->cdfDocument->hasEntity($elementFromSetTwo->getUuid()));
+    }
+
+    /**
+     * @dataProvider providerMergeDocumentsOverlap
+     * @param $setOne
+     * @param $setTwo
+     * @param $overlappingElement
+     */
+    public function testMergeDocumentsOverlap($setOne, $setTwo, $overlappingElement)
+    {
+        $this->cdfDocument->setCDFEntities(...$setOne);
+        $documentToMerge = new CDFDocument(...$setTwo);
+
+        $this->assertTrue($this->cdfDocument->hasEntity($overlappingElement->getUuid()));
+        $this->cdfDocument->mergeDocuments($documentToMerge);
+        $this->assertTrue($this->cdfDocument->hasEntity($overlappingElement->getUuid()));
     }
 
     /**
@@ -204,6 +236,134 @@ class CDFDocumentTest extends TestCase
                     $cdfObjectMockSecond
                 ]
             ])
+        ];
+    }
+
+    public function providerMergeDocumentsNoOverlap()
+    {
+        //First set of objects
+        $setOneFirst = $this->getMockBuilder(CDFObject::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['getUuid'])
+            ->getMock();
+        $setOneSecond = $this->getMockBuilder(CDFObject::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['getUuid'])
+            ->getMock();
+
+        $setOneFirst->expects($this->any())
+            ->method('getUuid')
+            ->willReturn('11111111-0000-0000-0000-000000000000');
+
+        $setOneSecond->expects($this->any())
+            ->method('getUuid')
+            ->willReturn('22222222-0000-0000-0000-000000000000');
+
+        //Second set of objects
+        $setTwoFirst = $this->getMockBuilder(CDFObject::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['getUuid'])
+            ->getMock();
+        $setTwoSecond = $this->getMockBuilder(CDFObject::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['getUuid'])
+            ->getMock();
+
+        $setTwoFirst->expects($this->any())
+            ->method('getUuid')
+            ->willReturn('33333333-0000-0000-0000-000000000000');
+
+        $setTwoSecond->expects($this->any())
+            ->method('getUuid')
+            ->willReturn('44444444-0000-0000-0000-000000000000');
+
+        return [
+            [
+                [
+                    $setOneFirst,
+                    $setOneSecond,
+                ],
+                [
+                    $setTwoFirst,
+                    $setTwoSecond,
+                ],
+                $setTwoFirst,
+            ],
+            [
+                [
+                    $setOneFirst,
+                    $setOneSecond,
+                ],
+                [
+                    $setTwoFirst,
+                    $setTwoSecond,
+                ],
+                $setTwoSecond,
+            ],
+        ];
+    }
+
+    public function providerMergeDocumentsOverlap()
+    {
+        //First set of objects
+        $setOneFirst = $this->getMockBuilder(CDFObject::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['getUuid'])
+            ->getMock();
+        $setOneSecond = $this->getMockBuilder(CDFObject::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['getUuid'])
+            ->getMock();
+
+        $setOneFirst->expects($this->any())
+            ->method('getUuid')
+            ->willReturn('11111111-0000-0000-0000-000000000000');
+
+        $setOneSecond->expects($this->any())
+            ->method('getUuid')
+            ->willReturn('22222222-0000-0000-0000-000000000000');
+
+        //Second set of objects
+        $setTwoFirst = $this->getMockBuilder(CDFObject::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['getUuid'])
+            ->getMock();
+        $setTwoSecond = $this->getMockBuilder(CDFObject::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['getUuid'])
+            ->getMock();
+
+        $setTwoFirst->expects($this->any())
+            ->method('getUuid')
+            ->willReturn('11111111-0000-0000-0000-000000000000');
+
+        $setTwoSecond->expects($this->any())
+            ->method('getUuid')
+            ->willReturn('22222222-0000-0000-0000-000000000000');
+
+        return [
+            [
+                [
+                    $setOneFirst,
+                    $setOneSecond,
+                ],
+                [
+                    $setTwoFirst,
+                    $setTwoSecond,
+                ],
+                $setTwoFirst,
+            ],
+            [
+                [
+                    $setOneFirst,
+                    $setOneSecond,
+                ],
+                [
+                    $setTwoFirst,
+                    $setTwoSecond,
+                ],
+                $setTwoSecond,
+            ],
         ];
     }
 
