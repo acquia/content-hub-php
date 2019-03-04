@@ -29,12 +29,17 @@ class GetCDFTypeEvent extends Event {
   /**
    * GetCDFTypeEvent constructor.
    *
-   * @param $data
+   * @param array $data
+   * @throws \Exception
    */
   public function __construct(array $data) {
     $this->data = $data;
     // Should throw something if type is missing.
-    $this->type = $data['type'];
+    if(isset($data['type'])) {
+      $this->type = $data['type'];
+    } else {
+      throw new \Exception('No type specified.');
+    }
   }
 
   public function getObject() {

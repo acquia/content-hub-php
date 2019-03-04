@@ -308,12 +308,14 @@ class ContentHubClient extends Client
    * @param $data
    *
    * @return \Acquia\ContentHubClient\CDF\CDFObjectInterface
-   * @throws \ReflectionException
    */
   protected function getCDFObject($data) {
-    $event = new GetCDFTypeEvent($data);
-    $this->dispatcher->dispatch(ContentHubLibraryEvents::GET_CDF_CLASS, $event);
-    return $event->getObject();
+    try {
+      $event = new GetCDFTypeEvent($data);
+      $this->dispatcher->dispatch(ContentHubLibraryEvents::GET_CDF_CLASS, $event);
+      return $event->getObject();
+    } catch (\Exception $exception) {
+    }
   }
 
   /**
