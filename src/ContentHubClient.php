@@ -62,10 +62,10 @@ class ContentHubClient extends Client
         // "base_url" parameter changed to "base_uri" in Guzzle6, so the following line
         // is there to make sure it does not disrupt previous configuration.
         if (!isset($config['base_uri']) && isset($config['base_url'])) {
-            $config['base_uri'] = "{$config['base_url']}/$api_version";
+            $config['base_uri'] = self::makeBaseURL($config['base_url'], $api_version);
         }
         else {
-          $config['base_uri'] = "{$config['base_uri']}/$api_version";
+          $config['base_uri'] = self::makeBaseURL($config['base_uri'], $api_version);
         }
 
         // Setting up the User Header string
@@ -102,8 +102,8 @@ class ContentHubClient extends Client
     {
         $config = $this->getConfig();
         // Create a new client because ping is not behind hmac.
-        $client = new Client(['base_uri' => $config['base_uri']]);
-        return $this->getResponseJson($client->get("/ping"));
+        $client = new Client(['base_uri' => self::makeBaseURL($config['base_uri'])]);
+        return $this->getResponseJson($client->get('ping'));
     }
 
     /**
@@ -133,7 +133,7 @@ class ContentHubClient extends Client
     public static function register(LoggerInterface $logger, EventDispatcherInterface $dispatcher, $name, $url, $api_key, $secret, $api_version = 'v2')
     {
         $config = [
-            'base_uri' => "$url/$api_version",
+            'base_uri' => self::makeBaseURL($url, $api_version),
             'headers' => [
                 'Content-Type' => 'application/json',
                 'User-Agent' => self::LIBRARYNAME . '/' . self::VERSION . ' ' . \GuzzleHttp\default_user_agent(),
@@ -149,7 +149,7 @@ class ContentHubClient extends Client
         $client = new Client($config);
         $options['body'] = json_encode(['name' => $name]);
         try {
-            $response = $client->post("/register", $options);
+            $response = $client->post('register', $options);
             $values = self::getResponseJson($response);
             $settings = new Settings($values['name'], $values['uuid'], $api_key, $secret, $url);
             $config = [
@@ -197,7 +197,7 @@ class ContentHubClient extends Client
      */
     public static function clientNameExists($name, $url, $api_key, $secret, $api_version = 'v2') {
         $config = [
-            'base_uri' => "$url/$api_version",
+            'base_uri' => self::makeBaseURL($url, $api_version),
             'headers' => [
                 'Content-Type' => 'application/json',
                 'User-Agent' => self::LIBRARYNAME . '/' . self::VERSION . ' ' . \GuzzleHttp\default_user_agent(),
@@ -214,7 +214,7 @@ class ContentHubClient extends Client
         $options['body'] = json_encode(['name' => $name]);
         // Attempt to fetch the client name, if it works
         try {
-          $client->get("/settings/clients/{$name}");
+          $client->get("settings/clients/$name");
           return TRUE;
         }
         catch (\GuzzleHttp\Exception\ClientException $error) {
@@ -240,7 +240,7 @@ class ContentHubClient extends Client
           $json['entities'][] = $object->toArray();
         }
         $options['body'] = json_encode($json);
-        return $this->post("/entities", $options);
+        return $this->post('entities', $options);
     }
 
     /**
@@ -257,7 +257,7 @@ class ContentHubClient extends Client
      */
     public function getEntity($uuid)
     {
-        $return = $this->getResponseJson($this->get("/entities/{$uuid}"));
+        $return = $this->getResponseJson($this->get("entities/$uuid"));
         if (!empty($return['data']['data'])) {
           return $this->getCDFObject($return['data']['data']);
         }
@@ -292,7 +292,7 @@ class ContentHubClient extends Client
         ],
       ];
       $options['body'] = json_encode((array) $query);
-      $results = $this->getResponseJson($this->get("/_search", $options));
+      $results = $this->getResponseJson($this->get('_search', $options));
       if (is_array($results) && isset($results['hits']['total']) && $results['hits']['total'] > 0) {
         foreach ($results['hits']['hits'] as $key => $item) {
           $objects[] = $this->getCDFObject($item['_source']['data']);
@@ -330,7 +330,7 @@ class ContentHubClient extends Client
     public function putEntity(CDFObject $object)
     {
         $options['body'] = json_encode(['entities' => [$object->toArray()], 'resource' => ""]);
-        return $this->put("/entities/{$object->getUuid()}", $options);
+        return $this->put("entities/{$object->getUuid()}", $options);
     }
 
   /**
@@ -351,7 +351,7 @@ class ContentHubClient extends Client
           $json['data']['entities'][] = $object->toArray();
         }
         $options['body'] = json_encode($json);
-        return $this->put("/entities", $options);
+        return $this->put('entities', $options);
     }
 
     public function postEntities(CDFObject ...$objects)
@@ -363,7 +363,7 @@ class ContentHubClient extends Client
             $json['data']['entities'][] = $object->toArray();
         }
         $options['body'] = json_encode($json);
-        return $this->post("/entities", $options);
+        return $this->post('entities', $options);
     }
 
     /**
@@ -377,7 +377,7 @@ class ContentHubClient extends Client
      */
     public function deleteEntity($uuid)
     {
-        return $this->delete("/entities/{$uuid}");
+        return $this->delete("entities/$uuid");
     }
 
     /**
@@ -392,7 +392,7 @@ class ContentHubClient extends Client
      */
     public function purge()
     {
-        return $this->getResponseJson($this->post("/entities/purge"));
+        return $this->getResponseJson($this->post('entities/purge'));
     }
 
     /**
@@ -406,7 +406,7 @@ class ContentHubClient extends Client
      */
     public function restore()
     {
-        return $this->getResponseJson($this->post("/entities/restore"));
+        return $this->getResponseJson($this->post('entities/restore'));
     }
     /**
      * Reindex a subscription.
@@ -419,7 +419,7 @@ class ContentHubClient extends Client
      */
     public function reindex()
     {
-        return $this->getResponseJson($this->post("/reindex"));
+        return $this->getResponseJson($this->post('reindex'));
     }
 
     /**
@@ -444,7 +444,7 @@ class ContentHubClient extends Client
             'sort' => 'timestamp:desc'
         ];
         $options['body'] = empty($query) ? '{"query": {"match_all": {}}}' : $query;
-        $endpoint = "/history?size={$query_options['size']}&from={$query_options['from']}&sort={$query_options['sort']}";
+        $endpoint = "history?size={$query_options['size']}&from={$query_options['from']}&sort={$query_options['sort']}";
         $response = $this->post($endpoint, $options);
         return $this->getResponseJson($response);
     }
@@ -458,7 +458,7 @@ class ContentHubClient extends Client
      */
     public function mapping()
     {
-        return $this->getResponseJson($this->get("/_mapping"));
+        return $this->getResponseJson($this->get('_mapping'));
     }
 
     /**
@@ -493,7 +493,7 @@ class ContentHubClient extends Client
             'filters' => [],
         ];
 
-        $url = "/entities?limit={$variables['limit']}&start={$variables['start']}";
+        $url = "entities?limit={$variables['limit']}&start={$variables['start']}";
 
         $url .= isset($variables['type']) ? "&type={$variables['type']}" :'';
         $url .= isset($variables['origin']) ? "&origin={$variables['origin']}" :'';
@@ -521,7 +521,7 @@ class ContentHubClient extends Client
     public function searchEntity($query)
     {
         $options['body'] = json_encode((array) $query);
-        return $this->getResponseJson($this->get("/_search", $options));
+        return $this->getResponseJson($this->get('_search', $options));
     }
 
     /**
@@ -533,18 +533,18 @@ class ContentHubClient extends Client
      */
     public function getClientByName($name)
     {
-        return $this->getResponseJson($this->get("/settings/clients/{$name}"));
+        return $this->getResponseJson($this->get("settings/clients/$name"));
     }
 
     public function getClients()
     {
-      $data = $this->getResponseJson($this->get("/settings"));
+      $data = $this->getResponseJson($this->get('settings'));
       return $data['clients'];
     }
 
     public function getWebHooks()
     {
-        $data = $this->getResponseJson($this->get("/settings"));
+        $data = $this->getResponseJson($this->get('settings'));
         return $data['webhooks'];
     }
 
@@ -575,7 +575,7 @@ class ContentHubClient extends Client
      */
     public function getRemoteSettings()
     {
-        return $this->getResponseJson($this->get("/settings"));
+        return $this->getResponseJson($this->get('settings'));
     }
 
     /**
@@ -588,7 +588,7 @@ class ContentHubClient extends Client
     public function addWebhook($webhook_url)
     {
         $options['body'] = json_encode(['url' => $webhook_url, 'version' => 2.0]);
-        return $this->getResponseJson($this->post("/settings/webhooks", $options));
+        return $this->getResponseJson($this->post('settings/webhooks', $options));
     }
 
     /**
@@ -603,7 +603,7 @@ class ContentHubClient extends Client
      */
     public function deleteWebhook($uuid)
     {
-        return $this->delete("/settings/webhooks/{$uuid}");
+        return $this->delete("settings/webhooks/$uuid");
     }
 
     /**
@@ -619,7 +619,7 @@ class ContentHubClient extends Client
     public function updateWebhook($uuid, $url)
     {
       $options['body'] = json_encode(['url' => $url]);
-      return $this->put("/settings/webhooks/{$uuid}", $options) ;
+      return $this->put("settings/webhooks/$uuid", $options);
     }
 
     /**
@@ -638,7 +638,7 @@ class ContentHubClient extends Client
     public function addEntitiesToInterestList($webhook_uuid, $uuids) 
     {
       $options['body'] = json_encode(['interests' => $uuids]);
-      return $this->post("/interest/webhook/{$webhook_uuid}", $options);
+      return $this->post("interest/webhook/$webhook_uuid", $options);
     }
 
     /**
@@ -655,7 +655,7 @@ class ContentHubClient extends Client
     {
         $settings = $this->getSettings();
         $uuid = isset($client_uuid) ? $client_uuid : $settings->getUuid();
-        return $this->delete("/settings/client/uuid/{$uuid}");
+        return $this->delete("settings/client/uuid/$uuid");
     }
 
     /**
@@ -673,7 +673,7 @@ class ContentHubClient extends Client
     public function updateClient($uuid, $name)
     {
         $options['body'] = json_encode(['name' => $name]);
-        return $this->put("/settings/client/uuid/{$uuid}", $options) ;
+        return $this->put("settings/client/uuid/$uuid", $options) ;
     }
 
     /**
@@ -685,7 +685,7 @@ class ContentHubClient extends Client
      */
     public function regenerateSharedSecret()
     {
-        return $this->getResponseJson($this->post("/settings/secret", ['body' => json_encode([])]));
+        return $this->getResponseJson($this->post('settings/secret', ['body' => json_encode([])]));
     }
 
     /**
@@ -699,7 +699,7 @@ class ContentHubClient extends Client
      * @throws \GuzzleHttp\Exception\RequestException
      */
     public function getFilter($filter_id) {
-        return $this::getResponseJson($this->get("/filters/{$filter_id}"));
+        return $this::getResponseJson($this->get("filters/$filter_id"));
     }
 
     /**
@@ -714,7 +714,7 @@ class ContentHubClient extends Client
      * @throws \GuzzleHttp\Exception\RequestException
      */
     public function getFilterByName($filter_name) {
-        $result = $this::getResponseJson($this->get("/filters?name={$filter_name}"));
+        $result = $this::getResponseJson($this->get("filters?name={$filter_name}"));
         if ($result['success'] == 1) {
             return $result['data'];
         }
@@ -730,7 +730,7 @@ class ContentHubClient extends Client
      * @throws \GuzzleHttp\Exception\RequestException
      */
     public function listFilters() {
-        return $this::getResponseJson($this->get("/filters"));
+        return $this::getResponseJson($this->get('filters'));
     }
 
     /**
@@ -755,7 +755,7 @@ class ContentHubClient extends Client
         'name' => $name,
       ];
       $options = ['body' => json_encode($data)];
-      return $this->getResponseJson($this->put("/filters", $options));
+      return $this->getResponseJson($this->put('filters', $options));
     }
 
     /**
@@ -770,7 +770,7 @@ class ContentHubClient extends Client
      * @throws \GuzzleHttp\Exception\RequestException
      */
     public function deleteFilter($filter_uuid) {
-      return $this->delete("/filters/{$filter_uuid}");
+      return $this->delete('filters', $filter_uuid);
     }
 
     /**
@@ -786,7 +786,7 @@ class ContentHubClient extends Client
      *
      */
     public function listFiltersForWebhook($webhook_id) {
-      return $this::getResponseJson($this->get("/settings/webhooks/{$webhook_id}/filters"));
+      return $this::getResponseJson($this->get("settings/webhooks/$webhook_id/filters"));
     }
 
     /**
@@ -805,7 +805,7 @@ class ContentHubClient extends Client
     public function addFilterToWebhook($filter_id, $webhook_id) {
       $data = ['filter_id' => $filter_id];
       $options = ['body' => json_encode($data)];
-      return $this->getResponseJson($this->post("/settings/webhooks/{$webhook_id}/filters", $options));
+      return $this->getResponseJson($this->post("settings/webhooks/$webhook_id/filters", $options));
     }
 
     /**
@@ -824,6 +824,14 @@ class ContentHubClient extends Client
 
     public function __call($method, $args) {
         try {
+            list($query, $uri) = explode('?', $args[0]);
+            $parts = explode('/', $uri);
+            if ($query) {
+              $last = array_pop($parts);
+              $last .= $query;
+              $parts[] = $last;
+            }
+            $args[0] = self::makePath(...$parts);
             return parent::__call($method, $args);
         }
         catch (\Exception $e) {
@@ -934,4 +942,46 @@ class ContentHubClient extends Client
     return new Response($code, [], json_encode([]), '1.1', $reason);
   }
 
+  /**
+   * Make a base url out of components and add a trailing slash to it
+   * @param string[] $base_url_components
+   *
+   * @return string
+   */
+  protected static function makeBaseURL(...$base_url_components): string {
+    return self::gluePartsTogether($base_url_components, '/') . '/';
+  }
+
+  /**
+   * Make path out of its individual components
+   * @param string[] $path_components
+   *
+   * @return string
+   */
+  protected static function makePath(...$path_components): string {
+    return self::gluePartsTogether($path_components, '/');
+  }
+
+  /**
+   * Glue all elements of an array together
+   * @param array $parts
+   * @param string $glue
+   *
+   * @return string
+   */
+  protected static function gluePartsTogether(array $parts, string $glue): string {
+    return implode($glue, self::removeAllLeadingAndTrailingSlashes($parts));
+  }
+
+  /**
+   * Strip all leading and trailing slashes from all components of the given array
+   * @param string[] $components
+   *
+   * @return string[]
+   */
+  protected static function removeAllLeadingAndTrailingSlashes(array $components): array {
+    return array_map(function ($component) {
+      return trim($component, '/');
+    }, $components);
+  }
 }
