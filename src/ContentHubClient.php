@@ -824,12 +824,17 @@ class ContentHubClient extends Client
 
     public function __call($method, $args) {
         try {
-            list($query, $uri) = explode('?', $args[0]);
-            $parts = explode('/', $uri);
-            if ($query) {
-              $last = array_pop($parts);
-              $last .= $query;
-              $parts[] = $last;
+            if (strpos($args[0], '?')) {
+              list($query, $uri) = explode('?', $args[0]);
+              $parts = explode('/', $uri);
+              if ($query) {
+                $last = array_pop($parts);
+                $last .= $query;
+                $parts[] = $last;
+              }
+            }
+            else {
+              $parts = explode('/', $args[0]);
             }
             $args[0] = self::makePath(...$parts);
             return parent::__call($method, $args);
