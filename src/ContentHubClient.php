@@ -825,11 +825,11 @@ class ContentHubClient extends Client
     public function __call($method, $args) {
         try {
             if (strpos($args[0], '?')) {
-              list($query, $uri) = explode('?', $args[0]);
+              list($uri, $query) = explode('?', $args[0]);
               $parts = explode('/', $uri);
               if ($query) {
                 $last = array_pop($parts);
-                $last .= $query;
+                $last .= "?$query";
                 $parts[] = $last;
               }
             }
