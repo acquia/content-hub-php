@@ -740,6 +740,8 @@ class ContentHubClient extends Client
      *   The query to add to the filter.
      * @param string $name
      *   The name of the filter.
+     * @param string $uuid
+     *   The filter UUID to update existing filter, NULL to create a new one.
      *
      * @return array
      *   An array of data including the filter UUID, if succeeds.
@@ -747,12 +749,13 @@ class ContentHubClient extends Client
      * @throws \GuzzleHttp\Exception\RequestException
      *
      */
-    public function putFilter($query, $name = '') {
+    public function putFilter($query, $name = '', $uuid = NULL) {
       $data = [
         'data' => [
           'query' => $query,
         ],
         'name' => $name,
+        'uuid' => $uuid,
       ];
       $options = ['body' => json_encode($data)];
       return $this->getResponseJson($this->put('filters', $options));
@@ -770,7 +773,7 @@ class ContentHubClient extends Client
      * @throws \GuzzleHttp\Exception\RequestException
      */
     public function deleteFilter($filter_uuid) {
-      return $this->delete('filters', $filter_uuid);
+      return $this->delete("filters/{$filter_uuid}");
     }
 
     /**
