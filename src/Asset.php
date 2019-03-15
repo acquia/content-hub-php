@@ -2,11 +2,19 @@
 
 namespace Acquia\ContentHubClient;
 
+/**
+ * Class Asset.
+ *
+ * @package Acquia\ContentHubClient
+ */
 class Asset extends \ArrayObject
 {
+
     /**
+     * Asset constructor.
      *
      * @param array $array
+     *   Asset data.
      */
     public function __construct(array $array = [])
     {
@@ -14,9 +22,13 @@ class Asset extends \ArrayObject
     }
 
     /**
+     * URL setter.
+     *
      * @param string $url
+     *   URL.
      *
      * @return \Acquia\ContentHubClient\Asset
+     *   Asset with URL.
      */
     public function setUrl($url)
     {
@@ -26,9 +38,13 @@ class Asset extends \ArrayObject
     }
 
     /**
+     * Setter for replace token.
+     *
      * @param string $replaceToken
+     *   Token value.
      *
      * @return \Acquia\ContentHubClient\Asset
+     *   Asset.
      */
     public function setReplaceToken($replaceToken)
     {
@@ -38,8 +54,10 @@ class Asset extends \ArrayObject
     }
 
     /**
+     * URL getter.
      *
      * @return string
+     *   URL property.
      */
     public function getUrl()
     {
@@ -47,8 +65,10 @@ class Asset extends \ArrayObject
     }
 
     /**
+     * Getter for 'replace-token'.
      *
      * @return string
+     *   'replace-token' value.
      */
     public function getReplaceToken()
     {
@@ -56,10 +76,15 @@ class Asset extends \ArrayObject
     }
 
     /**
+     * Properties getter.
+     *
      * @param string $key
+     *   Property name.
      * @param string $default
+     *   Default value.
      *
      * @return mixed
+     *   Property value.
      */
     protected function getValue($key, $default)
     {
