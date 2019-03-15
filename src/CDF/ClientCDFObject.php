@@ -31,8 +31,7 @@ class ClientCDFObject extends CDFObject
         parent::__construct('client', $uuid, date('c'), date('c'), $uuid);
 
         // Add all the client settings as attributes to the client object.
-        $this->settings = new Settings($settings['name'], $settings['uuid'], $settings['apiKey'], $settings['secretKey'],
-          $settings['url'], $settings['sharedSecret'], $settings['webhook']);
+        $this->settings = new Settings($settings['name'], $settings['uuid'], $settings['apiKey'], $settings['secretKey'], $settings['url'], $settings['sharedSecret'], $settings['webhook']);
         $this->setMetadata($settings);
         $this->addAttribute('clientname', CDFAttribute::TYPE_STRING, $this->settings->getName());
     }
