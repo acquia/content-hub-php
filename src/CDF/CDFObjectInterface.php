@@ -2,59 +2,140 @@
 
 namespace Acquia\ContentHubClient\CDF;
 
-interface CDFObjectInterface {
+/**
+ * Interface CDFObjectInterface.
+ *
+ * @package Acquia\ContentHubClient\CDF
+ */
+interface CDFObjectInterface
+{
 
-  /**
-   * @return string
-   */
-  public function getType();
+    /**
+     * Returns CDF object type.
+     *
+     * @return string
+     *   Object type.
+     */
+    public function getType();
 
-  /**
-   * @return string
-   */
-  public function getUuid();
+    /**
+     * Returns CDF object UUID.
+     *
+     * @return string
+     *   Object uuid.
+     */
+    public function getUuid();
 
-  /**
-   * @return string
-   */
-  public function getCreated();
+    /**
+     * Returns CDF created date.
+     *
+     * @return string
+     *   Created date.
+     */
+    public function getCreated();
 
-  /**
-   * @return string
-   */
-  public function getModified();
+    /**
+     * Returns modified date.
+     *
+     * @return string
+     *   Modified date.
+     */
+    public function getModified();
 
-  /**
-   * @return string
-   */
-  public function getOrigin();
+    /**
+     * Returns origin UUID.
+     *
+     * @return string
+     *   Origin UUID.
+     */
+    public function getOrigin();
 
-  /**
-   * @return array
-   */
-  public function getMetadata();
+    /**
+     * Returns object's metadata.
+     *
+     * @return array
+     *   Object's metadata.
+     */
+    public function getMetadata();
 
-  public function setMetadata(array $metadata);
+    /**
+     * Metadata setter.
+     *
+     * @param array $metadata
+     *   Metadata array.
+     */
+    public function setMetadata(array $metadata);
 
-  public function getModuleDependencies();
+    /**
+     * Returns dependent modules.
+     *
+     * @return array
+     *   Modules list.
+     */
+    public function getModuleDependencies();
 
-  public function getDependencies();
+    /**
+     * Returns dependent entities.
+     *
+     * @return array
+     *   Dependencies list.
+     */
+    public function getDependencies();
 
-  public function hasProcessedDependencies();
+    /**
+     * Checks that object has processed dependencies.
+     *
+     * @return bool
+     *   TRUE if dependencies was processed, otherwise FALSE.
+     */
+    public function hasProcessedDependencies();
 
-  public function markProcessedDependencies();
+    /**
+     * Mark that object have processed dependencies.
+     */
+    public function markProcessedDependencies();
 
-  public function getAttributes();
+    /**
+     * Returns object's attributes.
+     *
+     * @return mixed
+     *   Attributes list.
+     */
+    public function getAttributes();
 
-  /**
-   * @param $id
-   *
-   * @return \Acquia\ContentHubClient\CDFAttribute
-   */
-  public function getAttribute($id);
+    /**
+     * Returns attribute by ID.
+     *
+     * @param string $id
+     *   Attribute ID.
+     *
+     * @return \Acquia\ContentHubClient\CDFAttribute
+     *   Attribute object.
+     */
+    public function getAttribute($id);
 
-  public function addAttribute($id, $type, $value = NULL, $language = 'und', $class = '\Acquia\ContentHubClient\CDFAttribute');
+    /**
+     * Appends attribute to object.
+     *
+     * @param string $id
+     *   Attribute ID.
+     * @param string $type
+     *   Attribute type.
+     * @param mixed|null $value
+     *   Attribute value.
+     * @param string $language
+     *   Attribute language.
+     * @param string $class
+     *   Attribute class.
+     */
+    public function addAttribute($id, $type, $value = null, $language = 'und', $class = '\Acquia\ContentHubClient\CDFAttribute');
 
-  public function toArray();
+    /**
+     * Converts object to array.
+     *
+     * @return mixed
+     *   Array representation.
+     */
+    public function toArray();
 
 }
