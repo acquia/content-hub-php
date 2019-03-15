@@ -36,8 +36,7 @@ class DefaultCDF implements EventSubscriberInterface
     {
         $data = $event->getData();
 
-        $object = new CDFObject($data['type'], $data['uuid'], $data['created'], $data['modified'], $data['origin'],
-          $data['metadata']);
+        $object = new CDFObject($data['type'], $data['uuid'], $data['created'], $data['modified'], $data['origin'], $data['metadata']);
 
         foreach ($data['attributes'] as $attribute_name => $values) {
             if (!$attribute = $object->getAttribute($attribute_name)) {
