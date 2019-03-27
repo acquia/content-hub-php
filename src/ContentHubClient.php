@@ -17,6 +17,7 @@ use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\Response as HttpResponse;
 
 /**
  * Class ContentHubClient.
@@ -956,7 +957,7 @@ class ContentHubClient extends Client
     protected function getExceptionMessage($method, array $args, \Exception $exception)
     {
         $response = NULL;
-        $status_code = 500;
+        $status_code = HttpResponse::HTTP_INTERNAL_SERVER_ERROR;
         $error_details = $exception->getMessage();
 
         if ($exception instanceof ServerException) {
@@ -978,7 +979,7 @@ class ContentHubClient extends Client
         switch ($method) {
             case 'getClientByName':
                 // All good, means the client name is available.
-                if ($response && 404 === $status_code) {
+                if ($response && HttpResponse::HTTP_NOT_FOUND === $status_code) {
                     return $response;
                 }
 
