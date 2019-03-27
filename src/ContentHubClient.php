@@ -994,8 +994,8 @@ class ContentHubClient extends Client
             case 'deleteWebhook':
                 // This function only requires one argument (webhook_uuid), but
                 // we are using the second one to pass the webhook_url.
-                $webhook_url = isset($args[1]) ? $args[1] : $args[0];
-                $message = sprintf('There was a problem trying to <b>unregister</b> Webhook URL = %s. Please try again. (Error Code = %d: @%s)',
+                $webhook_url = $args[1] ?? $args[0];
+                $message = sprintf('There was a problem trying to unregister Webhook URL = %s. Please try again. (Error Code = %d: @%s)',
                     $webhook_url, $status_code, $error_details);
                 break;
 
