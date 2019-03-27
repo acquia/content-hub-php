@@ -380,6 +380,18 @@ class ContentHubClient extends Client
         return $this->delete("entities/$uuid");
     }
 
+  /**
+   * Deletes an entity from a webhook's interest list.
+   *
+   * @param  string                                 $uuid
+   * @param  string                                 $webhook_uuid
+   *
+   * @return \Psr\Http\Message\ResponseInterface
+   */
+    public function deleteInterest($uuid, $webhook_uuid) {
+      return $this->delete("/interest/$uuid/$webhook_uuid");
+    }
+
     /**
      * Purges all entities from the Content Hub.
      *
