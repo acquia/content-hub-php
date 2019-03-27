@@ -222,8 +222,8 @@ class ContentHubClient extends Client
             $client->get("settings/clients/$name");
 
             return true;
-        } catch (\GuzzleHttp\Exception\ClientException $error) {
-            return $error->getResponse()->getStatusCode() != 404;
+        } catch (ClientException $error) {
+            return $error->getResponse()->getStatusCode() !== HttpResponse::HTTP_NOT_FOUND;
         }
     }
 
