@@ -689,7 +689,7 @@ class ContentHubClient extends Client
     }
 
     /**
-     * Add entities to Intrest List.
+     * Add entities to Interest List.
      *
      * @param string $webhook_uuid
      *   The UUID of the webhook
@@ -1030,6 +1030,16 @@ class ContentHubClient extends Client
                 case 'searchEntity':
                     return $this->getErrorResponse($response->getStatusCode(),
                       sprintf('Error trying to make a search query to Content Hub. Are your credentials inserted correctly? (Error Code = %d: %s)',
+                        $response->getStatusCode(), $response->getReasonPhrase()));
+
+                case 'addEntitiesToInterestList':
+                    return $this->getErrorResponse($response->getStatusCode(),
+                      sprintf('Error trying to add entities to the interest list (Error Code = %d: %s)',
+                        $response->getStatusCode(), $response->getReasonPhrase()));
+
+                case 'deleteInterest':
+                    return $this->getErrorResponse($response->getStatusCode(),
+                      sprintf('Error trying to remove entity from the interest list (Error Code = %d: %s)',
                         $response->getStatusCode(), $response->getReasonPhrase()));
 
                 default:
