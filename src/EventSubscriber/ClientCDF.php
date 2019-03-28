@@ -37,7 +37,15 @@ class ClientCDF implements EventSubscriberInterface
     {
         if ($event->getType() === 'client') {
             $data = $event->getData();
-            $object = new ClientCDFObject($data['uuid'], $data['metadata']);
+            // Backwards compatibility
+            if (!isset($data['metadata']['settings'])) {
+              $settings = $data['metadata'];
+              $data['metadata']['settings'] = $settings;
+            }
+            if (!isset($data['metadata']['extradata'])) {
+              $data['metadata']['extradata'] = [];
+            }
+            $object = new ClientCDFObject($data['uuid'], $data['metadata']['settings'], $data['metadata']['extradata']);
             $event->setObject($object);
             $event->stopPropagation();
         }
