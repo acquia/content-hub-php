@@ -37,7 +37,7 @@ class ClientCDF implements EventSubscriberInterface
     {
         if ($event->getType() === 'client') {
             $data = $event->getData();
-            $object = new ClientCDFObject($data['uuid'], $data['metadata']);
+            $object = ClientCDFObject::fromArray($data);
             $event->setObject($object);
             $event->stopPropagation();
         }

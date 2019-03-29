@@ -26,14 +26,14 @@ class ClientCDFObject extends CDFObject
      *
      * @throws \Exception
      */
-    public function __construct($uuid, array $settings)
+    public function __construct($type, $uuid, $created, $modified, $origin, $metadata = [])
     {
-        parent::__construct('client', $uuid, date('c'), date('c'), $uuid);
+        parent::__construct($type, $uuid, $created, $modified, $origin, $metadata);
+        $this->addAttribute('clientname', CDFAttribute::TYPE_STRING, $metadata['settings']['name']);
+    }
 
-        // Add all the client settings as attributes to the client object.
-        $this->settings = new Settings($settings['name'], $settings['uuid'], $settings['apiKey'], $settings['secretKey'], $settings['url'], $settings['sharedSecret'], $settings['webhook']);
-        $this->setMetadata($settings);
-        $this->addAttribute('clientname', CDFAttribute::TYPE_STRING, $this->settings->getName());
+    public static function create($uuid, $metadata) {
+      return new static('client', $uuid, date('c'), date('c'), $uuid, $metadata);
     }
 
     /**
@@ -53,7 +53,10 @@ class ClientCDFObject extends CDFObject
      */
     public function getSettings()
     {
-        return $this->settings;
+      if (empty($this->settings)) {
+        $this->settings = new Settings($this->metadata['settings']['name'], $this->metadata['settings']['uuid'], $this->metadata['settings']['apiKey'], $this->metadata['settings']['secretKey'], $this->metadata['settings']['url'], $this->metadata['settings']['sharedSecret'], $this->metadata['settings']['webhook']);
+      }
+      return $this->settings;
     }
 
     /**
@@ -64,8 +67,8 @@ class ClientCDFObject extends CDFObject
     public function getWebhook()
     {
         $metadata = $this->getMetadata();
-        if (isset($metadata['webhook'])) {
-            return $metadata['webhook'];
+        if (isset($metadata['settings']['webhook'])) {
+            return $metadata['settings']['webhook'];
         }
 
         return [];
