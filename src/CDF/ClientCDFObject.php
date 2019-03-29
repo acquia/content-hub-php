@@ -18,15 +18,15 @@ class ClientCDFObject extends CDFObject
      */
     protected $settings;
 
-  /**
-   * ClientCDFObject constructor wrapper.
-   *
-   * @param string $uuid
-   * @param array $metadata
-   *
-   * @return \Acquia\ContentHubClient\CDF\ClientCDFObject
-   * @throws \Exception
-   */
+    /**
+     * ClientCDFObject constructor wrapper.
+     *
+     * @param string $uuid
+     * @param array $metadata
+     *
+     * @return \Acquia\ContentHubClient\CDF\ClientCDFObject
+     * @throws \Exception
+     */
     public static function create($uuid, $metadata)
     {
         $cdf = new static('client', $uuid, date('c'), date('c'), $uuid, $metadata);
