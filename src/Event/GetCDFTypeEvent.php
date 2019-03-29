@@ -88,13 +88,4 @@ class GetCDFTypeEvent extends Event
     {
         return $this->type;
     }
-
-    /**
-     * Manipulate Data going into the CDFs
-     * @return array
-     */
-    public function setData($data)
-    {
-      $this->data = $data;
-    }
 }

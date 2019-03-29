@@ -96,6 +96,14 @@ class CDFObject implements CDFObjectInterface
         $this->setMetadata($metadata);
     }
 
+  /**
+   * Static Factory method to allow CDFObject to interpret their own data.
+   *
+   * @param array $data
+   *
+   * @return \Acquia\ContentHubClient\CDF\CDFObject
+   * @throws \ReflectionException
+   */
     public static function fromArray(array $data)
     {
       $object = new static($data['type'], $data['uuid'], $data['created'], $data['modified'], $data['origin'], $data['metadata']);
@@ -115,6 +123,15 @@ class CDFObject implements CDFObjectInterface
       }
       return $object;
     }
+
+  /**
+   * Static Factory method to format data from the CDFObject into JSON.
+   *
+   * @param string $json
+   *
+   * @return \Acquia\ContentHubClient\CDF\CDFObject
+   * @throws \ReflectionException
+   */
     public static function fromJson(string $json)
     {
       return self::fromArray(json_decode($json, TRUE));
