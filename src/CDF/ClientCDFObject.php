@@ -27,7 +27,7 @@ class ClientCDFObject extends CDFObject
      * @return \Acquia\ContentHubClient\CDF\ClientCDFObject
      * @throws \Exception
      */
-    public static function create($uuid, $metadata)
+    public static function create($uuid, array $metadata)
     {
         $cdf = new static('client', $uuid, date('c'), date('c'), $uuid, $metadata);
         $cdf->addAttribute('clientname', CDFAttribute::TYPE_STRING, $metadata['settings']['name']);
