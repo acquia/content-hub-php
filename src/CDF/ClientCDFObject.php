@@ -73,4 +73,14 @@ class ClientCDFObject extends CDFObject
 
         return [];
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setMetadata(array $metadata)
+    {
+      // Filter out any instance of 'secret' in the settings.
+      $metadata['settings'] = array_intersect_key($metadata['settings'], array_flip(preg_grep('/secret/i', array_keys($metadata['settings']), PREG_GREP_INVERT)));
+      $this->metadata = $metadata;
+    }
 }
