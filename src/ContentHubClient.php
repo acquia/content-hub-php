@@ -721,7 +721,7 @@ class ContentHubClient extends Client
     public function deleteClient($client_uuid = null)
     {
         $settings = $this->getSettings();
-        $uuid = isset($client_uuid) ? $client_uuid : $settings->getUuid();
+        $uuid = $client_uuid ?? $settings->getUuid();
         if (!$this->deleteEntity($uuid)) {
           throw new \Exception(sprintf("Entity with UUID = %s cannot be deleted.", $uuid));
         }
