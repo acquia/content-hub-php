@@ -19,21 +19,19 @@ class ClientCDFObject extends CDFObject
     protected $settings;
 
     /**
-     * ClientCDFObject constructor.
+     * ClientCDFObject constructor wrapper.
      *
      * @param string $uuid
-     * @param array $settings
+     * @param array $metadata
      *
+     * @return \Acquia\ContentHubClient\CDF\ClientCDFObject
      * @throws \Exception
      */
-    public function __construct($uuid, array $settings)
+    public static function create($uuid, array $metadata)
     {
-        parent::__construct('client', $uuid, date('c'), date('c'), $uuid);
-
-        // Add all the client settings as attributes to the client object.
-        $this->settings = new Settings($settings['name'], $settings['uuid'], $settings['apiKey'], $settings['secretKey'], $settings['url'], $settings['sharedSecret'], $settings['webhook']);
-        $this->setMetadata($settings);
-        $this->addAttribute('clientname', CDFAttribute::TYPE_STRING, $this->settings->getName());
+        $cdf = new static('client', $uuid, date('c'), date('c'), $uuid, $metadata);
+        $cdf->addAttribute('clientname', CDFAttribute::TYPE_STRING, $metadata['settings']['name']);
+        return $cdf;
     }
 
     /**
@@ -53,7 +51,12 @@ class ClientCDFObject extends CDFObject
      */
     public function getSettings()
     {
-        return $this->settings;
+      // Add all the client settings as attributes to the client object.
+      if (empty($this->settings)) {
+        $metadata = $this->getMetadata();
+        $this->settings = new Settings($metadata['settings']['name'], $metadata['settings']['uuid'], $metadata['settings']['apiKey'], $metadata['settings']['secretKey'], $metadata['settings']['url'], $metadata['settings']['sharedSecret'], $metadata['settings']['webhook']);
+      }
+      return $this->settings;
     }
 
     /**
@@ -64,8 +67,8 @@ class ClientCDFObject extends CDFObject
     public function getWebhook()
     {
         $metadata = $this->getMetadata();
-        if (isset($metadata['webhook'])) {
-            return $metadata['webhook'];
+        if (isset($metadata['settings']['webhook'])) {
+            return $metadata['settings']['webhook'];
         }
 
         return [];
