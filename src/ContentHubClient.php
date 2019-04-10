@@ -716,12 +716,15 @@ class ContentHubClient extends Client
      *
      * @return \Psr\Http\Message\ResponseInterface
      *
-     * @throws \GuzzleHttp\Exception\RequestException
+     * @throws \Exception
      */
     public function deleteClient($client_uuid = null)
     {
         $settings = $this->getSettings();
-        $uuid = isset($client_uuid) ? $client_uuid : $settings->getUuid();
+        $uuid = $client_uuid ?? $settings->getUuid();
+        if (!$this->deleteEntity($uuid)) {
+          throw new \Exception(sprintf("Entity with UUID = %s cannot be deleted.", $uuid));
+        }
         return $this->delete("settings/client/uuid/$uuid");
     }
 
