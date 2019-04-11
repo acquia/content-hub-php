@@ -40,7 +40,7 @@ class CDFDocumentTest extends TestCase
   {
     //Check hasEntities method before and after we add an Object
     $this->assertEquals($this->cdfDocument->hasEntities(), false);
-    $this->cdfDocument->addCDFEntity($objectToAdd);
+    $this->cdfDocument->addCdfEntity($objectToAdd);
     $this->assertEquals($this->cdfDocument->hasEntities(), true);
   }
 
@@ -52,9 +52,9 @@ class CDFDocumentTest extends TestCase
   public function testGetEntity($objectToAdd, $notAddedObject)
   {
     //Check getting added and not added Object
-    $this->cdfDocument->addCDFEntity($objectToAdd);
-    $this->assertEquals($this->cdfDocument->getCDFEntity($objectToAdd->getUuid()), $objectToAdd);
-    $this->assertEquals($this->cdfDocument->getCDFEntity($notAddedObject->getUuid()), null);
+    $this->cdfDocument->addCdfEntity($objectToAdd);
+    $this->assertEquals($this->cdfDocument->getCdfEntity($objectToAdd->getUuid()), $objectToAdd);
+    $this->assertEquals($this->cdfDocument->getCdfEntity($notAddedObject->getUuid()), null);
   }
 
   /**
@@ -65,7 +65,7 @@ class CDFDocumentTest extends TestCase
   public function testGetEntities($objectOne, $objectTwo)
   {
     //Check getting added and not added Object
-    $this->cdfDocument->setCDFEntities($objectOne, $objectTwo);
+    $this->cdfDocument->setCdfEntities($objectOne, $objectTwo);
 
     foreach ($this->cdfDocument->getEntities() as $entity) {
       $this->assertInstanceOf(CDFObject::class, $entity);
@@ -80,7 +80,7 @@ class CDFDocumentTest extends TestCase
   public function testAddEntity($objectToAdd, $notAddedObject)
   {
     //Check if hasEntity will return correct values for added and not added Objects
-    $this->cdfDocument->addCDFEntity($objectToAdd);
+    $this->cdfDocument->addCdfEntity($objectToAdd);
     $this->assertEquals($this->cdfDocument->hasEntity($objectToAdd->getUuid()), true);
     $this->assertEquals($this->cdfDocument->hasEntity($notAddedObject->getUuid()), false);
   }
@@ -92,9 +92,9 @@ class CDFDocumentTest extends TestCase
   public function testRemoveEntity($objectToAdd)
   {
     //Test removing Entity
-    $this->cdfDocument->addCDFEntity($objectToAdd);
+    $this->cdfDocument->addCdfEntity($objectToAdd);
     $this->assertEquals($this->cdfDocument->hasEntity($objectToAdd->getUuid()), true);
-    $this->cdfDocument->removeCDFEntity($objectToAdd->getUuid());
+    $this->cdfDocument->removeCdfEntity($objectToAdd->getUuid());
     $this->assertEquals($this->cdfDocument->hasEntity($objectToAdd->getUuid()), false);
   }
 
@@ -105,7 +105,7 @@ class CDFDocumentTest extends TestCase
    */
   public function testMergeDocuments($setOne, $setTwo)
   {
-    $this->cdfDocument->setCDFEntities(...$setOne);
+    $this->cdfDocument->setCdfEntities(...$setOne);
     $documentToMerge = new CDFDocument(...$setTwo);
 
     foreach ($setTwo as $entity) {
@@ -124,7 +124,7 @@ class CDFDocumentTest extends TestCase
    */
   public function testMergeDocumentsByKeys($setOne, $setTwo)
   {
-    $this->cdfDocument->setCDFEntities(...$setOne);
+    $this->cdfDocument->setCdfEntities(...$setOne);
     $documentToMerge = new CDFDocument(...$setTwo);
 
     $keysOne = array_keys($this->cdfDocument->getEntities());
@@ -145,7 +145,7 @@ class CDFDocumentTest extends TestCase
    */
   public function testMergeDocumentsNoOverlap($setOne, $setTwo, $elementFromSetTwo)
   {
-    $this->cdfDocument->setCDFEntities(...$setOne);
+    $this->cdfDocument->setCdfEntities(...$setOne);
     $documentToMerge = new CDFDocument(...$setTwo);
 
     $this->assertFalse($this->cdfDocument->hasEntity($elementFromSetTwo->getUuid()));
@@ -161,7 +161,7 @@ class CDFDocumentTest extends TestCase
    */
   public function testMergeDocumentsOverlap($setOne, $setTwo, $overlappingElement)
   {
-    $this->cdfDocument->setCDFEntities(...$setOne);
+    $this->cdfDocument->setCdfEntities(...$setOne);
     $documentToMerge = new CDFDocument(...$setTwo);
 
     $this->assertTrue($this->cdfDocument->hasEntity($overlappingElement->getUuid()));
@@ -178,7 +178,7 @@ class CDFDocumentTest extends TestCase
   public function testToString($objectsList, $emptyObjectsJson, $filledObjectsJson)
   {
     $this->assertJsonStringEqualsJsonString($this->cdfDocument->toString(), $emptyObjectsJson);
-    $this->cdfDocument->setCDFEntities(...$objectsList);
+    $this->cdfDocument->setCdfEntities(...$objectsList);
     $this->assertJsonStringEqualsJsonString($this->cdfDocument->toString(), $filledObjectsJson);
   }
 
