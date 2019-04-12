@@ -10,7 +10,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 /**
  * The Configuration entity CDF creator.
  *
- * @see \Drupal\acquia_contenthub\Event\CreateCDFEntityEvent
+ * @see \Drupal\acquia_contenthub\Event\CreateCdfEntityEvent
  */
 class DefaultCDF implements EventSubscriberInterface
 {
