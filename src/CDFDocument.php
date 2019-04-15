@@ -27,7 +27,7 @@ class CDFDocument
      */
     public function __construct(CDFObject ...$entities)
     {
-        $this->setCDFEntities(...$entities);
+        $this->setCdfEntities(...$entities);
     }
 
     /**
@@ -50,7 +50,7 @@ class CDFDocument
      * @return \Acquia\ContentHubClient\CDF\CDFObject|null
      *   CDFObject if exists, otherwise NULL
      */
-    public function getCDFEntity($uuid)
+    public function getCdfEntity($uuid)
     {
         return $this->entities[$uuid] ?? null;
     }
@@ -61,7 +61,7 @@ class CDFDocument
      * @param \Acquia\ContentHubClient\CDF\CDFObject[] $entities
      *   Entities list.
      */
-    public function setCDFEntities(CDFObject ...$entities)
+    public function setCdfEntities(CDFObject ...$entities)
     {
         $entitiesList = [];
         foreach ($entities as $entity) {
@@ -76,7 +76,7 @@ class CDFDocument
      * @param \Acquia\ContentHubClient\CDF\CDFObject $object
      *   CDF object.
      */
-    public function addCDFEntity(CDFObject $object)
+    public function addCdfEntity(CDFObject $object)
     {
         $this->entities[$object->getUuid()] = $object;
     }
@@ -87,7 +87,7 @@ class CDFDocument
      * @param string $uuid
      *   Entity UUID.
      */
-    public function removeCDFEntity($uuid)
+    public function removeCdfEntity($uuid)
     {
         unset($this->entities[$uuid]);
     }
@@ -126,7 +126,7 @@ class CDFDocument
     public function mergeDocuments(CDFDocument $document)
     {
         foreach ($document->getEntities() as $entity) {
-            $this->addCDFEntity($entity);
+            $this->addCdfEntity($entity);
         }
     }
 

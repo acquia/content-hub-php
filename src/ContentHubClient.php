@@ -102,7 +102,7 @@ class ContentHubClient extends Client
     {
         $config = $this->getConfig();
         // Create a new client because ping is not behind hmac.
-        $client = new Client(['base_uri' => self::makeBaseURL($config['base_uri'])]);
+        $client = new Client(['base_uri' => self::makeBaseURL($config['base_url'])]);
         return $this->getResponseJson($client->get('ping'));
     }
 
@@ -814,7 +814,7 @@ class ContentHubClient extends Client
     /**
      * Puts a Filter into Content Hub.
      *
-     * @param string $query
+     * @param string|array $query
      *   The query to add to the filter.
      * @param string $name
      *   The name of the filter.
