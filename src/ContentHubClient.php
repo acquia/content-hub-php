@@ -899,6 +899,24 @@ class ContentHubClient extends Client
     }
 
     /**
+     * Detaches filter from webhook.
+     *
+     * @param string $filter_id
+     *   Filter UUID.
+     * @param string $webhook_id
+     *   Webhook UUID.
+     *
+     * @return mixed
+     * @throws \Exception
+     */
+    public function removeFilterFromWebhook($filter_id, $webhook_id)
+    {
+        $options = ['body' => json_encode(['filter_id' => $filter_id])];
+        $response = $this->delete("settings/webhooks/$webhook_id/filters", $options);
+        return $this->getResponseJson($response);
+    }
+
+    /**
      * Gets a Json Response from a request.
      *
      * @param \Psr\Http\Message\ResponseInterface $response
