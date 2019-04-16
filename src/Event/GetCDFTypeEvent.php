@@ -5,62 +5,87 @@ namespace Acquia\ContentHubClient\Event;
 use Acquia\ContentHubClient\CDF\CDFObjectInterface;
 use Symfony\Component\EventDispatcher\Event;
 
-class GetCDFTypeEvent extends Event {
+/**
+ * Class GetCDFTypeEvent
+ *
+ * @package Acquia\ContentHubClient\Event
+ */
+class GetCDFTypeEvent extends Event
+{
 
+    /**
+     * The CDF representation from plexus.
+     *
+     * @var array
+     */
+    protected $data;
 
-  /**
-   * The CDF representation from plexus.
-   * @var array data
-   */
-  protected $data;
+    /**
+     * @var string
+     *   The CDF Type
+     */
+    protected $type;
 
-  /**
-   * @var string type
-   * The CDF Type
-   */
-  protected $type;
+    /**
+     * @var CDFObjectInterface $cdfObject
+     *   The instantiated Object
+     */
+    protected $cdfObject;
 
-  /**
-   * @var CDFObjectInterface $cdfObject
-   * The instantiated Object
-   */
-  protected $cdfObject;
-
-  /**
-   * GetCDFTypeEvent constructor.
-   *
-   * @param array $data
-   * @throws \Exception
-   */
-  public function __construct(array $data) {
-    $this->data = $data;
-    // Should throw something if type is missing.
-    if(isset($data['type'])) {
-      $this->type = $data['type'];
-    } else {
-      throw new \Exception('No type specified.');
+    /**
+    * GetCDFTypeEvent constructor.
+    *
+    * @param array $data
+     *   Data.
+    */
+    public function __construct(array $data)
+    {
+        $this->data = $data;
+        // Should throw something if type is missing.
+        $this->type = $data['type'];
     }
-  }
 
-  public function getObject() {
-    return $this->cdfObject;
-  }
+    /**
+     * Returns CDF object.
+     *
+     * @return \Acquia\ContentHubClient\CDF\CDFObjectInterface
+     *   CDF object.
+     */
+    public function getObject()
+    {
+        return $this->cdfObject;
+    }
 
-  public function setObject(CDFObjectInterface $object) {
-    $this->cdfObject = $object;
-  }
+    /**
+     * CDF object setter.
+     *
+     * @param \Acquia\ContentHubClient\CDF\CDFObjectInterface $object
+     *   CDF object.
+     */
+    public function setObject(CDFObjectInterface $object)
+    {
+        $this->cdfObject = $object;
+    }
 
-  /**
-   * @return array
-   */
-  public function getData() {
-    return $this->data;
-  }
+    /**
+     * Returns event data.
+     *
+     * @return array
+     *    CDF representation from plexus.
+     */
+    public function getData()
+    {
+        return $this->data;
+    }
 
-  /**
-   * @return string
-   */
-  public function getType() {
-    return $this->type;
-  }
+    /**
+     * Returns CDF Type.
+     *
+     * @return string
+     *   CDF Type.
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
 }

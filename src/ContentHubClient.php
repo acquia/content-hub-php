@@ -18,6 +18,11 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * Class ContentHubClient.
+ *
+ * @package Acquia\ContentHubClient
+ */
 class ContentHubClient extends Client
 {
     // Override VERSION inherited from GuzzleHttp::ClientInterface
@@ -46,12 +51,7 @@ class ContentHubClient extends Client
     protected $dispatcher;
 
     /**
-     * Overrides \GuzzleHttp\Client::__construct()
-     *
-     * @param array $config
-     * @param \Acquia\ContentHubClient\Settings $settings
-     * @param \Acquia\Hmac\Guzzle\HmacAuthMiddleware $middleware
-     * @param string $api_version
+     * {@inheritdoc}
      */
     public function __construct(array $config = [], LoggerInterface $logger, Settings $settings, HmacAuthMiddleware $middleware, EventDispatcherInterface $dispatcher, $api_version = 'v2')
     {
@@ -62,13 +62,12 @@ class ContentHubClient extends Client
         // "base_url" parameter changed to "base_uri" in Guzzle6, so the following line
         // is there to make sure it does not disrupt previous configuration.
         if (!isset($config['base_uri']) && isset($config['base_url'])) {
-            $config['base_uri'] = "{$config['base_url']}/$api_version";
-        }
-        else {
-          $config['base_uri'] = "{$config['base_uri']}/$api_version";
+            $config['base_uri'] = self::makeBaseURL($config['base_url'], $api_version);
+        } else {
+            $config['base_uri'] = self::makeBaseURL($config['base_uri'], $api_version);
         }
 
-        // Setting up the User Header string
+        // Setting up the User Header string.
         $user_agent_string = self::LIBRARYNAME . '/' . self::VERSION . ' ' . \GuzzleHttp\default_user_agent();
         if (isset($config['client-user-agent'])) {
             $user_agent_string = $config['client-user-agent'] . ' ' . $user_agent_string;
@@ -95,6 +94,7 @@ class ContentHubClient extends Client
      * @return \Psr\Http\Message\ResponseInterface
      *
      * @throws \GuzzleHttp\Exception\RequestException
+     * @throws \Exception
      *
      * @since 0.2.0
      */
@@ -102,8 +102,8 @@ class ContentHubClient extends Client
     {
         $config = $this->getConfig();
         // Create a new client because ping is not behind hmac.
-        $client = new Client(['base_uri' => $config['base_uri']]);
-        return $this->getResponseJson($client->get("/ping"));
+        $client = new Client(['base_uri' => self::makeBaseURL($config['base_url'])]);
+        return $this->getResponseJson($client->get('ping'));
     }
 
     /**
@@ -112,6 +112,8 @@ class ContentHubClient extends Client
      * @param string $endpoint
      *
      * @return array
+     *
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function definition($endpoint = '')
     {
@@ -128,12 +130,13 @@ class ContentHubClient extends Client
      *
      * @return \Acquia\ContentHubClient\ContentHubClient
      *
+     * @throws \Exception
      * @throws \GuzzleHttp\Exception\RequestException
      */
     public static function register(LoggerInterface $logger, EventDispatcherInterface $dispatcher, $name, $url, $api_key, $secret, $api_version = 'v2')
     {
         $config = [
-            'base_uri' => "$url/$api_version",
+            'base_uri' => self::makeBaseURL($url, $api_version),
             'headers' => [
                 'Content-Type' => 'application/json',
                 'User-Agent' => self::LIBRARYNAME . '/' . self::VERSION . ' ' . \GuzzleHttp\default_user_agent(),
@@ -149,7 +152,7 @@ class ContentHubClient extends Client
         $client = new Client($config);
         $options['body'] = json_encode(['name' => $name]);
         try {
-            $response = $client->post("/register", $options);
+            $response = $client->post('register', $options);
             $values = self::getResponseJson($response);
             $settings = new Settings($values['name'], $values['uuid'], $api_key, $secret, $url);
             $config = [
@@ -195,9 +198,10 @@ class ContentHubClient extends Client
      * @return boolean
      *   Whether the clientName from the request matches the name passed to it.
      */
-    public static function clientNameExists($name, $url, $api_key, $secret, $api_version = 'v2') {
+    public static function clientNameExists($name, $url, $api_key, $secret, $api_version = 'v2')
+    {
         $config = [
-            'base_uri' => "$url/$api_version",
+            'base_uri' => self::makeBaseURL($url, $api_version),
             'headers' => [
                 'Content-Type' => 'application/json',
                 'User-Agent' => self::LIBRARYNAME . '/' . self::VERSION . ' ' . \GuzzleHttp\default_user_agent(),
@@ -214,11 +218,11 @@ class ContentHubClient extends Client
         $options['body'] = json_encode(['name' => $name]);
         // Attempt to fetch the client name, if it works
         try {
-          $client->get("/settings/clients/{$name}");
-          return TRUE;
-        }
-        catch (\GuzzleHttp\Exception\ClientException $error) {
-          return $error->getResponse()->getStatusCode() != 404;
+            $client->get("settings/clients/$name");
+
+            return true;
+        } catch (\GuzzleHttp\Exception\ClientException $error) {
+            return $error->getResponse()->getStatusCode() != 404;
         }
     }
 
@@ -237,86 +241,91 @@ class ContentHubClient extends Client
           'resource' => "",
         ];
         foreach ($objects as $object) {
-          $json['entities'][] = $object->toArray();
+            $json['entities'][] = $object->toArray();
         }
         $options['body'] = json_encode($json);
-        return $this->post("/entities", $options);
+        return $this->post('entities', $options);
     }
 
     /**
      * Returns an entity by UUID.
      *
-     * @param  string                               $uuid
+     * @param  string $uuid
      *
      * @return \Acquia\ContentHubClient\CDF\CDFObjectInterface|array
      *   A CDFObject representing the entity or an array if there was no data.
      *
      * @throws \GuzzleHttp\Exception\RequestException
+     * @throws \ReflectionException
      *
      * @todo can we return a CDFObject here?
      */
     public function getEntity($uuid)
     {
-        $return = $this->getResponseJson($this->get("/entities/{$uuid}"));
+        $return = $this->getResponseJson($this->get("entities/$uuid"));
         if (!empty($return['data']['data'])) {
-          return $this->getCDFObject($return['data']['data']);
+            return $this->getCDFObject($return['data']['data']);
         }
+
         return $return;
     }
 
-  /**
-   * Searches for entities.
-   *
-   * @param  array $uuids
-   *   An array of UUIDs.
-   *
-   * @return \Acquia\ContentHubClient\CDFDocument
-   *
-   * @throws \GuzzleHttp\Exception\RequestException
-   */
-  public function getEntities(array $uuids)
-  {
-    $chunks = array_chunk($uuids, 50);
-    $objects = [];
-    foreach ($chunks as $chunk) {
-      $query = [
-        'size' => 50,
-        'query' => [
-          'constant_score' => [
-            'filter' => [
-              'terms' => [
-                'uuid' => $chunk,
+    /**
+     * Searches for entities.
+     *
+     * @param  array $uuids
+     *   An array of UUIDs.
+     *
+     * @return \Acquia\ContentHubClient\CDFDocument
+     *
+     * @throws \GuzzleHttp\Exception\RequestException
+     * @throws \ReflectionException
+     */
+    public function getEntities(array $uuids)
+    {
+        $chunks = array_chunk($uuids, 50);
+        $objects = [];
+        foreach ($chunks as $chunk) {
+            $query = [
+              'size' => 50,
+              'query' => [
+                'constant_score' => [
+                  'filter' => [
+                    'terms' => [
+                      'uuid' => $chunk,
+                    ],
+                  ],
+                ],
               ],
-            ],
-          ],
-        ],
-      ];
-      $options['body'] = json_encode((array) $query);
-      $results = $this->getResponseJson($this->get("/_search", $options));
-      if (is_array($results) && isset($results['hits']['total']) && $results['hits']['total'] > 0) {
-        foreach ($results['hits']['hits'] as $key => $item) {
-          $objects[] = $this->getCDFObject($item['_source']['data']);
+            ];
+            $options['body'] = json_encode((array)$query);
+            $results = $this->getResponseJson($this->get('_search', $options));
+            if (is_array($results) && isset($results['hits']['total']) && $results['hits']['total'] > 0) {
+                foreach ($results['hits']['hits'] as $key => $item) {
+                    $objects[] = $this->getCDFObject($item['_source']['data']);
+                }
+            }
         }
-      }
-    }
-    $document = new CDFDocument(...$objects);
-    return $document;
-  }
+        $document = new CDFDocument(...$objects);
 
-  /**
-   * Retrieves a CDF Object
-   * @param $data
-   *
-   * @return \Acquia\ContentHubClient\CDF\CDFObjectInterface
-   */
-  protected function getCDFObject($data) {
-    try {
-      $event = new GetCDFTypeEvent($data);
-      $this->dispatcher->dispatch(ContentHubLibraryEvents::GET_CDF_CLASS, $event);
-      return $event->getObject();
-    } catch (\Exception $exception) {
+        return $document;
     }
-  }
+
+    /**
+     * Retrieves a CDF Object
+     *
+     * @param $data
+     *
+     * @return \Acquia\ContentHubClient\CDF\CDFObjectInterface
+     * @throws \ReflectionException
+     */
+    protected function getCDFObject($data)
+    {
+        $event = new GetCDFTypeEvent($data);
+        $this->dispatcher->dispatch(ContentHubLibraryEvents::GET_CDF_CLASS, $event);
+
+        return $event->getObject();
+    }
 
   /**
    * Updates an entity asynchronously.
@@ -332,7 +341,7 @@ class ContentHubClient extends Client
     public function putEntity(CDFObject $object)
     {
         $options['body'] = json_encode(['entities' => [$object->toArray()], 'resource' => ""]);
-        return $this->put("/entities/{$object->getUuid()}", $options);
+        return $this->put("entities/{$object->getUuid()}", $options);
     }
 
   /**
@@ -350,12 +359,18 @@ class ContentHubClient extends Client
           'resource' => "",
         ];
         foreach ($objects as $object) {
-          $json['data']['entities'][] = $object->toArray();
+            $json['data']['entities'][] = $object->toArray();
         }
         $options['body'] = json_encode($json);
-        return $this->put("/entities", $options);
+
+        return $this->put('entities', $options);
     }
 
+    /**
+     * @param \Acquia\ContentHubClient\CDF\CDFObject ...$objects
+     *
+     * @return \Psr\Http\Message\ResponseInterface
+     */
     public function postEntities(CDFObject ...$objects)
     {
         $json = [
@@ -365,7 +380,7 @@ class ContentHubClient extends Client
             $json['data']['entities'][] = $object->toArray();
         }
         $options['body'] = json_encode($json);
-        return $this->post("/entities", $options);
+        return $this->post('entities', $options);
     }
 
     /**
@@ -379,7 +394,19 @@ class ContentHubClient extends Client
      */
     public function deleteEntity($uuid)
     {
-        return $this->delete("/entities/{$uuid}");
+        return $this->delete("entities/$uuid");
+    }
+
+  /**
+   * Deletes an entity from a webhook's interest list.
+   *
+   * @param  string                                 $uuid
+   * @param  string                                 $webhook_uuid
+   *
+   * @return \Psr\Http\Message\ResponseInterface
+   */
+    public function deleteInterest($uuid, $webhook_uuid) {
+      return $this->delete("/interest/$uuid/$webhook_uuid");
     }
 
     /**
@@ -391,10 +418,12 @@ class ContentHubClient extends Client
      * backup. Be VERY careful when using this endpoint.
      *
      * @return mixed
+     *
+     * @throws \Exception
      */
     public function purge()
     {
-        return $this->getResponseJson($this->post("/entities/purge"));
+        return $this->getResponseJson($this->post('entities/purge'));
     }
 
     /**
@@ -405,11 +434,14 @@ class ContentHubClient extends Client
      * previous state. Be VERY careful when using this endpoint.
      *
      * @return mixed
+     *
+     * @throws \Exception
      */
     public function restore()
     {
-        return $this->getResponseJson($this->post("/entities/restore"));
+        return $this->getResponseJson($this->post('entities/restore'));
     }
+
     /**
      * Reindex a subscription.
      *
@@ -418,10 +450,11 @@ class ContentHubClient extends Client
      * @return mixed
      *
      * @throws \GuzzleHttp\Exception\RequestException
+     * @throws \Exception
      */
     public function reindex()
     {
-        return $this->getResponseJson($this->post("/reindex"));
+        return $this->getResponseJson($this->post('reindex'));
     }
 
     /**
@@ -436,6 +469,7 @@ class ContentHubClient extends Client
      *
      * @return mixed
      *
+     * @throws \Exception
      * @throws \GuzzleHttp\Exception\RequestException
      */
     public function logs($query = '', $query_options = [])
@@ -446,7 +480,7 @@ class ContentHubClient extends Client
             'sort' => 'timestamp:desc'
         ];
         $options['body'] = empty($query) ? '{"query": {"match_all": {}}}' : $query;
-        $endpoint = "/history?size={$query_options['size']}&from={$query_options['from']}&sort={$query_options['sort']}";
+        $endpoint = "history?size={$query_options['size']}&from={$query_options['from']}&sort={$query_options['sort']}";
         $response = $this->post($endpoint, $options);
         return $this->getResponseJson($response);
     }
@@ -456,11 +490,12 @@ class ContentHubClient extends Client
      *
      * @return mixed
      *
+     * @throws \Exception
      * @throws \GuzzleHttp\Exception\RequestException
      */
     public function mapping()
     {
-        return $this->getResponseJson($this->get("/_mapping"));
+        return $this->getResponseJson($this->get('_mapping'));
     }
 
     /**
@@ -486,6 +521,7 @@ class ContentHubClient extends Client
      * @return mixed
      *
      * @throws \GuzzleHttp\Exception\RequestException
+     * @throws \Exception
      */
     public function listEntities($options = [])
     {
@@ -495,7 +531,7 @@ class ContentHubClient extends Client
             'filters' => [],
         ];
 
-        $url = "/entities?limit={$variables['limit']}&start={$variables['start']}";
+        $url = "entities?limit={$variables['limit']}&start={$variables['start']}";
 
         $url .= isset($variables['type']) ? "&type={$variables['type']}" :'';
         $url .= isset($variables['origin']) ? "&origin={$variables['origin']}" :'';
@@ -514,16 +550,17 @@ class ContentHubClient extends Client
     /**
      * Searches for entities.
      *
-     * @param  array                                  $query
+     * @param  array $query
      *
      * @return mixed
      *
+     * @throws \Exception
      * @throws \GuzzleHttp\Exception\RequestException
      */
     public function searchEntity($query)
     {
         $options['body'] = json_encode((array) $query);
-        return $this->getResponseJson($this->get("/_search", $options));
+        return $this->getResponseJson($this->get('_search', $options));
     }
 
     /**
@@ -532,24 +569,44 @@ class ContentHubClient extends Client
      * @param string $name
      *
      * @return mixed
+     *
+     * @throws \Exception
      */
     public function getClientByName($name)
     {
-        return $this->getResponseJson($this->get("/settings/clients/{$name}"));
+        return $this->getResponseJson($this->get("settings/clients/$name"));
     }
 
+    /**
+     * @return mixed
+     * @throws \Exception
+     */
     public function getClients()
     {
-      $data = $this->getResponseJson($this->get("/settings"));
-      return $data['clients'];
+        $data = $this->getResponseJson($this->get('settings'));
+
+        return $data['clients'];
     }
 
+    /**
+     * @return mixed
+     *
+     * @throws \Exception
+     */
     public function getWebHooks()
     {
-        $data = $this->getResponseJson($this->get("/settings"));
+        $data = $this->getResponseJson($this->get('settings'));
+
         return $data['webhooks'];
     }
 
+    /**
+     * @param $url
+     *
+     * @return array
+     *
+     * @throws \Exception
+     */
     public function getWebHook($url)
     {
         $webhooks = $this->getWebHooks();
@@ -566,18 +623,21 @@ class ContentHubClient extends Client
      *
      * @return \Acquia\ContentHubClient\Settings
      */
-    public function getSettings() {
-      return $this->settings;
+    public function getSettings()
+    {
+        return $this->settings;
     }
 
     /**
      * Obtains the Settings for the active subscription.
      *
      * @return Settings
+     *
+     * @throws \Exception
      */
     public function getRemoteSettings()
     {
-        return $this->getResponseJson($this->get("/settings"));
+        return $this->getResponseJson($this->get('settings'));
     }
 
     /**
@@ -586,11 +646,14 @@ class ContentHubClient extends Client
      * @param $webhook_url
      *
      * @return mixed
+     *
+     * @throws \Exception
      */
     public function addWebhook($webhook_url)
     {
         $options['body'] = json_encode(['url' => $webhook_url, 'version' => 2.0]);
-        return $this->getResponseJson($this->post("/settings/webhooks", $options));
+
+        return $this->getResponseJson($this->post('settings/webhooks', $options));
     }
 
     /**
@@ -605,7 +668,7 @@ class ContentHubClient extends Client
      */
     public function deleteWebhook($uuid)
     {
-        return $this->delete("/settings/webhooks/{$uuid}");
+        return $this->delete("settings/webhooks/$uuid");
     }
 
     /**
@@ -620,8 +683,9 @@ class ContentHubClient extends Client
      */
     public function updateWebhook($uuid, $url)
     {
-      $options['body'] = json_encode(['url' => $url]);
-      return $this->put("/settings/webhooks/{$uuid}", $options) ;
+        $options['body'] = json_encode(['url' => $url]);
+
+        return $this->put("settings/webhooks/$uuid", $options);
     }
 
     /**
@@ -637,27 +701,31 @@ class ContentHubClient extends Client
      *
      * @throws \GuzzleHttp\Exception\RequestException
      */
-    public function addEntitiesToInterestList($webhook_uuid, $uuids) 
+    public function addEntitiesToInterestList($webhook_uuid, $uuids)
     {
-      $options['body'] = json_encode(['interests' => $uuids]);
-      return $this->post("/interest/webhook/{$webhook_uuid}", $options);
+        $options['body'] = json_encode(['interests' => $uuids]);
+
+        return $this->post("interest/webhook/$webhook_uuid", $options);
     }
 
     /**
      * Deletes a client from the active subscription.
      *
-     * @param $uuid
+     * @param string $client_uuid
      *   The UUID of the client to delete, blank for current client.
      *
      * @return \Psr\Http\Message\ResponseInterface
      *
-     * @throws \GuzzleHttp\Exception\RequestException
+     * @throws \Exception
      */
-    public function deleteClient($client_uuid = NULL)
+    public function deleteClient($client_uuid = null)
     {
         $settings = $this->getSettings();
-        $uuid = isset($client_uuid) ? $client_uuid : $settings->getUuid();
-        return $this->delete("/settings/client/uuid/{$uuid}");
+        $uuid = $client_uuid ?? $settings->getUuid();
+        if (!$this->deleteEntity($uuid)) {
+          throw new \Exception(sprintf("Entity with UUID = %s cannot be deleted.", $uuid));
+        }
+        return $this->delete("settings/client/uuid/$uuid");
     }
 
     /**
@@ -675,7 +743,7 @@ class ContentHubClient extends Client
     public function updateClient($uuid, $name)
     {
         $options['body'] = json_encode(['name' => $name]);
-        return $this->put("/settings/client/uuid/{$uuid}", $options) ;
+        return $this->put("settings/client/uuid/$uuid", $options) ;
     }
 
     /**
@@ -684,10 +752,11 @@ class ContentHubClient extends Client
      * @return array
      *
      * @throws \GuzzleHttp\Exception\RequestException
+     * @throws \Exception
      */
     public function regenerateSharedSecret()
     {
-        return $this->getResponseJson($this->post("/settings/secret", ['body' => json_encode([])]));
+        return $this->getResponseJson($this->post('settings/secret', ['body' => json_encode([])]));
     }
 
     /**
@@ -699,9 +768,11 @@ class ContentHubClient extends Client
      * @return array
      *
      * @throws \GuzzleHttp\Exception\RequestException
+     * @throws \Exception
      */
-    public function getFilter($filter_id) {
-        return $this::getResponseJson($this->get("/filters/{$filter_id}"));
+    public function getFilter($filter_id)
+    {
+        return $this::getResponseJson($this->get("filters/$filter_id"));
     }
 
     /**
@@ -714,13 +785,16 @@ class ContentHubClient extends Client
      *   The filter array.
      *
      * @throws \GuzzleHttp\Exception\RequestException
+     * @throws \Exception
      */
-    public function getFilterByName($filter_name) {
-        $result = $this::getResponseJson($this->get("/filters?name={$filter_name}"));
+    public function getFilterByName($filter_name)
+    {
+        $result = $this::getResponseJson($this->get("filters?name={$filter_name}"));
         if ($result['success'] == 1) {
             return $result['data'];
         }
-        return NULL;
+
+        return null;
     }
 
     /**
@@ -730,34 +804,42 @@ class ContentHubClient extends Client
      *   An array of all filters in the subscription.
      *
      * @throws \GuzzleHttp\Exception\RequestException
+     * @throws \Exception
      */
-    public function listFilters() {
-        return $this::getResponseJson($this->get("/filters"));
+    public function listFilters()
+    {
+        return $this::getResponseJson($this->get('filters'));
     }
 
     /**
      * Puts a Filter into Content Hub.
      *
-     * @param string $query
+     * @param string|array $query
      *   The query to add to the filter.
      * @param string $name
      *   The name of the filter.
+     * @param string $uuid
+     *   The filter UUID to update existing filter, NULL to create a new one.
      *
      * @return array
      *   An array of data including the filter UUID, if succeeds.
      *
      * @throws \GuzzleHttp\Exception\RequestException
+     * @throws \Exception
      *
      */
-    public function putFilter($query, $name = '') {
-      $data = [
-        'data' => [
-          'query' => $query,
-        ],
-        'name' => $name,
-      ];
-      $options = ['body' => json_encode($data)];
-      return $this->getResponseJson($this->put("/filters", $options));
+    public function putFilter($query, $name = '', $uuid = null)
+    {
+        $data = [
+          'data' => [
+            'query' => $query,
+          ],
+          'name' => $name,
+          'uuid' => $uuid,
+        ];
+        $options = ['body' => json_encode($data)];
+
+        return $this->getResponseJson($this->put('filters', $options));
     }
 
     /**
@@ -771,8 +853,9 @@ class ContentHubClient extends Client
      *
      * @throws \GuzzleHttp\Exception\RequestException
      */
-    public function deleteFilter($filter_uuid) {
-      return $this->delete("/filters/{$filter_uuid}");
+    public function deleteFilter($filter_uuid)
+    {
+        return $this->delete("filters/{$filter_uuid}");
     }
 
     /**
@@ -785,10 +868,12 @@ class ContentHubClient extends Client
      *   An array of data including the filter UUID, if succeeds.
      *
      * @throws \GuzzleHttp\Exception\RequestException
+     * @throws \Exception
      *
      */
-    public function listFiltersForWebhook($webhook_id) {
-      return $this::getResponseJson($this->get("/settings/webhooks/{$webhook_id}/filters"));
+    public function listFiltersForWebhook($webhook_id)
+    {
+        return $this::getResponseJson($this->get("settings/webhooks/$webhook_id/filters"));
     }
 
     /**
@@ -803,11 +888,14 @@ class ContentHubClient extends Client
      *   An array of data including the filter UUID, if succeeds.
      *
      * @throws \GuzzleHttp\Exception\RequestException
+     * @throws \Exception
      */
-    public function addFilterToWebhook($filter_id, $webhook_id) {
-      $data = ['filter_id' => $filter_id];
-      $options = ['body' => json_encode($data)];
-      return $this->getResponseJson($this->post("/settings/webhooks/{$webhook_id}/filters", $options));
+    public function addFilterToWebhook($filter_id, $webhook_id)
+    {
+        $data = ['filter_id' => $filter_id];
+        $options = ['body' => json_encode($data)];
+
+        return $this->getResponseJson($this->post("settings/webhooks/$webhook_id/filters", $options));
     }
 
     /**
@@ -821,17 +909,35 @@ class ContentHubClient extends Client
     public static function getResponseJson(ResponseInterface $response)
     {
         $body = (string) $response->getBody();
-        return json_decode($body, TRUE);
+
+        return json_decode($body, true);
     }
 
-    public function __call($method, $args) {
+    /**
+     * {@inheritdoc}
+     */
+    public function __call($method, $args)
+    {
         try {
+            if (strpos($args[0], '?')) {
+                list($uri, $query) = explode('?', $args[0]);
+                $parts = explode('/', $uri);
+                if ($query) {
+                    $last = array_pop($parts);
+                    $last .= "?$query";
+                    $parts[] = $last;
+                }
+            } else {
+                $parts = explode('/', $args[0]);
+            }
+            $args[0] = self::makePath(...$parts);
+
             return parent::__call($method, $args);
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             $exceptionResponse = $this->getExceptionMessage($method, $args, $e);
         }
-        $this->logger->error((string) $exceptionResponse->getReasonPhrase());
+        $this->logger->error((string)$exceptionResponse->getReasonPhrase());
+
         return $exceptionResponse;
     }
 
@@ -850,90 +956,184 @@ class ContentHubClient extends Client
    * @return ResponseInterface The text to write in the messages.
    * The text to write in the messages.
    */
-  protected function getExceptionMessage($method, array $args, \Exception $exception) {
-    if ($exception instanceof ServerException) {
-      return $this->getErrorResponse(500, sprintf('Could not reach the Content Hub. Please verify your hostname and Credentials. [Error message: %s]', $exception->getMessage()));
+    protected function getExceptionMessage($method, array $args, \Exception $exception)
+    {
+        if ($exception instanceof ServerException) {
+            return $this->getErrorResponse(500,
+              sprintf('Could not reach the Content Hub. Please verify your hostname and Credentials. [Error message: %s]',
+                $exception->getMessage()));
+        }
+        if ($exception instanceof ConnectException) {
+            return $this->getErrorResponse(500,
+              sprintf('Could not reach the Content Hub. Please verify your hostname URL. [Error message: %s]',
+                $exception->getMessage()));
+        }
+        if ($exception instanceof ClientException || $exception instanceof BadResponseException) {
+            $response = $exception->getResponse();
+            switch ($method) {
+                case 'getClientByName':
+                    // All good, means the client name is available.
+                    if ($response->getStatusCode() == 404) {
+                        return $response;
+                    }
+
+                    return $this->getErrorResponse($response->getStatusCode(),
+                      sprintf('Error trying to connect to the Content Hub" (Error Code = %d: %s)', $response->getStatusCode(),
+                        $response->getReasonPhrase()));
+
+                case 'addWebhook':
+                    return $this->getErrorResponse($response->getStatusCode(),
+                      sprintf('There was a problem trying to register Webhook URL = %s. Please try again. (Error Code = %d: %s)',
+                        $args[0], $response->getStatusCode(), $response->getReasonPhrase()));
+
+                case 'deleteWebhook':
+                    // This function only requires one argument (webhook_uuid), but
+                    // we are using the second one to pass the webhook_url.
+                    $webhook_url = isset($args[1]) ? $args[1] : $args[0];
+
+                    return $this->getErrorResponse($response->getStatusCode(),
+                      sprintf('There was a problem trying to <b>unregister</b> Webhook URL = %s. Please try again. (Error Code = %d: @%s)',
+                        $webhook_url, $response->getStatusCode(), $response->getReasonPhrase()));
+
+                case 'purge':
+                    return $this->getErrorResponse($response->getStatusCode(),
+                      sprintf('Error purging entities from the Content Hub [Error Code = %d: %s]', $response->getStatusCode(),
+                        $response->getReasonPhrase()));
+
+                case 'readEntity':
+                    return $this->getErrorResponse($response->getStatusCode(),
+                      sprintf('Error reading entity with UUID="%s" from Content Hub (Error Code = %d: %s)', $args[0],
+                        $response->getStatusCode(), $response->getReasonPhrase()));
+
+                case 'createEntity':
+                    return $this->getErrorResponse($response->getStatusCode(),
+                      sprintf('Error trying to create an entity in Content Hub (Error Code = %d: %s)', $response->getStatusCode(),
+                        $response->getReasonPhrase()));
+
+                case 'createEntities':
+                    return $this->getErrorResponse($response->getStatusCode(),
+                      sprintf('Error trying to create entities in Content Hub (Error Code = %d: %s)', $response->getStatusCode(),
+                        $response->getReasonPhrase()));
+
+                case 'updateEntity':
+                    return $this->getErrorResponse($response->getStatusCode(),
+                      sprintf('Error trying to update an entity with UUID="%s" in Content Hub (Error Code = %d: %s)', $args[1],
+                        $response->getStatusCode(), $response->getReasonPhrase()));
+
+                case 'updateEntities':
+                    return $this->getErrorResponse($response->getStatusCode(),
+                      sprintf('Error trying to update some entities in Content Hub (Error Code = %d: %s)',
+                        $response->getStatusCode(), $response->getReasonPhrase()));
+
+                case 'deleteEntity':
+                    return $this->getErrorResponse($response->getStatusCode(),
+                      sprintf('Error trying to delete entity with UUID="@uuid" in Content Hub (Error Code = @error_code: @error_message)',
+                        $args[0], $response->getStatusCode(), $response->getReasonPhrase()));
+
+                case 'searchEntity':
+                    return $this->getErrorResponse($response->getStatusCode(),
+                      sprintf('Error trying to make a search query to Content Hub. Are your credentials inserted correctly? (Error Code = %d: %s)',
+                        $response->getStatusCode(), $response->getReasonPhrase()));
+
+                default:
+                    return $response;
+            }
+        }
+        if ($exception instanceof RequestException) {
+            switch ($method) {
+                // Customize the error message per request here.
+                case 'createEntity':
+                    return $this->getErrorResponse(500,
+                      sprintf('Error trying to create an entity in Content Hub (Error Message: %s)', $exception->getMessage()));
+
+                case 'createEntities':
+                    return $this->getErrorResponse(500,
+                      sprintf('Error trying to create entities in Content Hub (Error Message = %s)', $exception->getMessage()));
+
+                case 'updateEntity':
+                    return $this->getErrorResponse(500,
+                      sprintf('Error trying to update entity with UUID="%s" in Content Hub (Error Message = %s)', $args[1],
+                        $exception->getMessage()));
+
+                case 'updateEntities':
+                    return $this->getErrorResponse(500,
+                      sprintf('Error trying to update some entities in Content Hub (Error Message = %s)',
+                        $exception->getMessage()));
+
+                case 'deleteEntity':
+                    return $this->getErrorResponse(500,
+                      sprintf('Error trying to delete entity with UUID="%s" in Content Hub (Error Message = %s)', $args[0],
+                        $exception->getMessage()));
+
+                case 'searchEntity':
+                    return $this->getErrorResponse(500,
+                      sprintf('Error trying to make a search query to Content Hub. Are your credentials inserted correctly? (Error Message = %s)',
+                        $exception->getMessage()));
+
+                default:
+                    return $this->getErrorResponse(500,
+                      sprintf('Error trying to connect to the Content Hub. Are your credentials inserted correctly? (Error Message = %s)',
+                        $exception->getMessage()));
+            }
+        }
+
+        return $this->getErrorResponse(500,
+          sprintf('Error trying to connect to the Content Hub (Error Message = %s)', $exception->getMessage()));
     }
-    if ($exception instanceof ConnectException) {
-      return $this->getErrorResponse(500, sprintf('Could not reach the Content Hub. Please verify your hostname URL. [Error message: %s]', $exception->getMessage()));
+
+    protected function getErrorResponse($code, $reason)
+    {
+        return new Response($code, [], json_encode([]), '1.1', $reason);
     }
-    if ($exception instanceof ClientException || $exception instanceof BadResponseException) {
-      $response = $exception->getResponse();
-      switch ($method) {
-        case 'getClientByName':
-          // All good, means the client name is available.
-          if ($response->getStatusCode() == 404) {
-            return $response;
-          }
-          return $this->getErrorResponse($response->getStatusCode(), sprintf('Error trying to connect to the Content Hub" (Error Code = %d: %s)', $response->getStatusCode(), $response->getReasonPhrase()));
 
-        case 'addWebhook':
-          return $this->getErrorResponse($response->getStatusCode(), sprintf('There was a problem trying to register Webhook URL = %s. Please try again. (Error Code = %d: %s)', $args[0], $response->getStatusCode(), $response->getReasonPhrase()));
-
-        case 'deleteWebhook':
-          // This function only requires one argument (webhook_uuid), but
-          // we are using the second one to pass the webhook_url.
-          $webhook_url = isset($args[1]) ? $args[1] : $args[0];
-          return $this->getErrorResponse($response->getStatusCode(), sprintf('There was a problem trying to <b>unregister</b> Webhook URL = %s. Please try again. (Error Code = %d: @%s)', $webhook_url, $response->getStatusCode(), $response->getReasonPhrase()));
-
-        case 'purge':
-          return $this->getErrorResponse($response->getStatusCode(), sprintf('Error purging entities from the Content Hub [Error Code = %d: %s]', $response->getStatusCode(), $response->getReasonPhrase()));
-
-        case 'readEntity':
-          return $this->getErrorResponse($response->getStatusCode(), sprintf('Error reading entity with UUID="%s" from Content Hub (Error Code = %d: %s)', $args[0], $response->getStatusCode(), $response->getReasonPhrase()));
-
-        case 'createEntity':
-          return $this->getErrorResponse($response->getStatusCode(), sprintf('Error trying to create an entity in Content Hub (Error Code = %d: %s)', $response->getStatusCode(), $response->getReasonPhrase()));
-
-        case 'createEntities':
-          return $this->getErrorResponse($response->getStatusCode(), sprintf('Error trying to create entities in Content Hub (Error Code = %d: %s)', $response->getStatusCode(), $response->getReasonPhrase()));
-
-        case 'updateEntity':
-          return $this->getErrorResponse($response->getStatusCode(), sprintf('Error trying to update an entity with UUID="%s" in Content Hub (Error Code = %d: %s)', $args[1], $response->getStatusCode(), $response->getReasonPhrase()));
-
-        case 'updateEntities':
-          return $this->getErrorResponse($response->getStatusCode(), sprintf('Error trying to update some entities in Content Hub (Error Code = %d: %s)', $response->getStatusCode(), $response->getReasonPhrase()));
-
-        case 'deleteEntity':
-          return $this->getErrorResponse($response->getStatusCode(), sprintf('Error trying to delete entity with UUID="@uuid" in Content Hub (Error Code = @error_code: @error_message)', $args[0], $response->getStatusCode(), $response->getReasonPhrase()));
-
-        case 'searchEntity':
-          return $this->getErrorResponse($response->getStatusCode(), sprintf('Error trying to make a search query to Content Hub. Are your credentials inserted correctly? (Error Code = %d: %s)', $response->getStatusCode(), $response->getReasonPhrase()));
-
-        default:
-          return $response;
-      }
+    /**
+     * Make a base url out of components and add a trailing slash to it
+     *
+     * @param string[] $base_url_components
+     *
+     * @return string
+     */
+    protected static function makeBaseURL(...$base_url_components): string
+    {
+        return self::gluePartsTogether($base_url_components, '/').'/';
     }
-    if ($exception instanceof RequestException) {
-      switch ($method) {
-        // Customize the error message per request here.
-        case 'createEntity':
-          return $this->getErrorResponse(500, sprintf('Error trying to create an entity in Content Hub (Error Message: %s)', $exception->getMessage()));
 
-        case 'createEntities':
-          return $this->getErrorResponse(500, sprintf('Error trying to create entities in Content Hub (Error Message = %s)', $exception->getMessage()));
-
-        case 'updateEntity':
-          return $this->getErrorResponse(500, sprintf('Error trying to update entity with UUID="%s" in Content Hub (Error Message = %s)', $args[1], $exception->getMessage()));
-
-        case 'updateEntities':
-          return $this->getErrorResponse(500, sprintf('Error trying to update some entities in Content Hub (Error Message = %s)', $exception->getMessage()));
-
-        case 'deleteEntity':
-          return $this->getErrorResponse(500, sprintf('Error trying to delete entity with UUID="%s" in Content Hub (Error Message = %s)', $args[0], $exception->getMessage()));
-
-        case 'searchEntity':
-          return $this->getErrorResponse(500, sprintf('Error trying to make a search query to Content Hub. Are your credentials inserted correctly? (Error Message = %s)', $exception->getMessage()));
-
-        default:
-          return $this->getErrorResponse(500, sprintf('Error trying to connect to the Content Hub. Are your credentials inserted correctly? (Error Message = %s)', $exception->getMessage()));
-      }
+    /**
+     * Make path out of its individual components
+     *
+     * @param string[] $path_components
+     *
+     * @return string
+     */
+    protected static function makePath(...$path_components): string
+    {
+        return self::gluePartsTogether($path_components, '/');
     }
-    return $this->getErrorResponse(500, sprintf('Error trying to connect to the Content Hub (Error Message = %s)', $exception->getMessage()));
-  }
 
-  protected function getErrorResponse($code, $reason) {
-    return new Response($code, [], json_encode([]), '1.1', $reason);
-  }
+    /**
+     * Glue all elements of an array together
+     *
+     * @param array $parts
+     * @param string $glue
+     *
+     * @return string
+     */
+    protected static function gluePartsTogether(array $parts, string $glue): string
+    {
+        return implode($glue, self::removeAllLeadingAndTrailingSlashes($parts));
+    }
 
+    /**
+     * Strip all leading and trailing slashes from all components of the given array
+     *
+     * @param string[] $components
+     *
+     * @return string[]
+     */
+    protected static function removeAllLeadingAndTrailingSlashes(array $components): array
+    {
+        return array_map(function ($component) {
+            return trim($component, '/');
+        }, $components);
+    }
 }

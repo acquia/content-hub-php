@@ -10,38 +10,31 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 /**
  * The Configuration entity CDF creator.
  *
- * @see \Drupal\acquia_contenthub\Event\CreateCDFEntityEvent
+ * @see \Drupal\acquia_contenthub\Event\CreateCdfEntityEvent
  */
-class DefaultCDF implements EventSubscriberInterface {
+class DefaultCDF implements EventSubscriberInterface
+{
 
   /**
    * {@inheritdoc}
    */
-  public static function getSubscribedEvents() {
-    $events[ContentHubLibraryEvents::GET_CDF_CLASS][] = ['onGetCDFType'];
-    return $events;
-  }
-
-  public function onGetCDFType(GetCDFTypeEvent $event) {
-    $data = $event->getData();
-
-    $object = new CDFObject($data['type'], $data['uuid'], $data['created'], $data['modified'], $data['origin'], $data['metadata']);
-    foreach ($data['attributes'] as $attribute_name => $values) {
-      if (!$attribute = $object->getAttribute($attribute_name)) {
-        $class = !empty($object->getMetadata()['attributes'][$attribute_name]) ? $object->getMetadata()['attributes'][$attribute_name]['class'] : FALSE;
-        if ($class && class_exists($class)) {
-          $object->addAttribute($attribute_name, $values['type'], NULL, CDFObject::LANGUAGE_UNDETERMINED, $class);
-        }
-        else {
-          $object->addAttribute($attribute_name, $values['type'], NULL);
-        }
-        $attribute = $object->getAttribute($attribute_name);
-      }
-      $value_property = (new \ReflectionClass($attribute))->getProperty('value');
-      $value_property->setAccessible(TRUE);
-      $value_property->setValue($attribute, $values['value']);
+    public static function getSubscribedEvents()
+    {
+        $events[ContentHubLibraryEvents::GET_CDF_CLASS][] = ['onGetCDFType'];
+        return $events;
     }
-    $event->setObject($object);
-    $event->stopPropagation();
-  }
+
+    /**
+     * Reacts on GET_CDF_CLASS event.
+     *
+     * @param \Acquia\ContentHubClient\Event\GetCDFTypeEvent $event
+     *   Event.
+     *
+     * @throws \ReflectionException
+     */
+    public function onGetCDFType(GetCDFTypeEvent $event)
+    {
+        $event->setObject(CDFObject::fromArray($event->getData()));
+        $event->stopPropagation();
+    }
 }
