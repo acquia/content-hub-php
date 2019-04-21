@@ -55,7 +55,7 @@ class GetCDFTypeEventTest extends TestCase
    */
   public function testCreateGetCdfTypeEventWithoutType() : void
   {
-    $this->expectException(\Exception::class);
+    $this->expectException(\InvalidArgumentException::class);
     new GetCDFTypeEvent([]);
   }
 
