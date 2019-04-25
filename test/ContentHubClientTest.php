@@ -10,6 +10,7 @@ use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
+use Symfony\Component\HttpFoundation\Response as HttpResponse;
 
 /**
  * @runTestsInSeparateProcesses
@@ -21,16 +22,6 @@ class ContentHubClientTest extends TestCase
    * @var ContentHubClient ContentHubClient Mock Object
    */
   private $contentHubClient;
-
-  /**
-   * @const int
-   */
-  const HTTP_SUCCESS_RESPONSE = 200;
-
-  /**
-   * @const int
-   */
-  const HTTP_FAILURE_RESPONSE = 404;
 
   /**
    * {@inheritdoc}
@@ -61,13 +52,13 @@ class ContentHubClientTest extends TestCase
     $jsonResponses = $this->getJsonResponses();
 
     $this->contentHubClient->shouldReceive('getResponseJson')
-      ->andReturnValues([$jsonResponses[self::HTTP_SUCCESS_RESPONSE], $jsonResponses[self::HTTP_FAILURE_RESPONSE]]);
+      ->andReturnValues([$jsonResponses[HttpResponse::HTTP_OK], $jsonResponses[HttpResponse::HTTP_NOT_FOUND]]);
     $responseMock = \Mockery::mock(Response::class);
     $this->contentHubClient->shouldReceive('request')
       ->andReturn($responseMock);
 
-    $this->assertEquals($jsonResponses[self::HTTP_SUCCESS_RESPONSE], $this->contentHubClient->definition('dummyendpoint'));
-    $this->assertEquals($jsonResponses[self::HTTP_FAILURE_RESPONSE], $this->contentHubClient->definition('dummyendpoint'));
+    $this->assertEquals($jsonResponses[HttpResponse::HTTP_OK], $this->contentHubClient->definition('dummyendpoint'));
+    $this->assertEquals($jsonResponses[HttpResponse::HTTP_NOT_FOUND], $this->contentHubClient->definition('dummyendpoint'));
   }
 
   /**
@@ -80,10 +71,10 @@ class ContentHubClientTest extends TestCase
     $jsonResponses = $this->getJsonResponses();
 
     $this->contentHubClient->shouldReceive('put')
-      ->andReturnValues([$jsonResponses[self::HTTP_SUCCESS_RESPONSE], $jsonResponses[self::HTTP_FAILURE_RESPONSE]]);
+      ->andReturnValues([$jsonResponses[HttpResponse::HTTP_OK], $jsonResponses[HttpResponse::HTTP_NOT_FOUND]]);
 
-    $this->assertEquals($jsonResponses[self::HTTP_SUCCESS_RESPONSE], $this->contentHubClient->putEntities($cdfObjectMock));
-    $this->assertEquals($jsonResponses[self::HTTP_FAILURE_RESPONSE], $this->contentHubClient->putEntities($cdfObjectMock));
+    $this->assertEquals($jsonResponses[HttpResponse::HTTP_OK], $this->contentHubClient->putEntities($cdfObjectMock));
+    $this->assertEquals($jsonResponses[HttpResponse::HTTP_NOT_FOUND], $this->contentHubClient->putEntities($cdfObjectMock));
   }
 
   /**
@@ -95,10 +86,10 @@ class ContentHubClientTest extends TestCase
     $jsonResponses = $this->getJsonResponses();
 
     $this->contentHubClient->shouldReceive('put')
-      ->andReturnValues([$jsonResponses[self::HTTP_SUCCESS_RESPONSE], $jsonResponses[self::HTTP_FAILURE_RESPONSE]]);
+      ->andReturnValues([$jsonResponses[HttpResponse::HTTP_OK], $jsonResponses[HttpResponse::HTTP_NOT_FOUND]]);
 
-    $this->assertEquals($jsonResponses[self::HTTP_SUCCESS_RESPONSE], $this->contentHubClient->putEntity($cdfObjectMock));
-    $this->assertEquals($jsonResponses[self::HTTP_FAILURE_RESPONSE], $this->contentHubClient->putEntity($cdfObjectMock));
+    $this->assertEquals($jsonResponses[HttpResponse::HTTP_OK], $this->contentHubClient->putEntity($cdfObjectMock));
+    $this->assertEquals($jsonResponses[HttpResponse::HTTP_NOT_FOUND], $this->contentHubClient->putEntity($cdfObjectMock));
   }
 
   /**
@@ -110,10 +101,10 @@ class ContentHubClientTest extends TestCase
     $jsonResponses = $this->getJsonResponses();
 
     $this->contentHubClient->shouldReceive('post')
-      ->andReturnValues([$jsonResponses[self::HTTP_SUCCESS_RESPONSE], $jsonResponses[self::HTTP_FAILURE_RESPONSE]]);
+      ->andReturnValues([$jsonResponses[HttpResponse::HTTP_OK], $jsonResponses[HttpResponse::HTTP_NOT_FOUND]]);
 
-    $this->assertEquals($jsonResponses[self::HTTP_SUCCESS_RESPONSE], $this->contentHubClient->postEntities($cdfObjectMock));
-    $this->assertEquals($jsonResponses[self::HTTP_FAILURE_RESPONSE], $this->contentHubClient->postEntities($cdfObjectMock));
+    $this->assertEquals($jsonResponses[HttpResponse::HTTP_OK], $this->contentHubClient->postEntities($cdfObjectMock));
+    $this->assertEquals($jsonResponses[HttpResponse::HTTP_NOT_FOUND], $this->contentHubClient->postEntities($cdfObjectMock));
   }
 
   /**
@@ -125,10 +116,10 @@ class ContentHubClientTest extends TestCase
     $jsonResponses = $this->getJsonResponses();
 
     $this->contentHubClient->shouldReceive('delete')
-      ->andReturnValues([$jsonResponses[self::HTTP_SUCCESS_RESPONSE], $jsonResponses[self::HTTP_FAILURE_RESPONSE]]);
+      ->andReturnValues([$jsonResponses[HttpResponse::HTTP_OK], $jsonResponses[HttpResponse::HTTP_NOT_FOUND]]);
 
-    $this->assertEquals($jsonResponses[self::HTTP_SUCCESS_RESPONSE], $this->contentHubClient->deleteEntity($uuid));
-    $this->assertEquals($jsonResponses[self::HTTP_FAILURE_RESPONSE], $this->contentHubClient->deleteEntity($uuid));
+    $this->assertEquals($jsonResponses[HttpResponse::HTTP_OK], $this->contentHubClient->deleteEntity($uuid));
+    $this->assertEquals($jsonResponses[HttpResponse::HTTP_NOT_FOUND], $this->contentHubClient->deleteEntity($uuid));
   }
 
   /**
@@ -141,10 +132,10 @@ class ContentHubClientTest extends TestCase
     $jsonResponses = $this->getJsonResponses();
 
     $this->contentHubClient->shouldReceive('delete')
-      ->andReturnValues([$jsonResponses[self::HTTP_SUCCESS_RESPONSE], $jsonResponses[self::HTTP_FAILURE_RESPONSE]]);
+      ->andReturnValues([$jsonResponses[HttpResponse::HTTP_OK], $jsonResponses[HttpResponse::HTTP_NOT_FOUND]]);
 
-    $this->assertEquals($jsonResponses[self::HTTP_SUCCESS_RESPONSE], $this->contentHubClient->deleteInterest($uuid, $webhookUuid));
-    $this->assertEquals($jsonResponses[self::HTTP_FAILURE_RESPONSE], $this->contentHubClient->deleteInterest($uuid, $webhookUuid));
+    $this->assertEquals($jsonResponses[HttpResponse::HTTP_OK], $this->contentHubClient->deleteInterest($uuid, $webhookUuid));
+    $this->assertEquals($jsonResponses[HttpResponse::HTTP_NOT_FOUND], $this->contentHubClient->deleteInterest($uuid, $webhookUuid));
   }
 
   /**
@@ -159,10 +150,10 @@ class ContentHubClientTest extends TestCase
     $this->contentHubClient->shouldReceive('post')
       ->andReturn($responseMock);
     $this->contentHubClient->shouldReceive('getResponseJson')
-      ->andReturnValues([$jsonResponses[self::HTTP_SUCCESS_RESPONSE], $jsonResponses[self::HTTP_FAILURE_RESPONSE]]);
+      ->andReturnValues([$jsonResponses[HttpResponse::HTTP_OK], $jsonResponses[HttpResponse::HTTP_NOT_FOUND]]);
 
-    $this->assertEquals($jsonResponses[self::HTTP_SUCCESS_RESPONSE], $this->contentHubClient->purge());
-    $this->assertEquals($jsonResponses[self::HTTP_FAILURE_RESPONSE], $this->contentHubClient->purge());
+    $this->assertEquals($jsonResponses[HttpResponse::HTTP_OK], $this->contentHubClient->purge());
+    $this->assertEquals($jsonResponses[HttpResponse::HTTP_NOT_FOUND], $this->contentHubClient->purge());
   }
 
   /**
@@ -177,10 +168,10 @@ class ContentHubClientTest extends TestCase
     $this->contentHubClient->shouldReceive('post')
       ->andReturn($responseMock);
     $this->contentHubClient->shouldReceive('getResponseJson')
-      ->andReturnValues([$jsonResponses[self::HTTP_SUCCESS_RESPONSE], $jsonResponses[self::HTTP_FAILURE_RESPONSE]]);
+      ->andReturnValues([$jsonResponses[HttpResponse::HTTP_OK], $jsonResponses[HttpResponse::HTTP_NOT_FOUND]]);
 
-    $this->assertEquals($jsonResponses[self::HTTP_SUCCESS_RESPONSE], $this->contentHubClient->restore());
-    $this->assertEquals($jsonResponses[self::HTTP_FAILURE_RESPONSE], $this->contentHubClient->restore());
+    $this->assertEquals($jsonResponses[HttpResponse::HTTP_OK], $this->contentHubClient->restore());
+    $this->assertEquals($jsonResponses[HttpResponse::HTTP_NOT_FOUND], $this->contentHubClient->restore());
   }
 
   /**
@@ -195,10 +186,10 @@ class ContentHubClientTest extends TestCase
     $this->contentHubClient->shouldReceive('post')
       ->andReturn($responseMock);
     $this->contentHubClient->shouldReceive('getResponseJson')
-      ->andReturnValues([$jsonResponses[self::HTTP_SUCCESS_RESPONSE], $jsonResponses[self::HTTP_FAILURE_RESPONSE]]);
+      ->andReturnValues([$jsonResponses[HttpResponse::HTTP_OK], $jsonResponses[HttpResponse::HTTP_NOT_FOUND]]);
 
-    $this->assertEquals($jsonResponses[self::HTTP_SUCCESS_RESPONSE], $this->contentHubClient->reindex());
-    $this->assertEquals($jsonResponses[self::HTTP_FAILURE_RESPONSE], $this->contentHubClient->reindex());
+    $this->assertEquals($jsonResponses[HttpResponse::HTTP_OK], $this->contentHubClient->reindex());
+    $this->assertEquals($jsonResponses[HttpResponse::HTTP_NOT_FOUND], $this->contentHubClient->reindex());
   }
 
   /**
@@ -210,9 +201,9 @@ class ContentHubClientTest extends TestCase
     $jsonResponses = $this->getJsonResponses();
     $responseMock = \Mockery::mock(ResponseInterface::class);
     $responseMock->shouldReceive('getBody')
-      ->andReturnValues([$jsonResponses[self::HTTP_SUCCESS_RESPONSE], $jsonResponses[self::HTTP_FAILURE_RESPONSE]]);
-    $this->assertEquals(json_decode($jsonResponses[self::HTTP_SUCCESS_RESPONSE], true), ContentHubClient::getResponseJson($responseMock));
-    $this->assertEquals(json_decode($jsonResponses[self::HTTP_FAILURE_RESPONSE], true), ContentHubClient::getResponseJson($responseMock));
+      ->andReturnValues([$jsonResponses[HttpResponse::HTTP_OK], $jsonResponses[HttpResponse::HTTP_NOT_FOUND]]);
+    $this->assertEquals(json_decode($jsonResponses[HttpResponse::HTTP_OK], true), ContentHubClient::getResponseJson($responseMock));
+    $this->assertEquals(json_decode($jsonResponses[HttpResponse::HTTP_NOT_FOUND], true), ContentHubClient::getResponseJson($responseMock));
   }
 
   /**
@@ -240,10 +231,10 @@ class ContentHubClientTest extends TestCase
       ->andReturnValues([true, true, false]);
 
     $this->contentHubClient->shouldReceive('delete')
-      ->andReturnValues([$jsonResponses[self::HTTP_SUCCESS_RESPONSE], $jsonResponses[self::HTTP_FAILURE_RESPONSE], $jsonResponses[self::HTTP_SUCCESS_RESPONSE]]);
+      ->andReturnValues([$jsonResponses[HttpResponse::HTTP_OK], $jsonResponses[HttpResponse::HTTP_NOT_FOUND], $jsonResponses[HttpResponse::HTTP_OK]]);
 
-    $this->assertEquals($jsonResponses[self::HTTP_SUCCESS_RESPONSE], $this->contentHubClient->deleteClient($uuid));
-    $this->assertEquals($jsonResponses[self::HTTP_FAILURE_RESPONSE], $this->contentHubClient->deleteClient($uuid));
+    $this->assertEquals($jsonResponses[HttpResponse::HTTP_OK], $this->contentHubClient->deleteClient($uuid));
+    $this->assertEquals($jsonResponses[HttpResponse::HTTP_NOT_FOUND], $this->contentHubClient->deleteClient($uuid));
     $this->expectException(\Exception::class);
     $this->contentHubClient->deleteClient($uuid);
   }
@@ -254,11 +245,11 @@ class ContentHubClientTest extends TestCase
   public function getJsonResponses()
   {
     return [
-      self::HTTP_SUCCESS_RESPONSE => \GuzzleHttp\json_encode([
-        'response_code' => self::HTTP_SUCCESS_RESPONSE,
+      HttpResponse::HTTP_OK => \GuzzleHttp\json_encode([
+        'response_code' => HttpResponse::HTTP_OK,
       ]),
-      self::HTTP_FAILURE_RESPONSE => \GuzzleHttp\json_encode([
-        'response_code' => self::HTTP_FAILURE_RESPONSE,
+      HttpResponse::HTTP_NOT_FOUND => \GuzzleHttp\json_encode([
+        'response_code' => HttpResponse::HTTP_NOT_FOUND,
       ]),
     ];
   }

@@ -15,19 +15,16 @@ class ClientCDFObjectTest extends TestCase
   private $clientCdfObject;
 
   /**
-   * {@inheritdoc}
+   * @throws \Exception
    */
   public function setUp() : void
   {
     parent::setUp();
     $settingsData = $this->getSettingsData();
-    try {
-      $this->clientCdfObject = ClientCDFObject::create(
-        'client_cdf_id_1',
-        $settingsData
-      );
-    } catch (\Exception $exception) {
-    }
+    $this->clientCdfObject = ClientCDFObject::create(
+      'client_cdf_id_1',
+      $settingsData
+    );
   }
 
   /**
