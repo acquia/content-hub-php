@@ -2,7 +2,6 @@
 
 namespace Acquia\ContentHubClient\test;
 
-
 use Acquia\ContentHubClient\CDF\CDFObject;
 use Acquia\ContentHubClient\CDF\ClientCDFObject;
 use Acquia\ContentHubClient\CDFAttribute;
@@ -16,7 +15,7 @@ class ClientCDFObjectTest extends TestCase
   private $clientCdfObject;
 
   /**
-   *
+   * {@inheritdoc}
    */
   public function setUp() : void
   {
@@ -32,26 +31,28 @@ class ClientCDFObjectTest extends TestCase
   }
 
   /**
-   *
+   * {@inheritdoc}
    */
-  public function tearDown() :void
+  public function tearDown() : void
   {
     parent::tearDown();
     unset($this->clientCdfObject);
   }
 
   /**
-   *
+   * {@inheritdoc}
    */
   public function testGetClientName() : void
   {
-    $this->assertInstanceOf(CDFAttribute::class, $this->clientCdfObject->getClientName());
-    $this->assertEquals(CDFAttribute::TYPE_STRING, $this->clientCdfObject->getClientName()->getType());
-    $this->assertEquals($this->getSettingsData()['settings']['name'], $this->clientCdfObject->getClientName()->getValue()[CDFObject::LANGUAGE_UNDETERMINED]);
+    $clientName = $this->clientCdfObject->getClientName();
+
+    $this->assertInstanceOf(CDFAttribute::class, $clientName);
+    $this->assertEquals(CDFAttribute::TYPE_STRING, $clientName->getType());
+    $this->assertEquals($this->getSettingsData()['settings']['name'], $clientName->getValue()[CDFObject::LANGUAGE_UNDETERMINED]);
   }
 
   /**
-   *
+   * {@inheritdoc}
    */
   public function testGetSettings() : void
   {
@@ -59,13 +60,16 @@ class ClientCDFObjectTest extends TestCase
   }
 
   /**
-   *
+   * {@inheritdoc}
    */
   public function testGetWebhook() : void
   {
     $this->assertEquals($this->getSettingsData()['settings']['webhook'], $this->clientCdfObject->getWebhook());
   }
 
+  /**
+   * @return array
+   */
   public function getSettingsData() : array
   {
     return [
