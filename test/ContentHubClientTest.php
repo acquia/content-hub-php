@@ -8,11 +8,12 @@ use Acquia\ContentHubClient\ContentHubClient;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\ResponseInterface;
 
 class ContentHubClientTest extends TestCase
 {
   /**
-   * @var ContentHubClient
+   * @var ContentHubClient ContentHubClient Mock Object
    */
   private $contentHubClient;
 
@@ -71,6 +72,86 @@ class ContentHubClientTest extends TestCase
     }
   }
 
+  public function testPutEntities()
+  {
+    $cdfObjectMock = $this->getCdfObjectMock();
+    $jsonResponses = $this->getJsonResponses();
+
+    $this->contentHubClient->shouldReceive('put')
+      ->andReturnValues([$jsonResponses[200], $jsonResponses[404]]);
+
+    try {
+      $this->assertEquals($jsonResponses[200], $this->contentHubClient->putEntity($cdfObjectMock));
+      $this->assertEquals($jsonResponses[404], $this->contentHubClient->putEntity($cdfObjectMock));
+    } catch (GuzzleException $exception) {
+    }
+  }
+
+  public function testPostEntities()
+  {
+    $cdfObjectMock = $this->getCdfObjectMock();
+    $jsonResponses = $this->getJsonResponses();
+
+    $this->contentHubClient->shouldReceive('post')
+      ->andReturnValues([$jsonResponses[200], $jsonResponses[404]]);
+
+    try {
+      $this->assertEquals($jsonResponses[200], $this->contentHubClient->postEntities($cdfObjectMock));
+      $this->assertEquals($jsonResponses[404], $this->contentHubClient->postEntities($cdfObjectMock));
+    } catch (GuzzleException $exception) {
+    }
+  }
+
+  public function testDeleteEntity()
+  {
+    $uuid = '11111111-0000-0000-0000-000000000000';
+    $jsonResponses = $this->getJsonResponses();
+
+    $this->contentHubClient->shouldReceive('delete')
+      ->andReturnValues([$jsonResponses[200], $jsonResponses[404]]);
+
+    try {
+      $this->assertEquals($jsonResponses[200], $this->contentHubClient->deleteEntity($uuid));
+      $this->assertEquals($jsonResponses[404], $this->contentHubClient->deleteEntity($uuid));
+    } catch (GuzzleException $exception) {
+    }
+  }
+
+  public function testDeleteInterest()
+  {
+    $uuid = '11111111-0000-0000-0000-000000000000';
+    $webhookUuid = '11111111-0000-0000-0000-000000000000';
+    $jsonResponses = $this->getJsonResponses();
+
+    $this->contentHubClient->shouldReceive('delete')
+      ->andReturnValues([$jsonResponses[200], $jsonResponses[404]]);
+
+    try {
+      $this->assertEquals($jsonResponses[200], $this->contentHubClient->deleteInterest($uuid, $webhookUuid));
+      $this->assertEquals($jsonResponses[404], $this->contentHubClient->deleteInterest($uuid, $webhookUuid));
+    } catch (GuzzleException $exception) {
+    }
+  }
+
+  public function testPurge()
+  {
+    $jsonResponses = $this->getJsonResponses();
+
+    $responseMock = \Mockery::mock(ResponseInterface::class);
+
+    $this->contentHubClient->shouldReceive('post')
+      ->andReturn($responseMock);
+    $this->contentHubClient->shouldReceive('getResponseJson')
+      ->andReturnValues([$jsonResponses[200], $jsonResponses[404]]);
+
+    try {
+      $this->assertEquals($jsonResponses[200], $this->contentHubClient->purge());
+      $this->assertEquals($jsonResponses[404], $this->contentHubClient->purge());
+    } catch (GuzzleException $exception) {
+    } catch (\Exception $exception) {
+    }
+  }
+
   public function getJsonResponses()
   {
     $successJsonResponse = \GuzzleHttp\json_encode([
@@ -84,26 +165,6 @@ class ContentHubClientTest extends TestCase
       200 => $successJsonResponse,
       404 => $failureJsonResponse,
     ];
-  }
-
-  public function testPutEntities()
-  {
-    $cdfObjectMock = $this->getCdfObjectMock();
-
-    $successJsonResponse = \GuzzleHttp\json_encode([
-      'response_code' => 200,
-    ]);
-    $failureJsonResponse = \GuzzleHttp\json_encode([
-      'response_code' => 404,
-    ]);
-    $this->contentHubClient->shouldReceive('put')
-      ->andReturnValues([$successJsonResponse, $failureJsonResponse]);
-
-    try {
-      $this->assertEquals($successJsonResponse, $this->contentHubClient->putEntity($cdfObjectMock));
-      $this->assertEquals($failureJsonResponse, $this->contentHubClient->putEntity($cdfObjectMock));
-    } catch (GuzzleException $exception) {
-    }
   }
 
   public function getCdfObjectMock()
