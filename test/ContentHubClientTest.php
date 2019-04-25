@@ -240,6 +240,62 @@ class ContentHubClientTest extends TestCase
   }
 
   /**
+   * @throws GuzzleException
+   * @throws \Exception
+   */
+  public function testAddFilterToWebhook()
+  {
+    $filterId = '11111111-0000-0000-0000-000000000000';
+    $webhookId = '22222222-0000-0000-0000-000000000000';
+    $jsonResponses = $this->getJsonResponses();
+    $responseMock = \Mockery::mock(ResponseInterface::class);
+
+    $this->contentHubClient->shouldReceive('post')
+      ->andReturn($responseMock);
+    $this->contentHubClient->shouldReceive('getResponseJson')
+      ->andReturnValues([$jsonResponses[HttpResponse::HTTP_OK], $jsonResponses[HttpResponse::HTTP_NOT_FOUND]]);
+
+    $this->assertEquals($jsonResponses[HttpResponse::HTTP_OK], $this->contentHubClient->addFilterToWebhook($filterId, $webhookId));
+    $this->assertEquals($jsonResponses[HttpResponse::HTTP_NOT_FOUND], $this->contentHubClient->addFilterToWebhook($filterId, $webhookId));
+  }
+
+  /**
+   * @throws GuzzleException
+   * @throws \Exception
+   */
+  public function testPutFilter()
+  {
+    $jsonResponses = $this->getJsonResponses();
+    $responseMock = \Mockery::mock(ResponseInterface::class);
+
+    $this->contentHubClient->shouldReceive('put')
+      ->andReturn($responseMock);
+    $this->contentHubClient->shouldReceive('getResponseJson')
+      ->andReturnValues([$jsonResponses[HttpResponse::HTTP_OK], $jsonResponses[HttpResponse::HTTP_NOT_FOUND]]);
+
+    $this->assertEquals($jsonResponses[HttpResponse::HTTP_OK], $this->contentHubClient->putFilter(''));
+    $this->assertEquals($jsonResponses[HttpResponse::HTTP_NOT_FOUND], $this->contentHubClient->putFilter(''));
+  }
+
+  /**
+   * @throws GuzzleException
+   * @throws \Exception
+   */
+  public function testListEntities()
+  {
+    $jsonResponses = $this->getJsonResponses();
+    $responseMock = \Mockery::mock(ResponseInterface::class);
+
+    $this->contentHubClient->shouldReceive('get')
+      ->andReturn($responseMock);
+    $this->contentHubClient->shouldReceive('getResponseJson')
+      ->andReturnValues([$jsonResponses[HttpResponse::HTTP_OK], $jsonResponses[HttpResponse::HTTP_NOT_FOUND]]);
+
+    $this->assertEquals($jsonResponses[HttpResponse::HTTP_OK], $this->contentHubClient->listEntities());
+    $this->assertEquals($jsonResponses[HttpResponse::HTTP_NOT_FOUND], $this->contentHubClient->listEntities());
+  }
+
+  /**
    * @return array
    */
   public function getJsonResponses()
