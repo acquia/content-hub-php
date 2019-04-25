@@ -17,7 +17,7 @@ class GetCDFTypeEventTest extends TestCase
   private $getCdfTypeEvent;
 
   /**
-   *
+   * {@inheritdoc}
    */
   public function setUp() : void
   {
@@ -29,7 +29,7 @@ class GetCDFTypeEventTest extends TestCase
   }
 
   /**
-   *
+   * {@inheritdoc}
    */
   public function tearDown() : void
   {
@@ -38,7 +38,7 @@ class GetCDFTypeEventTest extends TestCase
   }
 
   /**
-   *
+   * {@inheritdoc}
    */
   public function testGetAndSetObject() : void
   {
@@ -51,7 +51,7 @@ class GetCDFTypeEventTest extends TestCase
   }
 
   /**
-   *
+   * {@inheritdoc}
    */
   public function testCreateGetCdfTypeEventWithoutType() : void
   {
@@ -60,7 +60,7 @@ class GetCDFTypeEventTest extends TestCase
   }
 
   /**
-   *
+   * {@inheritdoc}
    */
   public function testGetData() : void
   {
@@ -68,7 +68,7 @@ class GetCDFTypeEventTest extends TestCase
   }
 
   /**
-   *
+   * {@inheritdoc}
    */
   public function testGetType()
   {

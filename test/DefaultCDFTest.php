@@ -22,7 +22,7 @@ class DefaultCDFTest extends TestCase
   private $defaultCdf;
 
   /**
-   *
+   * {@inheritdoc}
    */
   public function setUp() : void
   {
@@ -31,7 +31,7 @@ class DefaultCDFTest extends TestCase
   }
 
   /**
-   *
+   * {@inheritdoc}
    */
   public function tearDown() : void
   {
@@ -40,6 +40,7 @@ class DefaultCDFTest extends TestCase
   }
 
   /**
+   * {@inheritdoc}
    */
   public function testGetSubscribedEvents()
   {
@@ -54,13 +55,16 @@ class DefaultCDFTest extends TestCase
   }
 
   /**
-   *
+   * {@inheritdoc}
    */
   public function testOnGetCDFType()
   {
     $this->assertNull($this->defaultCdf->onGetCDFType($this->getGetCDFTypeEvent()));
   }
 
+  /**
+   * @return mixed
+   */
   public function getGetCDFTypeEvent()
   {
     $cdfObjectInterfaceMock = \Mockery::mock(CDFObjectInterface::class);

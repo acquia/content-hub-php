@@ -23,7 +23,7 @@ class ContentHubClientTest extends TestCase
   private $contentHubClient;
 
   /**
-   *
+   * {@inheritdoc}
    */
   public function setUp() : void
   {
@@ -34,7 +34,7 @@ class ContentHubClientTest extends TestCase
   }
 
   /**
-   *
+   * {@inheritdoc}
    */
   public function tearDown() : void
   {
