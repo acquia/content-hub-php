@@ -73,7 +73,6 @@ class ClientCDFObjectTest extends TestCase
   public function getSettingsData() : array
   {
     return [
-
       'origin' => '22222222-00000000-00000000-00000000',
       'created' => '2014-12-21T20:12:11+00:00Z',
       'modified' => '2015-12-21T20:12:11+00:00Z',
