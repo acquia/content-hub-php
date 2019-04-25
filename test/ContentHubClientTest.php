@@ -202,9 +202,8 @@ class ContentHubClientTest extends TestCase
     $responseMock = \Mockery::mock(ResponseInterface::class);
     $responseMock->shouldReceive('getBody')
       ->andReturnValues([$jsonResponses[200], $jsonResponses[404]]);
-
-    $this->assertEquals($jsonResponses[200], ContentHubClient::getResponseJson($responseMock));
-    $this->assertEquals($jsonResponses[404], ContentHubClient::getResponseJson($responseMock));
+    $this->assertEquals(json_decode($jsonResponses[200], true), ContentHubClient::getResponseJson($responseMock));
+    $this->assertEquals(json_decode($jsonResponses[404], true), ContentHubClient::getResponseJson($responseMock));
   }
 
   /**
