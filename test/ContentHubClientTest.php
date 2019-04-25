@@ -10,6 +10,10 @@ use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 
+/**
+ * @runTestsInSeparateProcesses
+ * @preserveGlobalState disabled
+ */
 class ContentHubClientTest extends TestCase
 {
   /**
@@ -136,7 +140,6 @@ class ContentHubClientTest extends TestCase
   public function testPurge()
   {
     $jsonResponses = $this->getJsonResponses();
-
     $responseMock = \Mockery::mock(ResponseInterface::class);
 
     $this->contentHubClient->shouldReceive('post')
@@ -147,6 +150,57 @@ class ContentHubClientTest extends TestCase
     try {
       $this->assertEquals($jsonResponses[200], $this->contentHubClient->purge());
       $this->assertEquals($jsonResponses[404], $this->contentHubClient->purge());
+    } catch (GuzzleException $exception) {
+    } catch (\Exception $exception) {
+    }
+  }
+
+  public function testRestore()
+  {
+    $jsonResponses = $this->getJsonResponses();
+    $responseMock = \Mockery::mock(ResponseInterface::class);
+
+    $this->contentHubClient->shouldReceive('post')
+      ->andReturn($responseMock);
+    $this->contentHubClient->shouldReceive('getResponseJson')
+      ->andReturnValues([$jsonResponses[200], $jsonResponses[404]]);
+
+    try {
+      $this->assertEquals($jsonResponses[200], $this->contentHubClient->restore());
+      $this->assertEquals($jsonResponses[404], $this->contentHubClient->restore());
+    } catch (GuzzleException $exception) {
+    } catch (\Exception $exception) {
+    }
+  }
+
+  public function testReindex()
+  {
+    $jsonResponses = $this->getJsonResponses();
+    $responseMock = \Mockery::mock(ResponseInterface::class);
+
+    $this->contentHubClient->shouldReceive('post')
+      ->andReturn($responseMock);
+    $this->contentHubClient->shouldReceive('getResponseJson')
+      ->andReturnValues([$jsonResponses[200], $jsonResponses[404]]);
+
+    try {
+      $this->assertEquals($jsonResponses[200], $this->contentHubClient->reindex());
+      $this->assertEquals($jsonResponses[404], $this->contentHubClient->reindex());
+    } catch (GuzzleException $exception) {
+    } catch (\Exception $exception) {
+    }
+  }
+
+  public function testGetResponseJson()
+  {
+    $jsonResponses = $this->getJsonResponses();
+    $responseMock = \Mockery::mock(ResponseInterface::class);
+    $responseMock->shouldReceive('getBody')
+      ->andReturnValues([$jsonResponses[200], $jsonResponses[404]]);
+
+    try {
+      $this->assertEquals($jsonResponses[200], ContentHubClient::getResponseJson($responseMock));
+      $this->assertEquals($jsonResponses[404], ContentHubClient::getResponseJson($responseMock));
     } catch (GuzzleException $exception) {
     } catch (\Exception $exception) {
     }
