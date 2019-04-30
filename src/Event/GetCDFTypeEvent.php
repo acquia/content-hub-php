@@ -41,7 +41,10 @@ class GetCDFTypeEvent extends Event
     public function __construct(array $data)
     {
         $this->data = $data;
-        // Should throw something if type is missing.
+
+        if (!isset($data['type'])) {
+          throw new \InvalidArgumentException('Parameters should have a \'type\' key');
+        }
         $this->type = $data['type'];
     }
 

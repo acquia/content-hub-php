@@ -820,6 +820,8 @@ class ContentHubClient extends Client
      *   The name of the filter.
      * @param string $uuid
      *   The filter UUID to update existing filter, NULL to create a new one.
+     * @param array $metadata
+     *   The Metadata array, empty if not given.
      *
      * @return array
      *   An array of data including the filter UUID, if succeeds.
@@ -828,14 +830,15 @@ class ContentHubClient extends Client
      * @throws \Exception
      *
      */
-    public function putFilter($query, $name = '', $uuid = null)
+    public function putFilter($query, $name = '', $uuid = null, $metadata = [])
     {
         $data = [
+          'name' => $name,
+          'uuid' => $uuid,
           'data' => [
             'query' => $query,
           ],
-          'name' => $name,
-          'uuid' => $uuid,
+          'metadata' => $metadata,
         ];
         $options = ['body' => json_encode($data)];
 
@@ -896,6 +899,24 @@ class ContentHubClient extends Client
         $options = ['body' => json_encode($data)];
 
         return $this->getResponseJson($this->post("settings/webhooks/$webhook_id/filters", $options));
+    }
+
+    /**
+     * Detaches filter from webhook.
+     *
+     * @param string $filter_id
+     *   Filter UUID.
+     * @param string $webhook_id
+     *   Webhook UUID.
+     *
+     * @return mixed
+     * @throws \Exception
+     */
+    public function removeFilterFromWebhook($filter_id, $webhook_id)
+    {
+        $options = ['body' => json_encode(['filter_id' => $filter_id])];
+        $response = $this->delete("settings/webhooks/$webhook_id/filters", $options);
+        return $this->getResponseJson($response);
     }
 
     /**
