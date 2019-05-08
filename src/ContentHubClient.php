@@ -821,7 +821,7 @@ class ContentHubClient extends Client
      * @param string $uuid
      *   The filter UUID to update existing filter, NULL to create a new one.
      * @param array $metadata
-     *   The Metadata array, empty if not given.
+     *   The Metadata array, NULL if not provided.
      *
      * @return array
      *   An array of data including the filter UUID, if succeeds.
@@ -830,16 +830,20 @@ class ContentHubClient extends Client
      * @throws \Exception
      *
      */
-    public function putFilter($query, $name = '', $uuid = null, $metadata = [])
+    public function putFilter($query, $name = '', $uuid = NULL, $metadata = NULL)
     {
         $data = [
           'name' => $name,
-          'uuid' => $uuid,
           'data' => [
             'query' => $query,
           ],
-          'metadata' => $metadata,
         ];
+        if (!empty($uuid)) {
+          $data['uuid'] = $uuid;
+        }
+        if (!empty($metadata)) {
+          $data['metadata'] = $metadata;
+        }
         $options = ['body' => json_encode($data)];
 
         return $this->getResponseJson($this->put('filters', $options));
