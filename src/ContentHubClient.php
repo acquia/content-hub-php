@@ -830,16 +830,18 @@ class ContentHubClient extends Client
      * @throws \Exception
      *
      */
-    public function putFilter($query, $name = '', $uuid = null, $metadata = [])
+    public function putFilter($query, $name = '', $uuid = NULL, $metadata = [])
     {
         $data = [
           'name' => $name,
-          'uuid' => $uuid,
           'data' => [
             'query' => $query,
           ],
-          'metadata' => $metadata,
+          'metadata' => (object) $metadata,
         ];
+        if (!empty($uuid)) {
+          $data['uuid'] = $uuid;
+        }
         $options = ['body' => json_encode($data)];
 
         return $this->getResponseJson($this->put('filters', $options));
