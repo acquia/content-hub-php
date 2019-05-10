@@ -2,9 +2,12 @@
 
 namespace Acquia\ContentHubClient\Guzzle\Middleware;
 
-use GuzzleHttp\Psr7\Request;
+use Closure;
+use Exception;
+use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class RequestLogger.
@@ -18,6 +21,23 @@ class RequestLogger
     protected $logger;
 
     /**
+     * @var \Psr\Http\Message\RequestInterface
+     */
+    protected $request;
+
+    /**
+     * @var \Psr\Http\Message\ResponseInterface
+     */
+    protected $response;
+
+    /**
+     * Decoded response body.
+     *
+     * @var mixed
+     */
+    protected $decodedResponseBody;
+
+    /**
      * RequestLogger constructor.
      *
      * @param \Psr\Log\LoggerInterface $logger
@@ -28,21 +48,21 @@ class RequestLogger
     }
 
     /**
-     * Logs any request.
+     * Logs any response/request.
      *
      * @param callable $handler
      *
      * @return \Closure
      */
-    public function __invoke(callable $handler): \Closure
+    public function __invoke(callable $handler): Closure
     {
-        return function (Request $request, array $options) use ($handler) {
+        return function (RequestInterface $request, array $options) use ($handler) {
 
             $promise = function (ResponseInterface $response) use ($request) {
                 try {
-                    $this->logResponse($request, $response);
-                } catch (\Exception $exception) {
-                    $message = sprintf('Failed to log request. Reason: %s', $exception->getMessage());
+                    $this->withResponseAndRequest($response, $request)->log();
+                } catch (Exception $exception) {
+                    $message = sprintf('Failed to make log entry. Reason: %s', $exception->getMessage());
                     $this->logger->critical($message);
                 }
 
@@ -55,71 +75,55 @@ class RequestLogger
 
     /**
      * Logs response.
-     *
-     * @param \GuzzleHttp\Psr7\Request $request
-     * @param \Psr\Http\Message\ResponseInterface $response
      */
-    public function logResponse(Request $request, ResponseInterface $response): void {
-        if (!$this->isTrackable($response)) {
+    public function log(): void
+    {
+        if (!$this->isTrackable()) {
             return;
         }
 
-        $entry = implode('. ', $this->buildLogEntry($request, $response));
+        $entry = $this->buildLogEntry();
 
-        $responseStatusCode = $response->getStatusCode();
-        switch ($responseStatusCode) {
-            case $responseStatusCode >= 500:
-                $this->logger->error($entry);
-                break;
-            case $responseStatusCode >= 400:
-                $this->logger->warning($entry);
-                break;
-            default:
-                $this->logger->info($entry);
-        }
+        $this->logEntry($entry, $this->response->getStatusCode());
     }
 
     /**
-     * @param $request
-     * @param \Psr\Http\Message\ResponseInterface $response
+     * Initializes response and request properties.
      *
-     * @return array
+     * @param \Psr\Http\Message\ResponseInterface $response
+     *   Response instance.
+     * @param \Psr\Http\Message\RequestInterface $request
+     *   Request instance.
+     *
+     * @return $this
      */
-    protected function buildLogEntry($request, ResponseInterface $response)
+    protected function withResponseAndRequest(ResponseInterface $response, RequestInterface $request)
     {
-        $body = $this->decodeResponse($response);
+        $this->request = $request;
+        $this->response = $response;
+        $this->decodedResponseBody = json_decode($response->getBody(), true);
 
-        $messages = [];
-        $messages[] = sprintf('Request ID: %s', $body['request_id']);
-        $messages[] = sprintf(
-          'Method: %s. Path: %s. Status code: %d',
-          $request->getMethod(),
-          $request->getUri()->getPath(),
-          $response->getStatusCode()
-        );
-        $messages[] = sprintf('Body: %s', $response->getBody());
-
-        return $messages;
+        return $this;
     }
 
     /**
      * Checks if a response can be tracked.
      *
-     * @param \Psr\Http\Message\ResponseInterface $response
-     *
      * @return bool
      */
-    protected function isTrackable(ResponseInterface $response): bool
+    protected function isTrackable(): bool
     {
-        $body = $this->decodeResponse($response);
+        if (empty($this->response) || empty($this->request)) {
+            return false;
+        }
 
         // Dont't track requests without ID.
-        if (empty($body['request_id'])) {
+        if (empty($this->decodedResponseBody['request_id'])) {
             return false;
         }
 
         // Dont't track requests with sensitive data.
-        if (isset($body['data']['data']['metadata']['settings'])) {
+        if (isset($this->decodedResponseBody['data']['data']['metadata']['settings'])) {
             return false;
         }
 
@@ -127,15 +131,45 @@ class RequestLogger
     }
 
     /**
-     * Decodes response.
+     * Builds log entry.
      *
-     * @param \Psr\Http\Message\ResponseInterface $response
-     *
-     * @return mixed
+     * @return string
+     *   Log message.
      */
-    protected function decodeResponse(ResponseInterface $response)
+    protected function buildLogEntry(): string
     {
-        return json_decode($response->getBody(), true);
+        return sprintf(
+            'Request ID: %s. Method: %s. Path: %s. Status code: %d. Body: %s',
+            $this->decodedResponseBody['request_id'],
+            $this->request->getMethod(),
+            $this->request->getUri()->getPath(),
+            $this->response->getStatusCode(),
+            $this->response->getBody()
+        );
     }
 
+    /**
+     * Logs message depending on response status code.
+     *
+     * @param string $entry
+     *   Log entry.
+     * @param int $statusCode
+     *   Response status code.
+     */
+    protected function logEntry(string $entry, int $statusCode): void
+    {
+        if ($statusCode >= Response::HTTP_INTERNAL_SERVER_ERROR) {
+            $this->logger->error($entry);
+
+            return;
+        }
+
+        if ($statusCode >= Response::HTTP_BAD_REQUEST) {
+            $this->logger->warning($entry);
+
+            return;
+        }
+
+        $this->logger->info($entry);
+    }
 }

@@ -85,7 +85,7 @@ class ContentHubClient extends Client
             $config['handler'] = HandlerStack::create();
         }
         $config['handler']->push($middleware);
-        $this->enableRequestLogging($config);
+        $this->addRequestLoggerHandler($config);
 
         parent::__construct($config);
     }
@@ -1163,14 +1163,14 @@ class ContentHubClient extends Client
     /**
      * @param array $config
      */
-    protected function enableRequestLogging(array $config): void
+    protected function addRequestLoggerHandler(array $config): void
     {
         if (empty($config['handler']) || empty($this->logger)) {
             return;
         }
 
-        if(!$config['handler'] instanceof HandlerStack){
-          return;
+        if (!$config['handler'] instanceof HandlerStack) {
+            return;
         }
 
         $config['handler']->push(new RequestLogger($this->logger));
