@@ -2,7 +2,6 @@
 
 namespace Acquia\ContentHubClient\Guzzle\Middleware;
 
-use Exception;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
@@ -28,12 +27,12 @@ class RequestResponseLogger
     /**
      * @var \Psr\Log\LoggerInterface
      */
-    private $logger;
+    protected $logger;
 
     /**
      * @var mixed
      */
-    private $decodedResponseBody;
+    protected $decodedResponseBody;
 
     /**
      * RequestResponseLogger constructor.
@@ -52,8 +51,6 @@ class RequestResponseLogger
 
     /**
      * Logs response/request data.
-     *
-     * @throws \Exception
      */
     public function log(): void
     {
@@ -70,17 +67,12 @@ class RequestResponseLogger
      * Checks if a response can be tracked.
      *
      * @return bool
-     * @throws \Exception
      */
     protected function isTrackable(): bool
     {
         // Dont't track requests without ID.
         if (empty($this->decodedResponseBody['request_id'])) {
-            $message = sprintf(
-                'Could not log response without ID. Response body: %s',
-                $this->response->getBody()
-            );
-            throw new Exception($message);
+            return false;
         }
 
         // Dont't track requests with sensitive data.
