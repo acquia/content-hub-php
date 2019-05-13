@@ -4,7 +4,7 @@ namespace Acquia\ContentHubClient;
 
 use Acquia\ContentHubClient\CDF\CDFObject;
 use Acquia\ContentHubClient\Event\GetCDFTypeEvent;
-use Acquia\ContentHubClient\Guzzle\Middleware\RequestLogger;
+use Acquia\ContentHubClient\Guzzle\Middleware\RequestResponseHandler;
 use Acquia\Hmac\Guzzle\HmacAuthMiddleware;
 use Acquia\Hmac\Key;
 use GuzzleHttp\Client;
@@ -85,7 +85,7 @@ class ContentHubClient extends Client
             $config['handler'] = HandlerStack::create();
         }
         $config['handler']->push($middleware);
-        $this->addRequestLoggerHandler($config);
+        $this->addRequestResponseHandler($config);
 
         parent::__construct($config);
     }
@@ -1163,7 +1163,7 @@ class ContentHubClient extends Client
     /**
      * @param array $config
      */
-    protected function addRequestLoggerHandler(array $config): void
+    protected function addRequestResponseHandler(array $config): void
     {
         if (empty($config['handler']) || empty($this->logger)) {
             return;
@@ -1173,6 +1173,6 @@ class ContentHubClient extends Client
             return;
         }
 
-        $config['handler']->push(new RequestLogger($this->logger));
+        $config['handler']->push(new RequestResponseHandler($this->logger));
     }
 }
