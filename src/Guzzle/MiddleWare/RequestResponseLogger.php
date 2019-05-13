@@ -91,7 +91,6 @@ class RequestResponseLogger
         return true;
     }
 
-
     /**
      * Builds log message.
      *
@@ -109,7 +108,6 @@ class RequestResponseLogger
             $this->response->getBody()
         );
     }
-
 
     /**
      * Logs message depending on response status code.
