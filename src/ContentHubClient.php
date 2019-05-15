@@ -676,17 +676,27 @@ class ContentHubClient extends Client
     /**
      * Updates a webhook from the active subscription.
      *
-     * @param $uuid
-     *   The UUID of the webhook to update
+     * @param string $uuid
+     *   The UUID of the webhook to update.
+     * @param int $hmac_version
+     *   The hmac version.
+     * @param int $disable_retries
+     *   Whether to disable webhook retries or not.
      *
      * @return \Psr\Http\Message\ResponseInterface
      *
      * @throws \GuzzleHttp\Exception\RequestException
      */
-    public function updateWebhook($uuid, $url)
+    public function updateWebhook($uuid, $url, $hmac_version = 2, $disable_retries = NULL)
     {
-        $options['body'] = json_encode(['url' => $url]);
-
+        $data = ['url' => $url];
+        if (in_array($hmac_version, [1, 2])) {
+            $data['version'] = $hmac_version;
+        }
+        if (!empty($disable_retries)) {
+            $data['disable_retries'] = $disable_retries;
+        }
+        $options['body'] = json_encode($data);
         return $this->put("settings/webhooks/$uuid", $options);
     }
 
