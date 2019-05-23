@@ -690,7 +690,7 @@ class ContentHubClient extends Client
     public function updateWebhook($uuid, $url, $hmac_version = 2, $disable_retries = NULL)
     {
         $data = ['url' => $url];
-        if (in_array($hmac_version, [1, 2])) {
+        if (in_array($hmac_version, [1, 2], TRUE)) {
             $data['version'] = $hmac_version;
         }
         if (!empty($disable_retries)) {
