@@ -621,6 +621,20 @@ class ContentHubClient extends Client
     }
 
     /**
+     * @param $webhook_uuid
+     *
+     * @return array
+     *
+     * @throws \Exception
+     */
+    public function getInterestsByWebhook($webhook_uuid)
+    {
+        $data = $this->getResponseJson($this->get("/interest/webhook/$webhook_uuid"));
+
+        return $data['data']['interests'];
+    }
+
+    /**
      * Get the settings that were used to instantiate this client.
      *
      * @return \Acquia\ContentHubClient\Settings
