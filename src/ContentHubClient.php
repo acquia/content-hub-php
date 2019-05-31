@@ -632,7 +632,7 @@ class ContentHubClient extends Client
 
         $data = $this->getResponseJson($this->get("/interest/webhook/$webhook_uuid"));
 
-        return !empty($data['data']['interests']) ? $data['data']['interests'] : [];
+        return $data['data']['interests'] ?? [];
 
     }
 
