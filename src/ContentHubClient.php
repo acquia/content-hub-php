@@ -621,6 +621,22 @@ class ContentHubClient extends Client
     }
 
     /**
+     * @param $webhook_uuid
+     *
+     * @return array
+     *
+     * @throws \Exception
+     */
+    public function getInterestsByWebhook($webhook_uuid)
+    {
+
+        $data = $this->getResponseJson($this->get("/interest/webhook/$webhook_uuid"));
+
+        return $data['data']['interests'] ?? [];
+
+    }
+
+    /**
      * Get the settings that were used to instantiate this client.
      *
      * @return \Acquia\ContentHubClient\Settings
@@ -933,7 +949,13 @@ class ContentHubClient extends Client
      */
     public static function getResponseJson(ResponseInterface $response)
     {
-        $body = (string) $response->getBody();
+
+        try {
+          $body = (string) $response->getBody();
+        } catch (\Exception $exception) {
+          $message = sprintf("An exception occurred in the JSON response. Message: %s", $exception->getMessage());
+          throw new \Exception($message);
+        }
 
         return json_decode($body, true);
     }
