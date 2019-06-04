@@ -5,6 +5,8 @@ namespace Acquia\ContentHubClient;
 use Acquia\ContentHubClient\CDF\CDFObject;
 use Acquia\ContentHubClient\Event\GetCDFTypeEvent;
 use Acquia\ContentHubClient\Guzzle\Middleware\RequestResponseHandler;
+use Acquia\ContentHubClient\SearchCriteria\SearchCriteria;
+use Acquia\ContentHubClient\SearchCriteria\SearchCriteriaBuilder;
 use Acquia\Hmac\Guzzle\HmacAuthMiddleware;
 use Acquia\Hmac\Key;
 use GuzzleHttp\Client;
@@ -979,6 +981,8 @@ class ContentHubClient extends Client
             }
             $args[0] = self::makePath(...$parts);
 
+            $args = $this->addSearchCriteriaHeader($args);
+
             return parent::__call($method, $args);
         } catch (\Exception $e) {
             $exceptionResponse = $this->getExceptionMessage($method, $args, $e);
@@ -1198,5 +1202,31 @@ class ContentHubClient extends Client
         }
 
         $config['handler']->push(new RequestResponseHandler($this->logger));
+    }
+
+    /**
+     * Appends search criteria header.
+     *
+     * @param array $args
+     *   Method arguments.
+     *
+     * @return array
+     *   Processed arguments.
+     */
+    protected function addSearchCriteriaHeader(array $args)
+    {
+        $uri = $args[0] ?? '';
+        list(, $queryString) = explode('?', $uri);
+        if (strpos($uri, '?') === false || empty($queryString)) {
+            return $args;
+        }
+
+        parse_str($queryString, $parsedQueryString);
+        $criteria = SearchCriteriaBuilder::createFromArray($parsedQueryString);
+
+        $args[1]['headers'] = $args[1]['headers'] ?? [];
+        $args[1]['headers'][SearchCriteria::HEADER_NAME] = base64_encode(json_encode($criteria));
+
+        return $args;
     }
 }
