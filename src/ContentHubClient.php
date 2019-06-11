@@ -30,7 +30,10 @@ class ContentHubClient extends Client
 {
     // Override VERSION inherited from GuzzleHttp::ClientInterface
     const VERSION = '2.0.0';
+
     const LIBRARYNAME = 'AcquiaContentHubPHPLib';
+
+    const OPTION_NAME_LANGUAGES = 'client-languages';
 
     /**
      * The settings.
@@ -1222,8 +1225,13 @@ class ContentHubClient extends Client
         }
 
         parse_str($queryString, $parsedQueryString);
-        $criteria = SearchCriteriaBuilder::createFromArray($parsedQueryString);
+        $languages = $this->getConfig(self::OPTION_NAME_LANGUAGES);
+        if (!empty($languages) && is_array($languages)) {
+            $parsedQueryString['languages'] = $languages;
+        }
 
+        /** @var \Acquia\ContentHubClient\SearchCriteria\SearchCriteria $criteria */
+        $criteria = SearchCriteriaBuilder::createFromArray($parsedQueryString);
         $args[1]['headers'] = $args[1]['headers'] ?? [];
         $args[1]['headers'][SearchCriteria::HEADER_NAME] = base64_encode(json_encode($criteria));
 

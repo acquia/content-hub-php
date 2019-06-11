@@ -11,7 +11,7 @@ use DateTimeInterface;
  */
 class SearchCriteria implements \JsonSerializable
 {
-    const HEADER_NAME = 'X-Search-Criteria';
+    const HEADER_NAME = 'X-Acquia-Content-Hub-Search-Criteria';
 
     const DEFAULT_SEARCH_TERM = 'drupal8_content_entity';
 
@@ -77,6 +77,11 @@ class SearchCriteria implements \JsonSerializable
     protected $version;
 
     /**
+     * @var array
+     */
+    protected $languages;
+
+    /**
      * SearchCriteria constructor.
      *
      * @param string $searchTerm
@@ -90,9 +95,22 @@ class SearchCriteria implements \JsonSerializable
      * @param int $size
      * @param string $sorting
      * @param string $version
+     * @param array $languages
      */
-    public function __construct(string $searchTerm, array $entityType, array $bundle, array $tags, string $label, ?DateTimeInterface $startDate, ?DateTimeInterface $endDate, int $from, int $size, string $sorting, string $version) // @codingStandardsIgnoreLine.
-    {
+    public function __construct(
+      string $searchTerm,
+      array $entityType,
+      array $bundle,
+      array $tags,
+      string $label,
+      ?DateTimeInterface $startDate,
+      ?DateTimeInterface $endDate,
+      int $from,
+      int $size,
+      string $sorting,
+      string $version,
+      array $languages
+    ) {
         $this->searchTerm = $searchTerm;
         $this->entityType = $entityType;
         $this->bundle = $bundle;
@@ -104,6 +122,7 @@ class SearchCriteria implements \JsonSerializable
         $this->size = $size;
         $this->sorting = $sorting;
         $this->version = $version;
+        $this->languages = $languages;
     }
 
     /**
@@ -123,6 +142,7 @@ class SearchCriteria implements \JsonSerializable
           'size' => $this->getSize(),
           'sorting' => $this->getSorting(),
           'version' => $this->getVersion(),
+          'languages' => $this->getLanguages(),
         ];
     }
 
@@ -212,5 +232,21 @@ class SearchCriteria implements \JsonSerializable
     public function getVersion(): string
     {
         return $this->version;
+    }
+
+    /**
+     * @return array
+     */
+    public function getLanguages(): array
+    {
+        return $this->languages;
+    }
+
+    /**
+     * @param array $languages
+     */
+    public function setLanguages(array $languages): void
+    {
+        $this->languages = $languages;
     }
 }

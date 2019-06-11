@@ -2,6 +2,8 @@
 
 namespace Acquia\ContentHubClient\SearchCriteria;
 
+use Acquia\ContentHubClient\CDF\CDFObject;
+
 /**
  * Class SearchCriteriaBuilder
  *
@@ -37,7 +39,8 @@ class SearchCriteriaBuilder
             self::extractPropertyFromArray('from', $data, SearchCriteria::DEFAULT_OFFSET),
             self::extractPropertyFromArray('size', $data, SearchCriteria::DEFAULT_LIMIT),
             self::extractPropertyFromArray('sorting', $data, ''),
-            self::extractPropertyFromArray('version', $data, SearchCriteria::DEFAULT_VERSION)
+            self::extractPropertyFromArray('version', $data, SearchCriteria::DEFAULT_VERSION),
+            self::extractPropertyFromArray('languages', $data, [CDFObject::LANGUAGE_UNDETERMINED])
         );
     }
 
@@ -61,6 +64,7 @@ class SearchCriteriaBuilder
           'size' => ['size', 'limit'],
           'sorting' => ['sort'],
           'version' => ['version'],
+          'languages' => ['languages'],
         ];
     }
 
@@ -86,7 +90,7 @@ class SearchCriteriaBuilder
         }
 
         $key = $values[0];
-
-        return is_array($default) ? [$data[$key]] : $data[$key];
+        
+        return is_array($default) && !is_array($data[$key]) ? [$data[$key]] : $data[$key];
     }
 }
