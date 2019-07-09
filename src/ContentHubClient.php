@@ -587,7 +587,7 @@ class ContentHubClient extends Client
     {
         $data = $this->getResponseJson($this->get('settings'));
 
-        return $data['clients'];
+        return $data['clients'] ?? [];
     }
 
     /**
@@ -599,7 +599,7 @@ class ContentHubClient extends Client
     {
         $data = $this->getResponseJson($this->get('settings'));
 
-        return $data['webhooks'];
+        return $data['webhooks'] ?? [];
     }
 
     /**
