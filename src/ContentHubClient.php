@@ -591,15 +591,16 @@ class ContentHubClient extends Client
     }
 
     /**
-     * @return mixed
+     * @return \Acquia\ContentHubClient\Webhook[]
      *
      * @throws \Exception
      */
     public function getWebHooks()
     {
         $data = $this->getResponseJson($this->get('settings'));
-
-        return $data['webhooks'] ?? [];
+        $webhooks = $data['webhooks'] ?? [];
+        array_walk($webhooks, function(&$webhook) {$webhook = new Webhook($webhook);});
+        return $webhooks;
     }
 
     /**
@@ -611,13 +612,7 @@ class ContentHubClient extends Client
      */
     public function getWebHook($url)
     {
-        $webhooks = $this->getWebHooks();
-        foreach ($webhooks as $webhook) {
-            if ($webhook['url'] == $url) {
-                return $webhook;
-            }
-        }
-        return [];
+        return current(array_filter($this->getWebHooks(), function (Webhook $webhook) use ($url) {return $webhook->getUrl() === $url;})) ?? [];
     }
 
     /**
