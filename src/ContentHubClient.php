@@ -688,9 +688,21 @@ class ContentHubClient extends Client
     public function updateWebhook($uuid, array $options)
     {
       if (isset($options['version']) && !in_array($options['version'], [1, 2], TRUE)) {
-        $options['version'] = 2;
+          $options['version'] = 2;
       }
-      $data['body'] = json_encode($options);
+      $acceptable_keys = [
+          'version',
+          'url',
+          'disable_retries',
+          'status',
+      ];
+      $values = [];
+      foreach ($acceptable_keys as $key) {
+          if (isset($options[$key])) {
+              $values[$key] = $options[$key];
+          }
+      }
+      $data['body'] = json_encode($values);
       return $this->put("settings/webhooks/$uuid", $data);
     }
 
