@@ -687,18 +687,34 @@ class ContentHubClient extends Client
     /**
      * Updates a webhook from the active subscription.
      *
-     * @param $uuid
-     *   The UUID of the webhook to update
+     * @param string $uuid
+     *   The UUID of the webhook to update.
+     * @param array $options
+     *   What to change in the webhook: url, version, disable_retries, etc.
      *
      * @return \Psr\Http\Message\ResponseInterface
      *
      * @throws \GuzzleHttp\Exception\RequestException
      */
-    public function updateWebhook($uuid, $url)
+    public function updateWebhook($uuid, array $options)
     {
-        $options['body'] = json_encode(['url' => $url]);
-
-        return $this->put("settings/webhooks/$uuid", $options);
+      if (isset($options['version']) && !in_array($options['version'], [1, 2], TRUE)) {
+          $options['version'] = 2;
+      }
+      $acceptable_keys = [
+          'version',
+          'url',
+          'disable_retries',
+          'status',
+      ];
+      $values = [];
+      foreach ($acceptable_keys as $key) {
+          if (isset($options[$key])) {
+              $values[$key] = $options[$key];
+          }
+      }
+      $data['body'] = json_encode($values);
+      return $this->put("settings/webhooks/$uuid", $data);
     }
 
     /**
