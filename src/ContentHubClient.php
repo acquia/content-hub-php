@@ -994,7 +994,7 @@ class ContentHubClient extends Client
             }
             $args[0] = self::makePath(...$parts);
 
-            $args = $this->addSearchCriteriaHeader($args);
+            $args = $this->addSearchCriteriaHeader($args, $this->getConfig(self::OPTION_NAME_LANGUAGES));
 
             return parent::__call($method, $args);
         } catch (\Exception $e) {
@@ -1217,16 +1217,18 @@ class ContentHubClient extends Client
         $config['handler']->push(new RequestResponseHandler($this->logger));
     }
 
-    /**
-     * Appends search criteria header.
-     *
-     * @param array $args
-     *   Method arguments.
-     *
-     * @return array
-     *   Processed arguments.
-     */
-    protected function addSearchCriteriaHeader(array $args): array
+  /**
+   * Appends search criteria header.
+   *
+   * @param array $args
+   *   Method arguments.
+   *
+   * @param mixed $languages
+   *
+   * @return array
+   *   Processed arguments.
+   */
+    protected function addSearchCriteriaHeader(array $args, $languages): array
     {
         [, $queryString] = explode('?', $args[0] ?? '');
 
@@ -1235,8 +1237,6 @@ class ContentHubClient extends Client
         }
 
         parse_str($queryString, $parsedQueryString);
-
-        $languages = $this->getConfig(self::OPTION_NAME_LANGUAGES);
 
         if (!empty($languages) && is_array($languages)) {
             $parsedQueryString['languages'] = $languages;
