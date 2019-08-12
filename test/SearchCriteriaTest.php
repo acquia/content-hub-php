@@ -5,7 +5,9 @@ namespace Acquia\ContentHubClient\test;
 use PHPUnit\Framework\TestCase;
 use Acquia\ContentHubClient\SearchCriteria\Transformer;
 
-
+/**
+ * @coversDefaultClass \Acquia\ContentHubClient\SearchCriteria\Transformer
+ */
 class SearchCriteriaTest extends TestCase {
 
   /**
@@ -18,6 +20,9 @@ class SearchCriteriaTest extends TestCase {
    */
   private $expected;
 
+  /**
+   * @before
+   */
   public function setUp() {
     $this->data = [
       'search_term' => 'some-search-term',
@@ -65,14 +70,23 @@ class SearchCriteriaTest extends TestCase {
         ],
     ];
   }
-  public function test_result_when_all_keys_are_present_in_data(): void {
+
+  /**
+   * @covers ::arrayToSearchCriteriaArray
+   * @preserveGlobalState disabled
+   */
+  public function testResultWhenAllKeysArePresentInData(): void {
     $data = $this->data;
     $expected = $this->expected;
 
     self::assertEquals(Transformer::arrayToSearchCriteriaArray($data), $expected);
   }
 
-  public function test_missing_keys_get_default_values(): void {
+  /**
+   * @covers ::arrayToSearchCriteriaArray
+   * @preserveGlobalState disabled
+   */
+  public function testMissingKeysGetDefaultValues(): void {
     $data = $this->data;
     $expected = $this->expected;
 
@@ -84,7 +98,11 @@ class SearchCriteriaTest extends TestCase {
     self::assertEquals(Transformer::arrayToSearchCriteriaArray($data), $expected);
   }
 
-  public function test_keys_with_alternate_possible_keys_receive_correct_data(): void {
+  /**
+   * @covers ::arrayToSearchCriteriaArray
+   * @preserveGlobalState disabled
+   */
+  public function testKeysWithAlternatePossibleKeysReceiveCorrectData(): void {
     $data = $this->data;
     $expected = $this->expected;
 
@@ -101,7 +119,11 @@ class SearchCriteriaTest extends TestCase {
     self::assertEquals(Transformer::arrayToSearchCriteriaArray($data), $expected);
   }
 
-  public function test_if_default_value_is_array_value_will_always_be_array(): void {
+  /**
+   * @covers ::arrayToSearchCriteriaArray
+   * @preserveGlobalState disabled
+   */
+  public function testIfDefaultValueIsArrayValueWillAlwaysBeArray(): void {
     $data = $this->data;
     $expected = $this->expected;
 
