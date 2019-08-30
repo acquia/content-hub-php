@@ -5,7 +5,6 @@ namespace Acquia\ContentHubClient;
 use Acquia\ContentHubClient\CDF\CDFObject;
 use Acquia\ContentHubClient\Event\GetCDFTypeEvent;
 use Acquia\ContentHubClient\Guzzle\Middleware\RequestResponseHandler;
-use Acquia\ContentHubClient\SearchCriteria\Transformer;
 use Acquia\Hmac\Guzzle\HmacAuthMiddleware;
 use Acquia\Hmac\Key;
 use GuzzleHttp\Client;
@@ -29,10 +28,7 @@ class ContentHubClient extends Client
 {
     // Override VERSION inherited from GuzzleHttp::ClientInterface
     const VERSION = '2.0.0';
-
     const LIBRARYNAME = 'AcquiaContentHubPHPLib';
-
-    const OPTION_NAME_LANGUAGES = 'client-languages';
 
     /**
      * The settings.
@@ -994,8 +990,6 @@ class ContentHubClient extends Client
             }
             $args[0] = self::makePath(...$parts);
 
-            $args = $this->addSearchCriteriaHeader($args, $this->getConfig(self::OPTION_NAME_LANGUAGES));
-
             return parent::__call($method, $args);
         } catch (\Exception $e) {
             $exceptionResponse = $this->getExceptionMessage($method, $args, $e);
@@ -1215,39 +1209,5 @@ class ContentHubClient extends Client
         }
 
         $config['handler']->push(new RequestResponseHandler($this->logger));
-    }
-
-  /**
-   * Appends search criteria header.
-   *
-   * @param array $args
-   *   Method arguments.
-   *
-   * @param mixed $languages
-   *
-   * @return array
-   *   Processed arguments.
-   */
-    protected function addSearchCriteriaHeader(array $args, $languages): array
-    {
-        [, $queryString] = explode('?', $args[0] ?? '');
-
-        if (empty($queryString)) {
-            return $args;
-        }
-
-        parse_str($queryString, $parsedQueryString);
-
-        if (!empty($languages) && is_array($languages)) {
-            $parsedQueryString['languages'] = $languages;
-        }
-
-        $args[1]['headers']['X-Acquia-Content-Hub-Search-Criteria'] = base64_encode(
-          json_encode(
-            Transformer::arrayToSearchCriteriaArray($parsedQueryString)
-          )
-        );
-
-        return $args;
     }
 }
