@@ -3,7 +3,5 @@ build
 vendor
 composer.lock
 
-.DS_Store
-
 nbproject
 .idea
