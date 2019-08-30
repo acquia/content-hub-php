@@ -86,7 +86,8 @@ class CDFAttribute
         }
         $this->id = $id;
         $this->type = $type;
-        if ($value) {
+
+        if ($value !== NULL) {
             $this->value[$language] = $value;
         }
     }
