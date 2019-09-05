@@ -1232,11 +1232,11 @@ class ContentHubClient extends Client
     {
         $result = explode('?', $args[0] ?? '');
 
-        if (count($result) < 2) {
+        if (!isset($result[1])) {
           return $args;
         }
 
-        [, $queryString] = $result;
+        $queryString = (string)$result[1];
 
         if (empty($queryString)) {
           return $args;
