@@ -591,19 +591,20 @@ class ContentHubClient extends Client
     {
         $data = $this->getResponseJson($this->get('settings'));
 
-        return $data['clients'];
+        return $data['clients'] ?? [];
     }
 
     /**
-     * @return mixed
+     * @return \Acquia\ContentHubClient\Webhook[]
      *
      * @throws \Exception
      */
     public function getWebHooks()
     {
         $data = $this->getResponseJson($this->get('settings'));
-
-        return $data['webhooks'];
+        $webhooks = $data['webhooks'] ?? [];
+        array_walk($webhooks, function(&$webhook) {$webhook = new Webhook($webhook);});
+        return $webhooks;
     }
 
     /**
@@ -615,13 +616,7 @@ class ContentHubClient extends Client
      */
     public function getWebHook($url)
     {
-        $webhooks = $this->getWebHooks();
-        foreach ($webhooks as $webhook) {
-            if ($webhook['url'] == $url) {
-                return $webhook;
-            }
-        }
-        return [];
+        return current(array_filter($this->getWebHooks(), function (Webhook $webhook) use ($url) {return $webhook->getUrl() === $url;})) ?? [];
     }
 
     /**
@@ -696,18 +691,34 @@ class ContentHubClient extends Client
     /**
      * Updates a webhook from the active subscription.
      *
-     * @param $uuid
-     *   The UUID of the webhook to update
+     * @param string $uuid
+     *   The UUID of the webhook to update.
+     * @param array $options
+     *   What to change in the webhook: url, version, disable_retries, etc.
      *
      * @return \Psr\Http\Message\ResponseInterface
      *
      * @throws \GuzzleHttp\Exception\RequestException
      */
-    public function updateWebhook($uuid, $url)
+    public function updateWebhook($uuid, array $options)
     {
-        $options['body'] = json_encode(['url' => $url]);
-
-        return $this->put("settings/webhooks/$uuid", $options);
+      if (isset($options['version']) && !in_array($options['version'], [1, 2], TRUE)) {
+          $options['version'] = 2;
+      }
+      $acceptable_keys = [
+          'version',
+          'url',
+          'disable_retries',
+          'status',
+      ];
+      $values = [];
+      foreach ($acceptable_keys as $key) {
+          if (isset($options[$key])) {
+              $values[$key] = $options[$key];
+          }
+      }
+      $data['body'] = json_encode($values);
+      return $this->put("settings/webhooks/$uuid", $data);
     }
 
     /**
