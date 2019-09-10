@@ -1229,13 +1229,16 @@ class ContentHubClient extends Client
      */
     protected function addSearchCriteriaHeader(array $args)
     {
-        $uri = $args[0] ?? '';
-        list(, $queryString) = explode('?', $uri);
-        if (strpos($uri, '?') === false || empty($queryString)) {
-            return $args;
+        $result = explode('?', $args[0] ?? '');
+        if (count($result) < 2) {
+          return $args;
         }
-
+        [, $queryString] = $result;
+        if (empty($queryString)) {
+          return $args;
+        }
         parse_str($queryString, $parsedQueryString);
+
         $languages = $this->getConfig(self::OPTION_NAME_LANGUAGES);
         if (!empty($languages) && is_array($languages)) {
             $parsedQueryString['languages'] = $languages;
