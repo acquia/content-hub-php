@@ -206,8 +206,11 @@ class Attribute extends \ArrayObject
     {
         // If this attribute has more than one single element then it obviously
         // has cardinality greater than 1 or unlimited so just return it as is.
-        if (count($this->getValue()) > 1) {
-            return $this;
+        $value = $this->getValue();
+        if (is_array($value) || $value instanceof Countable) {
+            if (count($value) > 1) {
+                return $this;
+            }
         }
 
         $attributeType = $this->getType();
