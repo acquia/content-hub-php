@@ -13,6 +13,20 @@ class CDFDocument
 {
 
     /**
+     * An array of entity dependencies keyed by parent entity uuid.
+     *
+     * @var array
+     */
+    protected $dependencies = [];
+
+    /**
+     * An array of entity ancestors keyed by the child entity uuid.
+     *
+     * @var array
+     */
+    protected $ancestors = [];
+
+    /**
      * Entities list.
      *
      * @var \Acquia\ContentHubClient\CDF\CDFObject[]
@@ -63,11 +77,11 @@ class CDFDocument
      */
     public function setCdfEntities(CDFObject ...$entities)
     {
-        $entitiesList = [];
+        $this->entities = [];
+
         foreach ($entities as $entity) {
-            $entitiesList[$entity->getUuid()] = $entity;
+            $this->addCdfEntity($entity);
         }
-        $this->entities = $entitiesList;
     }
 
     /**
@@ -79,6 +93,7 @@ class CDFDocument
     public function addCdfEntity(CDFObject $object)
     {
         $this->entities[$object->getUuid()] = $object;
+        $this->generateDependencyMap($object);
     }
 
     /**
@@ -89,7 +104,17 @@ class CDFDocument
      */
     public function removeCdfEntity($uuid)
     {
-        unset($this->entities[$uuid]);
+        $children = $this->getDependencies($uuid);
+
+        unset($this->entities[$uuid], $this->dependencies[$uuid]);
+
+        foreach ($children as $child) {
+            unset($this->ancestors[$child][$uuid]);
+
+            if (empty($this->getDependencies($child)) && empty($this->getAncestors($child))) {
+                $this->removeCdfEntity($child);
+            }
+        }
     }
 
     /**
@@ -146,4 +171,22 @@ class CDFDocument
 
         return json_encode($output, JSON_PRETTY_PRINT);
     }
+
+    protected function generateDependencyMap(CDFObject $entity) {
+        $uuid = $entity->getUuid();
+        $this->dependencies[$uuid] = array_keys($entity->getMetadata()['dependencies']['entity'] ?? []);
+
+        foreach ($this->dependencies[$uuid] as $child_uuid) {
+            $this->ancestors[$child_uuid][$uuid] = $uuid;
+        }
+    }
+
+    public function getDependencies(string $uuid): array {
+        return $this->dependencies[$uuid] ?? [];
+    }
+
+    public function getAncestors(string $uuid): array {
+        return $this->ancestors[$uuid] ?? [];
+    }
+
 }
