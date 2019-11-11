@@ -12,7 +12,9 @@ php:
   - hhvm-3.18
 
 before_script:
+  - composer require --dev php-coveralls/php-coveralls
   - composer install
 
 after_script:
+  - travis_retry php vendor/bin/php-coveralls -v
   - vendor/bin/ocular code-coverage:upload --format=php-clover build/logs/clover.xml
