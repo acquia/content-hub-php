@@ -14,6 +14,8 @@ class ClientCDFObject extends CDFObject
 {
 
     /**
+     * Settings object.
+     *
      * @var Settings
      */
     protected $settings;
@@ -22,9 +24,13 @@ class ClientCDFObject extends CDFObject
      * ClientCDFObject constructor wrapper.
      *
      * @param string $uuid
+     *   Object UUID.
      * @param array $metadata
+     *   Object metadata.
      *
      * @return \Acquia\ContentHubClient\CDF\ClientCDFObject
+     *   The ClientCDFObject instance.
+     *
      * @throws \Exception
      */
     public static function create($uuid, array $metadata)
@@ -38,6 +44,7 @@ class ClientCDFObject extends CDFObject
      * Grabs the clientname on the cdf.
      *
      * @return \Acquia\ContentHubClient\CDFAttribute
+     *   The 'clientname' attribute.
      */
     public function getClientName()
     {
@@ -48,6 +55,7 @@ class ClientCDFObject extends CDFObject
      * Grabs the settings object instead of the attributes which are an array.
      *
      * @return \Acquia\ContentHubClient\Settings
+     *   Settings object.
      */
     public function getSettings()
     {
@@ -63,6 +71,7 @@ class ClientCDFObject extends CDFObject
      * Grabs the webhook for the client.
      *
      * @return array
+     *   Webhook array.
      */
     public function getWebhook()
     {

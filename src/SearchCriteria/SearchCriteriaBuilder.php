@@ -23,8 +23,10 @@ class SearchCriteriaBuilder
      * Creates search-criteria instance from array.
      *
      * @param array $data
+     *   An array of initial data.
      *
      * @return \Acquia\ContentHubClient\SearchCriteria\SearchCriteria
+     *   Search criteria object.
      */
     public static function createFromArray(array $data)
     {
@@ -72,10 +74,14 @@ class SearchCriteriaBuilder
      * Extracts property value.
      *
      * @param string $propertyName
+     *   Property name.
      * @param array $data
+     *   Data array.
      * @param string $default
+     *   Default value.
      *
      * @return array|mixed|string
+     *   Extracted value.
      */
     protected static function extractPropertyFromArray(string $propertyName, array $data, $default = '')
     {

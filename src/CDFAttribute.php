@@ -74,8 +74,9 @@ class CDFAttribute
      *   The value of the attribute.
      * @param string $language
      *   The language of the initial value.
-     *
-     * @throws \Exception Unsupported data type exception.
+
+     * @throws \Exception
+     *   Unsupported data type exception.
      */
     public function __construct($id, $type, $value = null, $language = CDFObject::LANGUAGE_UNDETERMINED)
     {
@@ -130,12 +131,12 @@ class CDFAttribute
      *
      * @param mixed $value
      *   Attribute value.
-     * @param string $langauge
+     * @param string $language
      *   Attribute language.
      */
-    public function setValue($value, $langauge = CDFObject::LANGUAGE_UNDETERMINED)
+    public function setValue($value, $language = CDFObject::LANGUAGE_UNDETERMINED)
     {
-        $this->value[$langauge] = $value;
+        $this->value[$language] = $value;
     }
 
     /**

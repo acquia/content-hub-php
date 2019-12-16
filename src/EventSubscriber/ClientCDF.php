@@ -33,11 +33,11 @@ class ClientCDF implements EventSubscriberInterface
      *
      * @throws \Exception
      */
-    public function onGetCDFType(GetCDFTypeEvent $event)
+    public function onGetCDFType(GetCDFTypeEvent $event) // phpcs:ignore
     {
         if ($event->getType() === 'client') {
             $data = $event->getData();
-            /* @deprecated Backwards Compatiblity, Remove by 2.0 */
+            /* @deprecated Backwards Compatibility, Remove by 2.0 */
             if (!isset($data['metadata']['settings'])) {
               $data['metadata'] = [
                 'settings' => $data['metadata']

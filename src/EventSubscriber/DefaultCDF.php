@@ -32,7 +32,7 @@ class DefaultCDF implements EventSubscriberInterface
      *
      * @throws \ReflectionException
      */
-    public function onGetCDFType(GetCDFTypeEvent $event)
+    public function onGetCDFType(GetCDFTypeEvent $event) // phpcs:ignore
     {
         $event->setObject(CDFObject::fromArray($event->getData()));
         $event->stopPropagation();

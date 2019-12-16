@@ -126,7 +126,7 @@ class Settings
     /**
      * Returns the Uuid.
      *
-     * @return string | boolean
+     * @return string|boolean
      *   UUID attribute.
      */
     public function getUuid()
@@ -202,7 +202,10 @@ class Settings
     }
 
     /**
+     * Returns the shared secret value.
+     *
      * @return null|string
+     *   The shared secret value.
      */
     public function getSharedSecret()
     {

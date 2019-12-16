@@ -15,14 +15,17 @@ class RequestResponseHandler
 {
 
     /**
+     * Logger instance.
+     *
      * @var \Psr\Log\LoggerInterface
      */
     protected $logger;
 
     /**
-     * RequestLogger constructor.
+     * RequestResponseHandler constructor.
      *
      * @param \Psr\Log\LoggerInterface $logger
+     *   Logger.
      */
     public function __construct(LoggerInterface $logger)
     {
@@ -33,8 +36,10 @@ class RequestResponseHandler
      * Logs any response/request.
      *
      * @param callable $handler
+     *   Request handler.
      *
      * @return \Closure
+     *   Request handler.
      */
     public function __invoke(callable $handler): Closure
     {

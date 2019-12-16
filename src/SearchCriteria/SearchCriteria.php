@@ -22,61 +22,85 @@ class SearchCriteria implements \JsonSerializable
     const DEFAULT_VERSION = '2.0';
 
     /**
+     * Search term.
+     *
      * @var string
      */
     protected $searchTerm;
 
     /**
+     * Entity types.
+     *
      * @var array
      */
     protected $entityType;
 
     /**
+     * Entity bundles.
+     *
      * @var array
      */
     protected $bundle;
 
     /**
+     * Entity tags list.
+     *
      * @var array
      */
     protected $tags;
 
     /**
+     * Entity label.
+     *
      * @var string
      */
     protected $label;
 
     /**
+     * Start date of the search interval.
+     *
      * @var \DateTimeInterface
      */
     protected $startDate;
 
     /**
+     * End date of the search interval.
+     *
      * @var \DateTimeInterface
      */
     protected $endDate;
 
     /**
+     * Search offset.
+     *
      * @var int
      */
     protected $from;
 
     /**
+     * Search limit.
+     *
      * @var int
      */
     protected $size;
 
     /**
+     * Sorting order.
+     *
      * @var string
      */
     protected $sorting;
 
     /**
+     * Search version.
+     *
      * @var string
      */
     protected $version;
 
     /**
+     * Languages list.
+     *
      * @var array
      */
     protected $languages;
@@ -85,17 +109,29 @@ class SearchCriteria implements \JsonSerializable
      * SearchCriteria constructor.
      *
      * @param string $searchTerm
+     *   Search term.
      * @param array $entityType
+     *   Entity types.
      * @param array $bundle
+     *   Bundles list.
      * @param array $tags
+     *   Tags list.
      * @param string $label
-     * @param \DateTimeInterface $startDate
-     * @param \DateTimeInterface $endDate
+     *   Entity label.
+     * @param \DateTimeInterface|null $startDate
+     *   Start date of the search interval.
+     * @param \DateTimeInterface|null $endDate
+     *   End date of the search interval.
      * @param int $from
+     *   Search offset.
      * @param int $size
+     *   Search limit.
      * @param string $sorting
+     *   Sorting order.
      * @param string $version
+     *   Search version.
      * @param array $languages
+     *   Languages list.
      */
     public function __construct(
       string $searchTerm,
@@ -147,7 +183,10 @@ class SearchCriteria implements \JsonSerializable
     }
 
     /**
+     * Search term getter.
+     *
      * @return string
+     *   Search term.
      */
     public function getSearchTerm(): string
     {
@@ -155,7 +194,10 @@ class SearchCriteria implements \JsonSerializable
     }
 
     /**
+     * Entity types getter.
+     *
      * @return array
+     *   Entity types list.
      */
     public function getEntityType(): array
     {
@@ -163,7 +205,10 @@ class SearchCriteria implements \JsonSerializable
     }
 
     /**
+     * Bundle getter.
+     *
      * @return array
+     *  Bundles list.
      */
     public function getBundle(): array
     {
@@ -171,7 +216,10 @@ class SearchCriteria implements \JsonSerializable
     }
 
     /**
+     * Tags getter.
+     *
      * @return array
+     *   Tags list.
      */
     public function getTags(): array
     {
@@ -179,7 +227,10 @@ class SearchCriteria implements \JsonSerializable
     }
 
     /**
+     * Label getter.
+     *
      * @return string
+     *   Label.
      */
     public function getLabel(): string
     {
@@ -187,7 +238,10 @@ class SearchCriteria implements \JsonSerializable
     }
 
     /**
+     * Start date getter.
+     *
      * @return \DateTimeInterface|null
+     *   Search start date.
      */
     public function getStartDate(): ?DateTimeInterface
     {
@@ -195,7 +249,10 @@ class SearchCriteria implements \JsonSerializable
     }
 
     /**
+     * End date getter.
+     *
      * @return \DateTimeInterface|null
+     *   Search end date.
      */
     public function getEndDate(): ?DateTimeInterface
     {
@@ -203,7 +260,10 @@ class SearchCriteria implements \JsonSerializable
     }
 
     /**
+     * Returns number of items that should be skipped before selection.
+     *
      * @return int
+     *   A number of items that should be skipped before selection.
      */
     public function getFrom(): int
     {
@@ -211,7 +271,10 @@ class SearchCriteria implements \JsonSerializable
     }
 
     /**
+     * Returns how many items should be selected.
+     *
      * @return int
+     *   Number of items that should be selected.
      */
     public function getSize(): int
     {
@@ -219,7 +282,10 @@ class SearchCriteria implements \JsonSerializable
     }
 
     /**
+     * Sorting getter.
+     *
      * @return string
+     *   Sorting value.
      */
     public function getSorting(): string
     {
@@ -227,7 +293,10 @@ class SearchCriteria implements \JsonSerializable
     }
 
     /**
+     * Version getter.
+     *
      * @return string
+     *   Version string.
      */
     public function getVersion(): string
     {
@@ -235,7 +304,10 @@ class SearchCriteria implements \JsonSerializable
     }
 
     /**
+     * Languages getter.
+     *
      * @return array
+     *   Languages list.
      */
     public function getLanguages(): array
     {
@@ -243,7 +315,10 @@ class SearchCriteria implements \JsonSerializable
     }
 
     /**
+     * Languages setter.
+     *
      * @param array $languages
+     *   Languages list.
      */
     public function setLanguages(array $languages): void
     {

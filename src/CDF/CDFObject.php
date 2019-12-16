@@ -100,9 +100,13 @@ class CDFObject implements CDFObjectInterface
      * Static Factory method to allow CDFObject to interpret their own data.
      *
      * @param array $data
+     *   Initial data.
      *
      * @return \Acquia\ContentHubClient\CDF\CDFObject
+     *   The CDF object instance.
+     *
      * @throws \ReflectionException
+     * @throws \Exception
      */
     public static function fromArray(array $data)
     {
@@ -128,8 +132,11 @@ class CDFObject implements CDFObjectInterface
      * Static Factory method to format data from JSON into the CDFObject.
      *
      * @param string $json
+     *   Data in JSON format.
      *
      * @return \Acquia\ContentHubClient\CDF\CDFObject
+     *   The CDFObject instance.
+     *
      * @throws \ReflectionException
      */
     public static function fromJson(string $json)
@@ -246,6 +253,8 @@ class CDFObject implements CDFObjectInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @throws \Exception
      */
     public function addAttribute($id, $type, $value = null, $language = self::LANGUAGE_UNDETERMINED, $className = CDFAttribute::class)
     {

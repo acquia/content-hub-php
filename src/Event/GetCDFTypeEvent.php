@@ -21,14 +21,16 @@ class GetCDFTypeEvent extends Event
     protected $data;
 
     /**
+     * The CDF type.
+     *
      * @var string
-     *   The CDF Type
      */
     protected $type;
 
     /**
+     * The instantiated object.
+     *
      * @var CDFObjectInterface $cdfObject
-     *   The instantiated Object
      */
     protected $cdfObject;
 

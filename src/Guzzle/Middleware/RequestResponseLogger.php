@@ -15,21 +15,29 @@ use Symfony\Component\HttpFoundation\Response;
 class RequestResponseLogger
 {
     /**
+     * Request object.
+     *
      * @var \Psr\Http\Message\RequestInterface
      */
     protected $request;
 
     /**
+     * Response object.
+     *
      * @var \Psr\Http\Message\ResponseInterface
      */
     protected $response;
 
     /**
+     * Logger instance.
+     *
      * @var \Psr\Log\LoggerInterface
      */
     protected $logger;
 
     /**
+     * Array representation of response body.
+     *
      * @var mixed
      */
     protected $decodedResponseBody;
@@ -38,8 +46,11 @@ class RequestResponseLogger
      * RequestResponseLogger constructor.
      *
      * @param \Psr\Http\Message\RequestInterface $request
+     *   Request object.
      * @param \Psr\Http\Message\ResponseInterface $response
+     *   Response object.
      * @param \Psr\Log\LoggerInterface $logger
+     *   Logger instance.
      */
     public function __construct(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
     {
@@ -67,6 +78,7 @@ class RequestResponseLogger
      * Checks if a response can be tracked.
      *
      * @return bool
+     *   TRUE in the case when the response should be tracked.
      */
     protected function isTrackable(): bool
     {

@@ -9,6 +9,7 @@ use Acquia\ContentHubClient\SearchCriteria\SearchCriteria;
 use Acquia\ContentHubClient\SearchCriteria\SearchCriteriaBuilder;
 use Acquia\Hmac\Guzzle\HmacAuthMiddleware;
 use Acquia\Hmac\Key;
+use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\ClientException;
@@ -20,6 +21,7 @@ use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use function GuzzleHttp\default_user_agent;
 
 /**
  * Class ContentHubClient.
@@ -74,7 +76,7 @@ class ContentHubClient extends Client
         }
 
         // Setting up the User Header string.
-        $user_agent_string = self::LIBRARYNAME . '/' . self::VERSION . ' ' . \GuzzleHttp\default_user_agent();
+        $user_agent_string = self::LIBRARYNAME . '/' . self::VERSION . ' ' . default_user_agent();
         if (isset($config['client-user-agent'])) {
             $user_agent_string = $config['client-user-agent'] . ' ' . $user_agent_string;
         }
@@ -99,6 +101,7 @@ class ContentHubClient extends Client
      * Pings the service to ensure that it is available.
      *
      * @return \Psr\Http\Message\ResponseInterface
+     *   Response in JSON format.
      *
      * @throws \GuzzleHttp\Exception\RequestException
      * @throws \Exception
@@ -114,13 +117,15 @@ class ContentHubClient extends Client
     }
 
     /**
-     * Discoverability of the API
+     * Discoverability of the API.
      *
      * @param string $endpoint
+     *   API endpoint URL.
      *
      * @return array
+     *   Options list.
      *
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \Exception
      */
     public function definition($endpoint = '')
     {
@@ -132,13 +137,25 @@ class ContentHubClient extends Client
      *
      * This method also returns the UUID for the new client being registered.
      *
+     * @param \Psr\Log\LoggerInterface $logger
+     *   Logger instance.
+     * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
+     *   Event dispatcher instance.
      * @param string $name
      *   The human-readable name for the client.
+     * @param string $url
+     *   Request URL
+     * @param string $api_key
+     *   API key.
+     * @param string $secret
+     *   Secret key.
+     * @param string $api_version
+     *   API version string.
      *
      * @return \Acquia\ContentHubClient\ContentHubClient
+     *    ContentHubClient instance.
      *
      * @throws \Exception
-     * @throws \GuzzleHttp\Exception\RequestException
      */
     public static function register(LoggerInterface $logger, EventDispatcherInterface $dispatcher, $name, $url, $api_key, $secret, $api_version = 'v2')
     {
@@ -146,7 +163,7 @@ class ContentHubClient extends Client
             'base_uri' => self::makeBaseURL($url, $api_version),
             'headers' => [
                 'Content-Type' => 'application/json',
-                'User-Agent' => self::LIBRARYNAME . '/' . self::VERSION . ' ' . \GuzzleHttp\default_user_agent(),
+                'User-Agent' => self::LIBRARYNAME . '/' . self::VERSION . ' ' . default_user_agent(),
             ],
             'handler' => HandlerStack::create(),
         ];
@@ -176,7 +193,7 @@ class ContentHubClient extends Client
             $settings = new Settings($settings->getName(), $settings->getUuid(), $settings->getApiKey(), $settings->getSecretKey(), $settings->getUrl(), $remote['shared_secret']);
             return new static($config, $logger, $settings, $settings->getMiddleware(), $dispatcher);
         }
-        catch (\Exception $exception) {
+        catch (Exception $exception) {
             if ($exception instanceof ClientException || $exception instanceof BadResponseException) {
               $message = sprintf('Error registering client with name="%s" (Error Code = %d: %s)', $name, $exception->getResponse()->getStatusCode(), $exception->getResponse()->getReasonPhrase());
               $logger->error($message);
@@ -189,18 +206,23 @@ class ContentHubClient extends Client
             }
             $message = sprintf("An unknown exception was caught. Message: %s", $exception->getMessage());
             $logger->error($message);
-            throw new \Exception($message);
+            throw new Exception($message);
         }
     }
 
     /**
      * Checks Plexus to see if the client name is already in use.
      *
-     * @param $name
-     * @param $url
-     * @param $api_key
-     * @param $secret
+     * @param string $name
+     *   Client name.
+     * @param string $url
+     *   Request URL.
+     * @param string $api_key
+     *   API key.
+     * @param string $secret
+     *   Secret key.
      * @param string $api_version
+     *   API version.
      *
      * @return boolean
      *   Whether the clientName from the request matches the name passed to it.
@@ -211,7 +233,7 @@ class ContentHubClient extends Client
             'base_uri' => self::makeBaseURL($url, $api_version),
             'headers' => [
                 'Content-Type' => 'application/json',
-                'User-Agent' => self::LIBRARYNAME . '/' . self::VERSION . ' ' . \GuzzleHttp\default_user_agent(),
+                'User-Agent' => self::LIBRARYNAME . '/' . self::VERSION . ' ' . default_user_agent(),
             ],
             'handler' => HandlerStack::create(),
         ];
@@ -228,7 +250,7 @@ class ContentHubClient extends Client
             $client->get("settings/clients/$name");
 
             return true;
-        } catch (\GuzzleHttp\Exception\ClientException $error) {
+        } catch (ClientException $error) {
             return $error->getResponse()->getStatusCode() != 404;
         }
     }
@@ -240,7 +262,7 @@ class ContentHubClient extends Client
    *   Individual CDFObjects to send to ContentHub.
    *
    * @return \Psr\Http\Message\ResponseInterface
-   *
+   *   Response object.
    */
     public function createEntities(CDFObject ...$objects)
     {
@@ -257,13 +279,14 @@ class ContentHubClient extends Client
     /**
      * Returns an entity by UUID.
      *
-     * @param  string $uuid
+     * @param string $uuid
+     *   Entity' UUID.
      *
      * @return \Acquia\ContentHubClient\CDF\CDFObjectInterface|array
      *   A CDFObject representing the entity or an array if there was no data.
      *
      * @throws \GuzzleHttp\Exception\RequestException
-     * @throws \ReflectionException
+     * @throws \Exception
      *
      * @todo can we return a CDFObject here?
      */
@@ -280,13 +303,14 @@ class ContentHubClient extends Client
     /**
      * Searches for entities.
      *
-     * @param  array $uuids
+     * @param array $uuids
      *   An array of UUIDs.
      *
      * @return \Acquia\ContentHubClient\CDFDocument
+     *   CDF document.
      *
      * @throws \GuzzleHttp\Exception\RequestException
-     * @throws \ReflectionException
+     * @throws \Exception
      */
     public function getEntities(array $uuids)
     {
@@ -321,10 +345,11 @@ class ContentHubClient extends Client
     /**
      * Retrieves a CDF Object
      *
-     * @param $data
+     * @param array $data
+     *   Data array.
      *
      * @return \Acquia\ContentHubClient\CDF\CDFObjectInterface
-     * @throws \ReflectionException
+     *   CDF object.
      */
     protected function getCDFObject($data)
     {
@@ -340,10 +365,10 @@ class ContentHubClient extends Client
    * The entity does not need to be passed to this method, but only the resource URL.
    *
    * @param \Acquia\ContentHubClient\CDF\CDFObject $object
-   *   The CDFObject
+   *   The CDFObject.
    *
    * @return \Psr\Http\Message\ResponseInterface
-   *
+   *   Response object.
    */
     public function putEntity(CDFObject $object)
     {
@@ -358,7 +383,7 @@ class ContentHubClient extends Client
    *   The CDFObjects to update.
    *
    * @return \Psr\Http\Message\ResponseInterface
-   *
+   *   Response object.
    */
     public function putEntities(CDFObject ...$objects)
     {
@@ -374,9 +399,13 @@ class ContentHubClient extends Client
     }
 
     /**
+     * Pushes entities to the ContentHub.
+     *
      * @param \Acquia\ContentHubClient\CDF\CDFObject ...$objects
+     *   CDF objects array.
      *
      * @return \Psr\Http\Message\ResponseInterface
+     *   Response object.
      */
     public function postEntities(CDFObject ...$objects)
     {
@@ -393,9 +422,11 @@ class ContentHubClient extends Client
     /**
      * Deletes an entity by UUID.
      *
-     * @param  string                                 $uuid
+     * @param string $uuid
+     *   Entity UUID.
      *
      * @return \Psr\Http\Message\ResponseInterface
+     *   Response object.
      *
      * @throws \GuzzleHttp\Exception\RequestException
      */
@@ -407,10 +438,13 @@ class ContentHubClient extends Client
   /**
    * Deletes an entity from a webhook's interest list.
    *
-   * @param  string                                 $uuid
-   * @param  string                                 $webhook_uuid
+   * @param string $uuid
+   *   Interest UUID.
+   * @param string $webhook_uuid
+   *   Webhook UUID.
    *
    * @return \Psr\Http\Message\ResponseInterface
+   *   Response object.
    */
     public function deleteInterest($uuid, $webhook_uuid) {
       return $this->delete("/interest/$uuid/$webhook_uuid");
@@ -425,6 +459,7 @@ class ContentHubClient extends Client
      * backup. Be VERY careful when using this endpoint.
      *
      * @return mixed
+     *   Response in JSON format.
      *
      * @throws \Exception
      */
@@ -441,6 +476,7 @@ class ContentHubClient extends Client
      * previous state. Be VERY careful when using this endpoint.
      *
      * @return mixed
+     *   Response in JSON format.
      *
      * @throws \Exception
      */
@@ -455,6 +491,7 @@ class ContentHubClient extends Client
      * Schedules a reindex process.
      *
      * @return mixed
+     *   Response in JSON format.
      *
      * @throws \GuzzleHttp\Exception\RequestException
      * @throws \Exception
@@ -475,6 +512,7 @@ class ContentHubClient extends Client
      *   An array with the number of items to show in the list and offset.
      *
      * @return mixed
+     *   Response in JSON format.
      *
      * @throws \Exception
      * @throws \GuzzleHttp\Exception\RequestException
@@ -496,6 +534,7 @@ class ContentHubClient extends Client
      * Retrieves active ElasticSearch mapping of entities.
      *
      * @return mixed
+     *   Response in JSON format.
      *
      * @throws \Exception
      * @throws \GuzzleHttp\Exception\RequestException
@@ -524,8 +563,10 @@ class ContentHubClient extends Client
      * </code>
      *
      * @param array $options
+     *   Array of the search options.
      *
      * @return mixed
+     *   Entities list.
      *
      * @throws \GuzzleHttp\Exception\RequestException
      * @throws \Exception
@@ -557,9 +598,11 @@ class ContentHubClient extends Client
     /**
      * Searches for entities.
      *
-     * @param  array $query
+     * @param array $query
+     *   Query.
      *
      * @return mixed
+     *   Entity representation in JSON format.
      *
      * @throws \Exception
      * @throws \GuzzleHttp\Exception\RequestException
@@ -574,8 +617,10 @@ class ContentHubClient extends Client
      * Returns the Client, given the site name.
      *
      * @param string $name
+     *   Client name.
      *
      * @return mixed
+     *   Client object in JSON format.
      *
      * @throws \Exception
      */
@@ -585,7 +630,11 @@ class ContentHubClient extends Client
     }
 
     /**
+     * Returns clients list.
+     *
      * @return mixed
+     *   Response in JSON format.
+     *
      * @throws \Exception
      */
     public function getClients()
@@ -596,7 +645,10 @@ class ContentHubClient extends Client
     }
 
     /**
+     * Returns an array of webhooks.
+     *
      * @return \Acquia\ContentHubClient\Webhook[]
+     *   An array of webhooks.
      *
      * @throws \Exception
      */
@@ -609,9 +661,13 @@ class ContentHubClient extends Client
     }
 
     /**
-     * @param $url
+     * Returns a webhook object with a provided URL.
      *
-     * @return array
+     * @param string $url
+     *   Webhook URL.
+     *
+     * @return \Acquia\ContentHubClient\Webhook|array
+     *   Webhook object.
      *
      * @throws \Exception
      */
@@ -621,9 +677,13 @@ class ContentHubClient extends Client
     }
 
     /**
-     * @param $webhook_uuid
+     * Returns interest list related to the webhook.
+     *
+     * @param string $webhook_uuid
+     *   Webhook URL.
      *
      * @return array
+     *   Interests array.
      *
      * @throws \Exception
      */
@@ -640,6 +700,7 @@ class ContentHubClient extends Client
      * Get the settings that were used to instantiate this client.
      *
      * @return \Acquia\ContentHubClient\Settings
+     *   Settings object.
      */
     public function getSettings()
     {
@@ -649,7 +710,8 @@ class ContentHubClient extends Client
     /**
      * Obtains the Settings for the active subscription.
      *
-     * @return Settings
+     * @return mixed
+     *   Response in JSON format.
      *
      * @throws \Exception
      */
@@ -661,9 +723,11 @@ class ContentHubClient extends Client
     /**
      * Adds a webhook to the active subscription.
      *
-     * @param $webhook_url
+     * @param string $webhook_url
+     *   Webhook URL.
      *
      * @return mixed
+     *   Response in JSON format.
      *
      * @throws \Exception
      */
@@ -677,10 +741,11 @@ class ContentHubClient extends Client
     /**
      * Deletes a webhook from the active subscription.
      *
-     * @param $uuid
+     * @param string $uuid
      *   The UUID of the webhook to delete
      *
      * @return \Psr\Http\Message\ResponseInterface
+     *   Response object.
      *
      * @throws \GuzzleHttp\Exception\RequestException
      */
@@ -698,6 +763,7 @@ class ContentHubClient extends Client
      *   What to change in the webhook: url, version, disable_retries, etc.
      *
      * @return \Psr\Http\Message\ResponseInterface
+     *   Response object.
      *
      * @throws \GuzzleHttp\Exception\RequestException
      */
@@ -723,7 +789,7 @@ class ContentHubClient extends Client
     }
 
     /**
-     * Add entities to Intrest List.
+     * Add entities to Interest List.
      *
      * @param string $webhook_uuid
      *   The UUID of the webhook
@@ -749,6 +815,7 @@ class ContentHubClient extends Client
      *   The UUID of the client to delete, blank for current client.
      *
      * @return \Psr\Http\Message\ResponseInterface
+     *   Response object.
      *
      * @throws \Exception
      */
@@ -757,7 +824,7 @@ class ContentHubClient extends Client
         $settings = $this->getSettings();
         $uuid = $client_uuid ?? $settings->getUuid();
         if (!$this->deleteEntity($uuid)) {
-          throw new \Exception(sprintf("Entity with UUID = %s cannot be deleted.", $uuid));
+          throw new Exception(sprintf("Entity with UUID = %s cannot be deleted.", $uuid));
         }
         return $this->delete("settings/client/uuid/$uuid");
     }
@@ -765,12 +832,13 @@ class ContentHubClient extends Client
     /**
      * Updates a client from the active subscription.
      *
-     * @param $uuid
+     * @param string $uuid
      *   The UUID of the client to update.
-     * @param $name
+     * @param string $name
      *   The new name for the client we're updating.
      *
      * @return \Psr\Http\Message\ResponseInterface
+     *   Response object.
      *
      * @throws \GuzzleHttp\Exception\RequestException
      */
@@ -784,6 +852,7 @@ class ContentHubClient extends Client
      * Regenerates a Shared Secret for the Subscription.
      *
      * @return array
+     *   Response in JSON format.
      *
      * @throws \GuzzleHttp\Exception\RequestException
      * @throws \Exception
@@ -800,6 +869,7 @@ class ContentHubClient extends Client
      *   The filter UUID.
      *
      * @return array
+     *   Filter object in JSON format.
      *
      * @throws \GuzzleHttp\Exception\RequestException
      * @throws \Exception
@@ -946,6 +1016,7 @@ class ContentHubClient extends Client
      *   Webhook UUID.
      *
      * @return mixed
+     *   Decoded response body.
      * @throws \Exception
      */
     public function removeFilterFromWebhook($filter_id, $webhook_id)
@@ -959,8 +1030,10 @@ class ContentHubClient extends Client
      * Gets a Json Response from a request.
      *
      * @param \Psr\Http\Message\ResponseInterface $response
+     *   Response object.
      *
      * @return mixed
+     *   Decoded response body.
      * @throws \Exception
      */
     public static function getResponseJson(ResponseInterface $response)
@@ -968,9 +1041,9 @@ class ContentHubClient extends Client
 
         try {
           $body = (string) $response->getBody();
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
           $message = sprintf("An exception occurred in the JSON response. Message: %s", $exception->getMessage());
-          throw new \Exception($message);
+          throw new Exception($message);
         }
 
         return json_decode($body, true);
@@ -983,7 +1056,7 @@ class ContentHubClient extends Client
     {
         try {
             if (strpos($args[0], '?')) {
-                list($uri, $query) = explode('?', $args[0]);
+                [$uri, $query] = explode('?', $args[0]);
                 $parts = explode('/', $uri);
                 if ($query) {
                     $last = array_pop($parts);
@@ -998,7 +1071,7 @@ class ContentHubClient extends Client
             $args = $this->addSearchCriteriaHeader($args);
 
             return parent::__call($method, $args);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $exceptionResponse = $this->getExceptionMessage($method, $args, $e);
         }
         $this->logger->error((string)$exceptionResponse->getReasonPhrase());
@@ -1018,10 +1091,10 @@ class ContentHubClient extends Client
    * @param \Exception $exception
    *   The Exception object.
    *
-   * @return ResponseInterface The text to write in the messages.
-   * The text to write in the messages.
+   * @return ResponseInterface
+   *   The text to write in the messages.
    */
-    protected function getExceptionMessage($method, array $args, \Exception $exception)
+    protected function getExceptionMessage($method, array $args, Exception $exception)
     {
         if ($exception instanceof ServerException) {
             return $this->getErrorResponse(500,
@@ -1146,6 +1219,17 @@ class ContentHubClient extends Client
           sprintf('Error trying to connect to the Content Hub (Error Message = %s)', $exception->getMessage()));
     }
 
+    /**
+     * Returns error response.
+     *
+     * @param int $code
+     *   Error code.
+     * @param string $reason
+     *   Error message.
+     *
+     * @return \GuzzleHttp\Psr7\Response
+     *   Response object.
+     */
     protected function getErrorResponse($code, $reason)
     {
         return new Response($code, [], json_encode([]), '1.1', $reason);
@@ -1155,10 +1239,12 @@ class ContentHubClient extends Client
      * Make a base url out of components and add a trailing slash to it
      *
      * @param string[] $base_url_components
+     *   Array of strings.
      *
      * @return string
+     *   Processed string.
      */
-    protected static function makeBaseURL(...$base_url_components): string
+    protected static function makeBaseURL(...$base_url_components): string  // phpcs:ignore
     {
         return self::gluePartsTogether($base_url_components, '/').'/';
     }
@@ -1167,8 +1253,10 @@ class ContentHubClient extends Client
      * Make path out of its individual components
      *
      * @param string[] $path_components
+     *   Array of strings.
      *
      * @return string
+     *   Processed string.
      */
     protected static function makePath(...$path_components): string
     {
@@ -1179,9 +1267,12 @@ class ContentHubClient extends Client
      * Glue all elements of an array together
      *
      * @param array $parts
+     *   Array of strings.
      * @param string $glue
+     *   Glue symbol.
      *
      * @return string
+     *   Processed string.
      */
     protected static function gluePartsTogether(array $parts, string $glue): string
     {
@@ -1192,8 +1283,10 @@ class ContentHubClient extends Client
      * Strip all leading and trailing slashes from all components of the given array
      *
      * @param string[] $components
+     *   Initial array of strings.
      *
      * @return string[]
+     *   Processed array.
      */
     protected static function removeAllLeadingAndTrailingSlashes(array $components): array
     {
@@ -1203,7 +1296,10 @@ class ContentHubClient extends Client
     }
 
     /**
+     * Appends request-response handler.
+     *
      * @param array $config
+     *   Existing config.
      */
     protected function addRequestResponseHandler(array $config): void
     {
