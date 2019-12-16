@@ -6,130 +6,71 @@ namespace Acquia\ContentHubClient\test;
 use Acquia\ContentHubClient\Settings;
 use PHPUnit\Framework\TestCase;
 
-class SettingsTest extends TestCase
-{
+class SettingsTest extends TestCase {
+
   /**
    * @var Settings
    */
   private $settings;
 
   /**
+   * @var array
+   */
+  private $setting_data;
+
+  /**
    *
    */
-  public function setUp() : void
-  {
+  public function setUp(): void {
     parent::setUp();
-    $settingsParameters = $this->getSettingsData();
-    $this->settings = new Settings(
-      $settingsParameters['name'],
-      $settingsParameters['uuid'],
-      $settingsParameters['apiKey'],
-      $settingsParameters['secretKey'],
-      $settingsParameters['url'],
-      $settingsParameters['sharedSecret'],
-      $settingsParameters['webhook']
-    );
-  }
 
-  /**
-   *
-   */
-  public function tearDown() : void
-  {
-    parent::tearDown();
-    unset($this->settings);
-  }
-
-  /**
-   * @dataProvider settingsDataProvider
-   * @param $settingsData
-   */
-  public function testToArray($settingsData)
-  {
-    $this->assertEquals($this->settings->toArray(), $settingsData);
-  }
-
-  /**
-   * @dataProvider settingsDataProvider
-   * @param $settingsData
-   */
-  public function testGetUuid($settingsData)
-  {
-    $emptySettings = new Settings('', '', '', '', '');
-    $this->assertFalse($emptySettings->getUuid());
-    $this->assertEquals($this->settings->getUuid(), $settingsData['uuid']);
-  }
-
-  /**
-   * @dataProvider settingsDataProvider
-   * @param $settingsData
-   */
-  public function testGetWebhook($settingsData)
-  {
-    $this->assertEquals($this->settings->getWebhook('http://example1.com/webhooks'), $settingsData['webhook']['http://example1.com/webhooks']);
-    $this->assertEquals($this->settings->getWebhook('http://example2.com/webhooks'), $settingsData['webhook']['http://example2.com/webhooks']);
-    $this->assertFalse($this->settings->getWebhook('http://non_existing_url'));
-  }
-
-  /**
-   * @dataProvider settingsDataProvider
-   * @param $settingsData
-   */
-  public function testGetUrl($settingsData)
-  {
-    $this->assertEquals($this->settings->getUrl(), $settingsData['url']);
-  }
-
-  /**
-   * @dataProvider settingsDataProvider
-   * @param $settingsData
-   */
-  public function testGetApiKey($settingsData)
-  {
-    $this->assertEquals($this->settings->getApiKey(), $settingsData['apiKey']);
-  }
-
-  /**
-   * @dataProvider settingsDataProvider
-   * @param $settingsData
-   */
-  public function testGetSecretKey($settingsData)
-  {
-    $this->assertEquals($this->settings->getSecretKey(), $settingsData['secretKey']);
-  }
-
-  /**
-   * @dataProvider settingsDataProvider
-   * @param $settingsData
-   */
-  public function testSharedSecret($settingsData)
-  {
-    $this->assertEquals($this->settings->getSharedSecret(), $settingsData['sharedSecret']);
-  }
-
-  public function getSettingsData()
-  {
-    return [
-      'name' => 'testName',
-      'uuid' => '11111111-00000000-00000000-00000000',
-      'apiKey' => 'AAAAAA-AAAAAA-AAAAAA',
-      'secretKey' => 'BBBBBB-BBBBBB-BBBBBB',
-      'url' => 'https://test.url',
-      'sharedSecret' => null,
+    $this->setting_data = [
+      'name' => 'some-name',
+      'uuid' => 'some-uuid',
+      'apiKey' => 'some-api-key',
+      'secretKey' => 'some-secret-key',
+      'url' => 'some-url',
+      'sharedSecret' => 'some-shared-secret',
       'webhook' => [
-        'http://example1.com/webhooks' => '00000000-0000-0000-0000-000000000000',
-        'http://example2.com/webhooks' => '11111111-0000-0000-0000-000000000000',
+        'webhook1' => 'w1-uuid',
+        'webhook2' => 'w2-uuid',
       ],
     ];
+
+    $this->settings = new Settings(...array_values($this->setting_data));
   }
 
-  public function settingsDataProvider()
-  {
-    return [
-      [
-        $this->getSettingsData()
-      ]
-    ];
+  public function tearDown(): void {
+    parent::tearDown();
+
+    unset($this->settings, $this->setting_data);
+  }
+
+  public function testToArrayReturnsExactlyTheArraySettingWasCreatedOff(): void {
+    $this->assertEquals($this->settings->toArray(), $this->setting_data);
+  }
+
+  public function testToGetUuidReturnsFalseIfInitializedWithEmptyValue(): void {
+    $this->setting_data['uuid'] = '';
+    $this->settings = new Settings(...array_values($this->setting_data));
+    $this->assertFalse($this->settings->getUuid());
+  }
+
+  public function testToGetWebhookReturnsFalseIfInitializedWithEmptyValue(): void {
+    $this->setting_data['webhook'] = [];
+    $this->settings = new Settings(...array_values($this->setting_data));
+    $this->assertFalse($this->settings->getWebhook());
+  }
+
+  public function testToGetWebhookReturnsFalseIfCalledWithNonExistentKey(): void {
+    $this->assertFalse($this->settings->getWebhook('some-non-existent-key'));
+  }
+
+  public function testToGetWebhookReturnsRespectiveValuefCalledWithExistentKey(): void {
+    $webhook = $this->settings->getWebhook('webhook1');
+
+    $this->assertNotFalse($webhook);
+    $this->assertEquals('w1-uuid', $webhook);
   }
 
 }

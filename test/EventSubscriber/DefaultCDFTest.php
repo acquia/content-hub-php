@@ -1,7 +1,6 @@
 <?php
 
-namespace Acquia\ContentHubClient\test;
-
+namespace Acquia\ContentHubClient\test\EventSubscriber;
 
 use Acquia\ContentHubClient\CDF\CDFObject;
 use Acquia\ContentHubClient\CDF\CDFObjectInterface;
@@ -14,59 +13,45 @@ use PHPUnit\Framework\TestCase;
  * @runTestsInSeparateProcesses
  * @preserveGlobalState disabled
  */
-class DefaultCDFTest extends TestCase
-{
+class DefaultCDFTest extends TestCase {
+
   /**
    * @var DefaultCDF
    */
   private $defaultCdf;
 
+  private $handler;
+
   /**
    * {@inheritdoc}
    */
-  public function setUp() : void
-  {
+  public function setUp(): void {
     parent::setUp();
+
     $this->defaultCdf = new DefaultCDF();
+    $this->handler = current(current($this->defaultCdf::getSubscribedEvents()[ContentHubLibraryEvents::GET_CDF_CLASS]));
   }
 
   /**
    * {@inheritdoc}
    */
-  public function tearDown() : void
-  {
+  public function tearDown(): void {
     parent::tearDown();
-    unset($this->defaultCdf);
+
+    unset($this->clientCdf, $this->handler);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function testGetSubscribedEvents()
-  {
-    $subscribedEvents = [
-      ContentHubLibraryEvents::GET_CDF_CLASS => [
-        [
-          'onGetCDFType',
-        ],
-      ],
-    ];
-    $this->assertEquals($subscribedEvents, $this->defaultCdf->getSubscribedEvents());
+  public function testGetSubscribedEventsAddsHandlerToEvent() {
+    $this->assertNotNull($this->handler);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function testOnGetCDFType()
-  {
-    $this->assertNull($this->defaultCdf->onGetCDFType($this->getGetCDFTypeEvent()));
-  }
-
-  /**
-   * @return mixed
-   */
-  public function getGetCDFTypeEvent()
-  {
+  public function testHandler() {
     $cdfObjectInterfaceMock = \Mockery::mock(CDFObjectInterface::class);
     $cdfObjectMock = \Mockery::mock('overload:' . CDFObject::class);
 
@@ -79,17 +64,16 @@ class DefaultCDFTest extends TestCase
       ->setMethods(['setObject', 'stopPropagation', 'getData'])
       ->getMock();
 
-    $getCDFTypeEventMock->expects($this->any())
-      ->method('getData')
-      ->willReturn([]);
-    $getCDFTypeEventMock->expects($this->any())
-      ->method('setObject')
-      ->willReturn(null);
-    $getCDFTypeEventMock->expects($this->any())
-      ->method('stopPropagation')
-      ->willReturn(null);
+    $getCDFTypeEventMock->expects($this->once())
+      ->method('getData');
 
-    return $getCDFTypeEventMock;
+    $getCDFTypeEventMock->expects($this->once())
+      ->method('setObject');
+
+    $getCDFTypeEventMock->expects($this->once())
+      ->method('stopPropagation');
+
+    $this->defaultCdf->{$this->handler}($getCDFTypeEventMock);
   }
 
 }

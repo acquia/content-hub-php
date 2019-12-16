@@ -109,12 +109,14 @@ class CDFObject implements CDFObjectInterface
       $object = new static($data['type'], $data['uuid'], $data['created'], $data['modified'], $data['origin'], $data['metadata']);
       foreach ($data['attributes'] as $attribute_name => $values) {
         if (!$attribute = $object->getAttribute($attribute_name)) {
-          $class = !empty($object->getMetadata()['attributes'][$attribute_name]) ? $object->getMetadata()['attributes'][$attribute_name]['class'] : false;
-          if ($class && class_exists($class)) {
-            $object->addAttribute($attribute_name, $values['type'], null, CDFObject::LANGUAGE_UNDETERMINED, $class);
+          $class = $object->getMetadata()['attributes'][$attribute_name]['class'] ?? 'non-existing-class';
+
+          if (class_exists($class)) {
+            $object->addAttribute($attribute_name, $values['type'], null, self::LANGUAGE_UNDETERMINED, $class);
           } else {
             $object->addAttribute($attribute_name, $values['type'], null);
           }
+
           $attribute = $object->getAttribute($attribute_name);
         }
         $value_property = (new \ReflectionClass($attribute))->getProperty('value');

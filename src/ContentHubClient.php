@@ -57,6 +57,8 @@ class ContentHubClient extends Client
     protected $dispatcher;
 
     /**
+     * @codeCoverageIgnore
+
      * {@inheritdoc}
      */
     public function __construct(array $config = [], LoggerInterface $logger, Settings $settings, HmacAuthMiddleware $middleware, EventDispatcherInterface $dispatcher, $api_version = 'v2')
@@ -87,7 +89,7 @@ class ContentHubClient extends Client
         // Add the authentication handler
         // @see https://github.com/acquia/http-hmac-spec
         if (!isset($config['handler'])) {
-            $config['handler'] = HandlerStack::create();
+            $config['handler'] = ObjectFactory::getHandlerStack();
         }
         $config['handler']->push($middleware);
         $this->addRequestResponseHandler($config);
@@ -95,7 +97,7 @@ class ContentHubClient extends Client
         parent::__construct($config);
     }
 
-    /**
+  /**
      * Pings the service to ensure that it is available.
      *
      * @return \Psr\Http\Message\ResponseInterface
@@ -105,26 +107,28 @@ class ContentHubClient extends Client
      *
      * @since 0.2.0
      */
-    public function ping()
-    {
-        $config = $this->getConfig();
-        // Create a new client because ping is not behind hmac.
-        $client = new Client(['base_uri' => self::makeBaseURL($config['base_url'])]);
-        return $this->getResponseJson($client->get('ping'));
+    public function ping() {
+      $makeBaseURL = self::makeBaseURL($this->getConfig()['base_url']);
+      $client = ObjectFactory::getGuzzleClient([
+        'base_uri' => $makeBaseURL
+      ]);
+
+      return self::getResponseJson($client->get('ping'));
     }
 
     /**
+     * @codeCoverageIgnore
+     *
      * Discoverability of the API
      *
      * @param string $endpoint
-     *
      * @return array
      *
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function definition($endpoint = '')
     {
-        return $this->getResponseJson($this->request('options', $endpoint));
+        return self::getResponseJson($this->request('options', $endpoint));
     }
 
     /**
@@ -148,24 +152,24 @@ class ContentHubClient extends Client
                 'Content-Type' => 'application/json',
                 'User-Agent' => self::LIBRARYNAME . '/' . self::VERSION . ' ' . \GuzzleHttp\default_user_agent(),
             ],
-            'handler' => HandlerStack::create(),
+            'handler' => ObjectFactory::getHandlerStack(),
         ];
 
         // Add the authentication handler
         // @see https://github.com/acquia/http-hmac-spec
-        $key = new Key($api_key, $secret);
-        $middleware = new HmacAuthMiddleware($key);
+        $key = ObjectFactory::getAuthenticationKey($api_key, $secret);
+        $middleware = ObjectFactory::getHmacAuthMiddleware($key);
         $config['handler']->push($middleware);
-        $client = new Client($config);
+        $client = ObjectFactory::getGuzzleClient($config);
         $options['body'] = json_encode(['name' => $name]);
         try {
             $response = $client->post('register', $options);
             $values = self::getResponseJson($response);
-            $settings = new Settings($values['name'], $values['uuid'], $api_key, $secret, $url);
+            $settings = ObjectFactory::instantiateSettings($values['name'], $values['uuid'], $api_key, $secret, $url);
             $config = [
-                'base_url' => $settings->getUrl()
+                'base_url' => $settings->getUrl(),
             ];
-            $client = new static($config, $logger, $settings, $settings->getMiddleware(), $dispatcher);
+            $client = ObjectFactory::getCHClient($config, $logger, $settings, $settings->getMiddleware(), $dispatcher);
             // @todo remove this once shared secret is returned on the register
             // endpoint.
             // We need the shared secret to be fully functional, so an additional
@@ -173,11 +177,11 @@ class ContentHubClient extends Client
             $remote = $client->getRemoteSettings();
             // Now that we have the shared secret, reinstantiate everything and
             // return a new instance of this class.
-            $settings = new Settings($settings->getName(), $settings->getUuid(), $settings->getApiKey(), $settings->getSecretKey(), $settings->getUrl(), $remote['shared_secret']);
-            return new static($config, $logger, $settings, $settings->getMiddleware(), $dispatcher);
+            $settings = ObjectFactory::instantiateSettings($settings->getName(), $settings->getUuid(), $settings->getApiKey(), $settings->getSecretKey(), $settings->getUrl(), $remote['shared_secret']);
+            return ObjectFactory::getCHClient($config, $logger, $settings, $settings->getMiddleware(), $dispatcher);
         }
         catch (\Exception $exception) {
-            if ($exception instanceof ClientException || $exception instanceof BadResponseException) {
+            if ($exception instanceof BadResponseException) {
               $message = sprintf('Error registering client with name="%s" (Error Code = %d: %s)', $name, $exception->getResponse()->getStatusCode(), $exception->getResponse()->getReasonPhrase());
               $logger->error($message);
               throw new RequestException($message, $exception->getRequest(), $exception->getResponse());
@@ -213,15 +217,15 @@ class ContentHubClient extends Client
                 'Content-Type' => 'application/json',
                 'User-Agent' => self::LIBRARYNAME . '/' . self::VERSION . ' ' . \GuzzleHttp\default_user_agent(),
             ],
-            'handler' => HandlerStack::create(),
+            'handler' => ObjectFactory::getHandlerStack(),
         ];
 
         // Add the authentication handler
         // @see https://github.com/acquia/http-hmac-spec
-        $key = new Key($api_key, $secret);
-        $middleware = new HmacAuthMiddleware($key);
+        $key = ObjectFactory::getAuthenticationKey($api_key, $secret);
+        $middleware = ObjectFactory::getHmacAuthMiddleware($key);
         $config['handler']->push($middleware);
-        $client = new Client($config);
+        $client = ObjectFactory::getGuzzleClient($config);
         $options['body'] = json_encode(['name' => $name]);
         // Attempt to fetch the client name, if it works
         try {
@@ -269,7 +273,7 @@ class ContentHubClient extends Client
      */
     public function getEntity($uuid)
     {
-        $return = $this->getResponseJson($this->get("entities/$uuid"));
+        $return = self::getResponseJson($this->get("entities/$uuid"));
         if (!empty($return['data']['data'])) {
             return $this->getCDFObject($return['data']['data']);
         }
@@ -288,7 +292,7 @@ class ContentHubClient extends Client
      * @throws \GuzzleHttp\Exception\RequestException
      * @throws \ReflectionException
      */
-    public function getEntities(array $uuids)
+      public function getEntities(array $uuids)
     {
         $chunks = array_chunk($uuids, 50);
         $objects = [];
@@ -305,17 +309,16 @@ class ContentHubClient extends Client
                 ],
               ],
             ];
-            $options['body'] = json_encode((array)$query);
-            $results = $this->getResponseJson($this->get('_search', $options));
-            if (is_array($results) && isset($results['hits']['total']) && $results['hits']['total'] > 0) {
+            $options['body'] = json_encode($query);
+            $results = self::getResponseJson($this->get('_search', $options));
+            if (isset($results['hits']['total'])) {
                 foreach ($results['hits']['hits'] as $key => $item) {
                     $objects[] = $this->getCDFObject($item['_source']['data']);
                 }
             }
         }
-        $document = new CDFDocument(...$objects);
 
-        return $document;
+        return ObjectFactory::getCDFDocument(...$objects);
     }
 
     /**
@@ -328,49 +331,10 @@ class ContentHubClient extends Client
      */
     protected function getCDFObject($data)
     {
-        $event = new GetCDFTypeEvent($data);
+        $event = ObjectFactory::getCDFTypeEvent($data);
         $this->dispatcher->dispatch(ContentHubLibraryEvents::GET_CDF_CLASS, $event);
 
         return $event->getObject();
-    }
-
-  /**
-   * Updates an entity asynchronously.
-   *
-   * The entity does not need to be passed to this method, but only the resource URL.
-   *
-   * @param \Acquia\ContentHubClient\CDF\CDFObject $object
-   *   The CDFObject
-   *
-   * @return \Psr\Http\Message\ResponseInterface
-   *
-   */
-    public function putEntity(CDFObject $object)
-    {
-        $options['body'] = json_encode(['entities' => [$object->toArray()], 'resource' => ""]);
-        return $this->put("entities/{$object->getUuid()}", $options);
-    }
-
-  /**
-   * Updates many entities asynchronously.
-   *
-   * @param \Acquia\ContentHubClient\CDF\CDFObject[] $objects
-   *   The CDFObjects to update.
-   *
-   * @return \Psr\Http\Message\ResponseInterface
-   *
-   */
-    public function putEntities(CDFObject ...$objects)
-    {
-        $json = [
-          'resource' => "",
-        ];
-        foreach ($objects as $object) {
-            $json['data']['entities'][] = $object->toArray();
-        }
-        $options['body'] = json_encode($json);
-
-        return $this->put('entities', $options);
     }
 
     /**
@@ -430,7 +394,7 @@ class ContentHubClient extends Client
      */
     public function purge()
     {
-        return $this->getResponseJson($this->post('entities/purge'));
+        return self::getResponseJson($this->post('entities/purge'));
     }
 
     /**
@@ -446,7 +410,7 @@ class ContentHubClient extends Client
      */
     public function restore()
     {
-        return $this->getResponseJson($this->post('entities/restore'));
+        return self::getResponseJson($this->post('entities/restore'));
     }
 
     /**
@@ -461,7 +425,7 @@ class ContentHubClient extends Client
      */
     public function reindex()
     {
-        return $this->getResponseJson($this->post('reindex'));
+        return self::getResponseJson($this->post('reindex'));
     }
 
     /**
@@ -481,15 +445,15 @@ class ContentHubClient extends Client
      */
     public function logs($query = '', $query_options = [])
     {
-        $query_options = $query_options + [
+        $query_options += [
             'size' => 20,
             'from' => 0,
             'sort' => 'timestamp:desc'
         ];
         $options['body'] = empty($query) ? '{"query": {"match_all": {}}}' : $query;
-        $endpoint = "history?size={$query_options['size']}&from={$query_options['from']}&sort={$query_options['sort']}";
+        $endpoint = 'history?' . http_build_query($query_options);
         $response = $this->post($endpoint, $options);
-        return $this->getResponseJson($response);
+        return self::getResponseJson($response);
     }
 
     /**
@@ -502,7 +466,7 @@ class ContentHubClient extends Client
      */
     public function mapping()
     {
-        return $this->getResponseJson($this->get('_mapping'));
+        return self::getResponseJson($this->get('_mapping'));
     }
 
     /**
@@ -538,20 +502,13 @@ class ContentHubClient extends Client
             'filters' => [],
         ];
 
-        $url = "entities?limit={$variables['limit']}&start={$variables['start']}";
-
-        $url .= isset($variables['type']) ? "&type={$variables['type']}" :'';
-        $url .= isset($variables['origin']) ? "&origin={$variables['origin']}" :'';
-        $url .= isset($variables['language']) ? "&language={$variables['language']}" :'';
-        $url .= isset($variables['fields']) ? "&fields={$variables['fields']}" :'';
-        foreach ($variables['filters'] as $name => $value) {
-            $filter = 'filter_' . $name;
-            $variables[$filter] = $value;
-            $url .= isset($value) ? sprintf('&filter:%s=%s', $name, $value) : '';
+        foreach ($variables['filters'] as $key => $value) {
+          $variables["filter:${key}"] = $value;
         }
+        unset($variables['filters']);
 
         // Now make the request.
-        return $this->getResponseJson($this->get($url));
+        return self::getResponseJson($this->get('entities?' . http_build_query($variables)));
     }
 
     /**
@@ -567,7 +524,7 @@ class ContentHubClient extends Client
     public function searchEntity($query)
     {
         $options['body'] = json_encode((array) $query);
-        return $this->getResponseJson($this->get('_search', $options));
+        return self::getResponseJson($this->get('_search', $options));
     }
 
     /**
@@ -581,7 +538,7 @@ class ContentHubClient extends Client
      */
     public function getClientByName($name)
     {
-        return $this->getResponseJson($this->get("settings/clients/$name"));
+        return self::getResponseJson($this->get("settings/clients/$name"));
     }
 
     /**
@@ -590,7 +547,7 @@ class ContentHubClient extends Client
      */
     public function getClients()
     {
-        $data = $this->getResponseJson($this->get('settings'));
+        $data = $this->getRemoteSettings();
 
         return $data['clients'] ?? [];
     }
@@ -602,15 +559,16 @@ class ContentHubClient extends Client
      */
     public function getWebHooks()
     {
-        $data = $this->getResponseJson($this->get('settings'));
+        $data = $this->getRemoteSettings();
         $webhooks = $data['webhooks'] ?? [];
-        array_walk($webhooks, function(&$webhook) {$webhook = new Webhook($webhook);});
+        array_walk($webhooks, function(&$webhook) {$webhook = ObjectFactory::getWebhook($webhook);});
         return $webhooks;
     }
 
     /**
-     * @param $url
+     * @codeCoverageIgnore
      *
+     * @param $url
      * @return array
      *
      * @throws \Exception
@@ -630,13 +588,15 @@ class ContentHubClient extends Client
     public function getInterestsByWebhook($webhook_uuid)
     {
 
-        $data = $this->getResponseJson($this->get("/interest/webhook/$webhook_uuid"));
+        $data = self::getResponseJson($this->get("/interest/webhook/$webhook_uuid"));
 
         return $data['data']['interests'] ?? [];
 
     }
 
     /**
+     * @codeCoverageIgnore
+     *
      * Get the settings that were used to instantiate this client.
      *
      * @return \Acquia\ContentHubClient\Settings
@@ -647,6 +607,8 @@ class ContentHubClient extends Client
     }
 
     /**
+     * @codeCoverageIgnore
+     *
      * Obtains the Settings for the active subscription.
      *
      * @return Settings
@@ -655,7 +617,7 @@ class ContentHubClient extends Client
      */
     public function getRemoteSettings()
     {
-        return $this->getResponseJson($this->get('settings'));
+        return self::getResponseJson($this->get('settings'));
     }
 
     /**
@@ -671,7 +633,7 @@ class ContentHubClient extends Client
     {
         $options['body'] = json_encode(['url' => $webhook_url, 'version' => 2.0]);
 
-        return $this->getResponseJson($this->post('settings/webhooks', $options));
+        return self::getResponseJson($this->post('settings/webhooks', $options));
     }
 
     /**
@@ -756,7 +718,8 @@ class ContentHubClient extends Client
     {
         $settings = $this->getSettings();
         $uuid = $client_uuid ?? $settings->getUuid();
-        if (!$this->deleteEntity($uuid)) {
+      $response = $this->deleteEntity($uuid);
+      if (!$response) {
           throw new \Exception(sprintf("Entity with UUID = %s cannot be deleted.", $uuid));
         }
         return $this->delete("settings/client/uuid/$uuid");
@@ -790,7 +753,7 @@ class ContentHubClient extends Client
      */
     public function regenerateSharedSecret()
     {
-        return $this->getResponseJson($this->post('settings/secret', ['body' => json_encode([])]));
+        return self::getResponseJson($this->post('settings/secret', ['body' => json_encode([])]));
     }
 
     /**
@@ -864,7 +827,7 @@ class ContentHubClient extends Client
      * @throws \Exception
      *
      */
-    public function putFilter($query, $name = '', $uuid = NULL, $metadata = [])
+    public function putFilter($query, $name, $uuid = NULL, $metadata = [])
     {
         $data = [
           'name' => $name,
@@ -878,7 +841,7 @@ class ContentHubClient extends Client
         }
         $options = ['body' => json_encode($data)];
 
-        return $this->getResponseJson($this->put('filters', $options));
+        return self::getResponseJson($this->put('filters', $options));
     }
 
     /**
@@ -934,7 +897,7 @@ class ContentHubClient extends Client
         $data = ['filter_id' => $filter_id];
         $options = ['body' => json_encode($data)];
 
-        return $this->getResponseJson($this->post("settings/webhooks/$webhook_id/filters", $options));
+        return self::getResponseJson($this->post("settings/webhooks/$webhook_id/filters", $options));
     }
 
     /**
@@ -952,7 +915,7 @@ class ContentHubClient extends Client
     {
         $options = ['body' => json_encode(['filter_id' => $filter_id])];
         $response = $this->delete("settings/webhooks/$webhook_id/filters", $options);
-        return $this->getResponseJson($response);
+        return self::getResponseJson($response);
     }
 
     /**
@@ -967,7 +930,7 @@ class ContentHubClient extends Client
     {
 
         try {
-          $body = (string) $response->getBody();
+          $body = $response->getBody()->getContents();
         } catch (\Exception $exception) {
           $message = sprintf("An exception occurred in the JSON response. Message: %s", $exception->getMessage());
           throw new \Exception($message);
@@ -977,13 +940,15 @@ class ContentHubClient extends Client
     }
 
     /**
+     * @codeCoverageIgnore
+
      * {@inheritdoc}
      */
     public function __call($method, $args)
     {
         try {
             if (strpos($args[0], '?')) {
-                list($uri, $query) = explode('?', $args[0]);
+                [$uri, $query] = explode('?', $args[0]);
                 $parts = explode('/', $uri);
                 if ($query) {
                     $last = array_pop($parts);
@@ -1007,8 +972,9 @@ class ContentHubClient extends Client
     }
 
   /**
-   * Obtains the appropriate exception message for the selected exception.
+   * @codeCoverageIgnore
    *
+   * Obtains the appropriate exception message for the selected exception.
    * This is the place to set up exception messages per request.
    *
    * @param string $method
@@ -1033,7 +999,7 @@ class ContentHubClient extends Client
               sprintf('Could not reach the Content Hub. Please verify your hostname URL. [Error message: %s]',
                 $exception->getMessage()));
         }
-        if ($exception instanceof ClientException || $exception instanceof BadResponseException) {
+        if ($exception instanceof BadResponseException) {
             $response = $exception->getResponse();
             switch ($method) {
                 case 'getClientByName':
@@ -1160,7 +1126,7 @@ class ContentHubClient extends Client
      */
     protected static function makeBaseURL(...$base_url_components): string
     {
-        return self::gluePartsTogether($base_url_components, '/').'/';
+        return self::makePath(...$base_url_components) . '/';
     }
 
     /**
@@ -1203,6 +1169,8 @@ class ContentHubClient extends Client
     }
 
     /**
+     * @codeCoverageIgnore
+     *
      * @param array $config
      */
     protected function addRequestResponseHandler(array $config): void
@@ -1251,4 +1219,5 @@ class ContentHubClient extends Client
 
         return $args;
     }
+
 }

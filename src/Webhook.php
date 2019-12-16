@@ -76,6 +76,13 @@ class Webhook {
     return $this->definition['status'];
   }
 
+  public function getIsMigrated():bool {
+    return $this->definition['is_migrated'];
+  }
+
+  public function getSuppressedUntil(): int {
+    return $this->definition['suppressed_until'];
+  }
   /**
    * @return array
    */
