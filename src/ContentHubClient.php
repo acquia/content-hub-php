@@ -1056,7 +1056,7 @@ class ContentHubClient extends Client
     {
         try {
             if (strpos($args[0], '?')) {
-                [$uri, $query] = explode('?', $args[0]);
+                list($uri, $query) = explode('?', $args[0]);
                 $parts = explode('/', $uri);
                 if ($query) {
                     $last = array_pop($parts);
