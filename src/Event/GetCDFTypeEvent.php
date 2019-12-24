@@ -45,7 +45,7 @@ class GetCDFTypeEvent extends Event
         $this->data = $data;
 
         if (!isset($data['type'])) {
-          throw new \InvalidArgumentException('Parameters should have a \'type\' key');
+            throw new \InvalidArgumentException('Parameters should have a \'type\' key');
         }
         $this->type = $data['type'];
     }

@@ -59,12 +59,20 @@ class ClientCDFObject extends CDFObject
      */
     public function getSettings()
     {
-      // Add all the client settings as attributes to the client object.
-      if (empty($this->settings)) {
-        $metadata = $this->getMetadata();
-        $this->settings = new Settings($metadata['settings']['name'], $metadata['settings']['uuid'], $metadata['settings']['apiKey'], $metadata['settings']['secretKey'], $metadata['settings']['url'], $metadata['settings']['sharedSecret'], $metadata['settings']['webhook']);
-      }
-      return $this->settings;
+        // Add all the client settings as attributes to the client object.
+        if (empty($this->settings)) {
+            $metadata = $this->getMetadata();
+            $this->settings = new Settings(
+                $metadata['settings']['name'],
+                $metadata['settings']['uuid'],
+                $metadata['settings']['apiKey'],
+                $metadata['settings']['secretKey'],
+                $metadata['settings']['url'],
+                $metadata['settings']['sharedSecret'],
+                $metadata['settings']['webhook']
+            );
+        }
+        return $this->settings;
     }
 
     /**

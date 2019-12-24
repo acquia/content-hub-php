@@ -59,5 +59,4 @@ class RequestResponseHandler
             return $handler($request, $options)->then($promise);
         };
     }
-
 }

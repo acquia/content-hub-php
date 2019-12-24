@@ -128,7 +128,13 @@ interface CDFObjectInterface
      * @param string $class
      *   Attribute class.
      */
-    public function addAttribute($id, $type, $value = null, $language = 'und', $class = '\Acquia\ContentHubClient\CDFAttribute');
+    public function addAttribute(
+        $id,
+        $type,
+        $value = null,
+        $language = 'und',
+        $class = '\Acquia\ContentHubClient\CDFAttribute'
+    );
 
     /**
      * Converts object to array.
@@ -137,5 +143,4 @@ interface CDFObjectInterface
      *   Array representation.
      */
     public function toArray();
-
 }

@@ -61,8 +61,7 @@ class ContentHubClient extends Client
     /**
      * {@inheritdoc}
      */
-    public function __construct(array $config = [], LoggerInterface $logger, Settings $settings, HmacAuthMiddleware $middleware, EventDispatcherInterface $dispatcher, $api_version = 'v2')
-    {
+    public function __construct(array $config = [], LoggerInterface $logger, Settings $settings, HmacAuthMiddleware $middleware, EventDispatcherInterface $dispatcher, $api_version = 'v2') { // phpcs:ignore
         $this->logger = $logger;
         $this->settings = $settings;
         $this->dispatcher = $dispatcher;
@@ -192,17 +191,17 @@ class ContentHubClient extends Client
             // return a new instance of this class.
             $settings = new Settings($settings->getName(), $settings->getUuid(), $settings->getApiKey(), $settings->getSecretKey(), $settings->getUrl(), $remote['shared_secret']);
             return new static($config, $logger, $settings, $settings->getMiddleware(), $dispatcher);
-        }
-        catch (Exception $exception) {
+        } catch (Exception $exception) {
             if ($exception instanceof ClientException || $exception instanceof BadResponseException) {
-              $message = sprintf('Error registering client with name="%s" (Error Code = %d: %s)', $name, $exception->getResponse()->getStatusCode(), $exception->getResponse()->getReasonPhrase());
-              $logger->error($message);
-              throw new RequestException($message, $exception->getRequest(), $exception->getResponse());
+                $message = sprintf('Error registering client with name="%s" (Error Code = %d: %s)', $name, $exception->getResponse()->getStatusCode(), $exception->getResponse()->getReasonPhrase());
+                $logger->error($message);
+
+                throw new RequestException($message, $exception->getRequest(), $exception->getResponse());
             }
             if ($exception instanceof RequestException) {
-              $message = sprintf('Could not get authorization from Content Hub to register client %s. Are your credentials inserted correctly? (Error message = %s)', $name, $exception->getMessage());
-              $logger->error($message);
-              throw new RequestException($message, $exception->getRequest(), $exception->getResponse());
+                $message = sprintf('Could not get authorization from Content Hub to register client %s. Are your credentials inserted correctly? (Error message = %s)', $name, $exception->getMessage());
+                $logger->error($message);
+                throw new RequestException($message, $exception->getRequest(), $exception->getResponse());
             }
             $message = sprintf("An unknown exception was caught. Message: %s", $exception->getMessage());
             $logger->error($message);
@@ -446,8 +445,9 @@ class ContentHubClient extends Client
    * @return \Psr\Http\Message\ResponseInterface
    *   Response object.
    */
-    public function deleteInterest($uuid, $webhook_uuid) {
-      return $this->delete("/interest/$uuid/$webhook_uuid");
+    public function deleteInterest($uuid, $webhook_uuid)
+    {
+        return $this->delete("/interest/$uuid/$webhook_uuid");
     }
 
     /**
@@ -656,7 +656,9 @@ class ContentHubClient extends Client
     {
         $data = $this->getResponseJson($this->get('settings'));
         $webhooks = $data['webhooks'] ?? [];
-        array_walk($webhooks, function(&$webhook) {$webhook = new Webhook($webhook);});
+        array_walk($webhooks, function (&$webhook) {
+            $webhook = new Webhook($webhook);
+        });
         return $webhooks;
     }
 
@@ -673,7 +675,10 @@ class ContentHubClient extends Client
      */
     public function getWebHook($url)
     {
-        return current(array_filter($this->getWebHooks(), function (Webhook $webhook) use ($url) {return $webhook->getUrl() === $url;})) ?? [];
+        $webhooks = array_filter($this->getWebHooks(), function (Webhook $webhook) use ($url) {
+            return $webhook->getUrl() === $url;
+        });
+        return current($webhooks) ?? [];
     }
 
     /**
@@ -693,7 +698,6 @@ class ContentHubClient extends Client
         $data = $this->getResponseJson($this->get("/interest/webhook/$webhook_uuid"));
 
         return $data['data']['interests'] ?? [];
-
     }
 
     /**
@@ -769,23 +773,23 @@ class ContentHubClient extends Client
      */
     public function updateWebhook($uuid, array $options)
     {
-      if (isset($options['version']) && !in_array($options['version'], [1, 2], TRUE)) {
-          $options['version'] = 2;
-      }
-      $acceptable_keys = [
+        if (isset($options['version']) && !in_array($options['version'], [1, 2], true)) {
+            $options['version'] = 2;
+        }
+        $acceptable_keys = [
           'version',
           'url',
           'disable_retries',
           'status',
-      ];
-      $values = [];
-      foreach ($acceptable_keys as $key) {
-          if (isset($options[$key])) {
-              $values[$key] = $options[$key];
-          }
-      }
-      $data['body'] = json_encode($values);
-      return $this->put("settings/webhooks/$uuid", $data);
+        ];
+        $values = [];
+        foreach ($acceptable_keys as $key) {
+            if (isset($options[$key])) {
+                $values[$key] = $options[$key];
+            }
+        }
+        $data['body'] = json_encode($values);
+        return $this->put("settings/webhooks/$uuid", $data);
     }
 
     /**
@@ -824,7 +828,7 @@ class ContentHubClient extends Client
         $settings = $this->getSettings();
         $uuid = $client_uuid ?? $settings->getUuid();
         if (!$this->deleteEntity($uuid)) {
-          throw new Exception(sprintf("Entity with UUID = %s cannot be deleted.", $uuid));
+            throw new Exception(sprintf("Entity with UUID = %s cannot be deleted.", $uuid));
         }
         return $this->delete("settings/client/uuid/$uuid");
     }
@@ -934,17 +938,17 @@ class ContentHubClient extends Client
      * @throws \Exception
      *
      */
-    public function putFilter($query, $name = '', $uuid = NULL, $metadata = [])
+    public function putFilter($query, $name = '', $uuid = null, $metadata = [])
     {
         $data = [
           'name' => $name,
           'data' => [
             'query' => $query,
           ],
-          'metadata' => (object) $metadata,
+          'metadata' => (object)$metadata,
         ];
         if (!empty($uuid)) {
-          $data['uuid'] = $uuid;
+            $data['uuid'] = $uuid;
         }
         $options = ['body' => json_encode($data)];
 
@@ -1038,12 +1042,11 @@ class ContentHubClient extends Client
      */
     public static function getResponseJson(ResponseInterface $response)
     {
-
         try {
-          $body = (string) $response->getBody();
+            $body = (string)$response->getBody();
         } catch (Exception $exception) {
-          $message = sprintf("An exception occurred in the JSON response. Message: %s", $exception->getMessage());
-          throw new Exception($message);
+            $message = sprintf("An exception occurred in the JSON response. Message: %s", $exception->getMessage());
+            throw new Exception($message);
         }
 
         return json_decode($body, true);
@@ -1097,14 +1100,10 @@ class ContentHubClient extends Client
     protected function getExceptionMessage($method, array $args, Exception $exception)
     {
         if ($exception instanceof ServerException) {
-            return $this->getErrorResponse(500,
-              sprintf('Could not reach the Content Hub. Please verify your hostname and Credentials. [Error message: %s]',
-                $exception->getMessage()));
+            return $this->getErrorResponse(500, sprintf('Could not reach the Content Hub. Please verify your hostname and Credentials. [Error message: %s]', $exception->getMessage())); // phpcs:ignore
         }
         if ($exception instanceof ConnectException) {
-            return $this->getErrorResponse(500,
-              sprintf('Could not reach the Content Hub. Please verify your hostname URL. [Error message: %s]',
-                $exception->getMessage()));
+            return $this->getErrorResponse(500, sprintf('Could not reach the Content Hub. Please verify your hostname URL. [Error message: %s]', $exception->getMessage())); // phpcs:ignore
         }
         if ($exception instanceof ClientException || $exception instanceof BadResponseException) {
             $response = $exception->getResponse();
@@ -1115,108 +1114,78 @@ class ContentHubClient extends Client
                         return $response;
                     }
 
-                    return $this->getErrorResponse($response->getStatusCode(),
-                      sprintf('Error trying to connect to the Content Hub" (Error Code = %d: %s)', $response->getStatusCode(),
-                        $response->getReasonPhrase()));
+                    return $this->getErrorResponse($response->getStatusCode(), sprintf('Error trying to connect to the Content Hub" (Error Code = %d: %s)', $response->getStatusCode(), $response->getReasonPhrase())); // phpcs:ignore
 
                 case 'addWebhook':
-                    return $this->getErrorResponse($response->getStatusCode(),
-                      sprintf('There was a problem trying to register Webhook URL = %s. Please try again. (Error Code = %d: %s)',
-                        $args[0], $response->getStatusCode(), $response->getReasonPhrase()));
+                    return $this->getErrorResponse($response->getStatusCode(), sprintf('There was a problem trying to register Webhook URL = %s. Please try again. (Error Code = %d: %s)', $args[0], $response->getStatusCode(), $response->getReasonPhrase())); // phpcs:ignore
 
                 case 'deleteWebhook':
                     // This function only requires one argument (webhook_uuid), but
                     // we are using the second one to pass the webhook_url.
                     $webhook_url = isset($args[1]) ? $args[1] : $args[0];
 
-                    return $this->getErrorResponse($response->getStatusCode(),
-                      sprintf('There was a problem trying to <b>unregister</b> Webhook URL = %s. Please try again. (Error Code = %d: @%s)',
-                        $webhook_url, $response->getStatusCode(), $response->getReasonPhrase()));
+                    return $this->getErrorResponse($response->getStatusCode(), sprintf('There was a problem trying to <b>unregister</b> Webhook URL = %s. Please try again. (Error Code = %d: @%s)', $webhook_url, $response->getStatusCode(), $response->getReasonPhrase())); // phpcs:ignore
 
                 case 'purge':
-                    return $this->getErrorResponse($response->getStatusCode(),
-                      sprintf('Error purging entities from the Content Hub [Error Code = %d: %s]', $response->getStatusCode(),
-                        $response->getReasonPhrase()));
+                    return $this->getErrorResponse($response->getStatusCode(), sprintf('Error purging entities from the Content Hub [Error Code = %d: %s]', $response->getStatusCode(), $response->getReasonPhrase())); // phpcs:ignore
 
                 case 'readEntity':
-                    return $this->getErrorResponse($response->getStatusCode(),
-                      sprintf('Error reading entity with UUID="%s" from Content Hub (Error Code = %d: %s)', $args[0],
-                        $response->getStatusCode(), $response->getReasonPhrase()));
+                    return $this->getErrorResponse($response->getStatusCode(), sprintf('Error reading entity with UUID="%s" from Content Hub (Error Code = %d: %s)', $args[0], $response->getStatusCode(), $response->getReasonPhrase())); // phpcs:ignore
 
                 case 'createEntity':
-                    return $this->getErrorResponse($response->getStatusCode(),
-                      sprintf('Error trying to create an entity in Content Hub (Error Code = %d: %s)', $response->getStatusCode(),
-                        $response->getReasonPhrase()));
+                    return $this->getErrorResponse($response->getStatusCode(), sprintf('Error trying to create an entity in Content Hub (Error Code = %d: %s)', $response->getStatusCode(), $response->getReasonPhrase())); // phpcs:ignore
 
                 case 'createEntities':
-                    return $this->getErrorResponse($response->getStatusCode(),
-                      sprintf('Error trying to create entities in Content Hub (Error Code = %d: %s)', $response->getStatusCode(),
-                        $response->getReasonPhrase()));
+                    return $this->getErrorResponse($response->getStatusCode(), sprintf('Error trying to create entities in Content Hub (Error Code = %d: %s)', $response->getStatusCode(), $response->getReasonPhrase())); // phpcs:ignore
 
                 case 'updateEntity':
-                    return $this->getErrorResponse($response->getStatusCode(),
-                      sprintf('Error trying to update an entity with UUID="%s" in Content Hub (Error Code = %d: %s)', $args[1],
-                        $response->getStatusCode(), $response->getReasonPhrase()));
+                    return $this->getErrorResponse($response->getStatusCode(), sprintf('Error trying to update an entity with UUID="%s" in Content Hub (Error Code = %d: %s)', $args[1], $response->getStatusCode(), $response->getReasonPhrase())); // phpcs:ignore
 
                 case 'updateEntities':
-                    return $this->getErrorResponse($response->getStatusCode(),
-                      sprintf('Error trying to update some entities in Content Hub (Error Code = %d: %s)',
-                        $response->getStatusCode(), $response->getReasonPhrase()));
+                    return $this->getErrorResponse($response->getStatusCode(), sprintf('Error trying to update some entities in Content Hub (Error Code = %d: %s)', $response->getStatusCode(), $response->getReasonPhrase())); // phpcs:ignore
 
                 case 'deleteEntity':
-                    return $this->getErrorResponse($response->getStatusCode(),
-                      sprintf('Error trying to delete entity with UUID="@uuid" in Content Hub (Error Code = @error_code: @error_message)',
-                        $args[0], $response->getStatusCode(), $response->getReasonPhrase()));
+                    return $this->getErrorResponse($response->getStatusCode(), sprintf('Error trying to delete entity with UUID="@uuid" in Content Hub (Error Code = @error_code: @error_message)', $args[0], $response->getStatusCode(), $response->getReasonPhrase())); // phpcs:ignore
 
                 case 'searchEntity':
-                    return $this->getErrorResponse($response->getStatusCode(),
-                      sprintf('Error trying to make a search query to Content Hub. Are your credentials inserted correctly? (Error Code = %d: %s)',
-                        $response->getStatusCode(), $response->getReasonPhrase()));
-
+                    return $this->getErrorResponse($response->getStatusCode(), sprintf('Error trying to make a search query to Content Hub. Are your credentials inserted correctly? (Error Code = %d: %s)', $response->getStatusCode(), $response->getReasonPhrase())); // phpcs:ignore
                 default:
                     return $response;
             }
         }
+
         if ($exception instanceof RequestException) {
             switch ($method) {
                 // Customize the error message per request here.
                 case 'createEntity':
-                    return $this->getErrorResponse(500,
-                      sprintf('Error trying to create an entity in Content Hub (Error Message: %s)', $exception->getMessage()));
-
+                    $message = sprintf('Error trying to create an entity in Content Hub (Error Message: %s)', $exception->getMessage()); // phpcs:ignore
+                    break;
                 case 'createEntities':
-                    return $this->getErrorResponse(500,
-                      sprintf('Error trying to create entities in Content Hub (Error Message = %s)', $exception->getMessage()));
-
+                    $message = sprintf('Error trying to create entities in Content Hub (Error Message = %s)', $exception->getMessage()); // phpcs:ignore
+                    break;
                 case 'updateEntity':
-                    return $this->getErrorResponse(500,
-                      sprintf('Error trying to update entity with UUID="%s" in Content Hub (Error Message = %s)', $args[1],
-                        $exception->getMessage()));
-
+                    $message = sprintf('Error trying to update entity with UUID="%s" in Content Hub (Error Message = %s)', $args[1], $exception->getMessage()); // phpcs:ignore
+                    break;
                 case 'updateEntities':
-                    return $this->getErrorResponse(500,
-                      sprintf('Error trying to update some entities in Content Hub (Error Message = %s)',
-                        $exception->getMessage()));
-
+                    $message = sprintf('Error trying to update some entities in Content Hub (Error Message = %s)', $exception->getMessage()); // phpcs:ignore
+                    break;
                 case 'deleteEntity':
-                    return $this->getErrorResponse(500,
-                      sprintf('Error trying to delete entity with UUID="%s" in Content Hub (Error Message = %s)', $args[0],
-                        $exception->getMessage()));
-
+                    $message = sprintf('Error trying to delete entity with UUID="%s" in Content Hub (Error Message = %s)', $args[0], $exception->getMessage()); // phpcs:ignore
+                    break;
                 case 'searchEntity':
-                    return $this->getErrorResponse(500,
-                      sprintf('Error trying to make a search query to Content Hub. Are your credentials inserted correctly? (Error Message = %s)',
-                        $exception->getMessage()));
-
+                    $message = sprintf('Error trying to make a search query to Content Hub. Are your credentials inserted correctly? (Error Message = %s)', $exception->getMessage()); // phpcs:ignore
+                    break;
                 default:
-                    return $this->getErrorResponse(500,
-                      sprintf('Error trying to connect to the Content Hub. Are your credentials inserted correctly? (Error Message = %s)',
-                        $exception->getMessage()));
+                    $message = sprintf('Error trying to connect to the Content Hub. Are your credentials inserted correctly? (Error Message = %s)', $exception->getMessage()); // phpcs:ignore
+                    break;
             }
+
+            return $this->getErrorResponse(500, $message);
         }
 
-        return $this->getErrorResponse(500,
-          sprintf('Error trying to connect to the Content Hub (Error Message = %s)', $exception->getMessage()));
+        $message = sprintf('Error trying to connect to the Content Hub (Error Message = %s)', $exception->getMessage());
+
+        return $this->getErrorResponse(500, $message);
     }
 
     /**
@@ -1327,11 +1296,11 @@ class ContentHubClient extends Client
     {
         $result = explode('?', $args[0] ?? '');
         if (count($result) < 2) {
-          return $args;
+            return $args;
         }
         [, $queryString] = $result;
         if (empty($queryString)) {
-          return $args;
+            return $args;
         }
         parse_str($queryString, $parsedQueryString);
 

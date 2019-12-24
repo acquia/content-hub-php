@@ -110,22 +110,42 @@ class CDFObject implements CDFObjectInterface
      */
     public static function fromArray(array $data)
     {
-      $object = new static($data['type'], $data['uuid'], $data['created'], $data['modified'], $data['origin'], $data['metadata']);
-      foreach ($data['attributes'] as $attribute_name => $values) {
-        if (!$attribute = $object->getAttribute($attribute_name)) {
-          $class = !empty($object->getMetadata()['attributes'][$attribute_name]) ? $object->getMetadata()['attributes'][$attribute_name]['class'] : false;
-          if ($class && class_exists($class)) {
-            $object->addAttribute($attribute_name, $values['type'], null, CDFObject::LANGUAGE_UNDETERMINED, $class);
-          } else {
-            $object->addAttribute($attribute_name, $values['type'], null);
-          }
-          $attribute = $object->getAttribute($attribute_name);
+        $object = new static(
+            $data['type'],
+            $data['uuid'],
+            $data['created'],
+            $data['modified'],
+            $data['origin'],
+            $data['metadata']
+        );
+        foreach ($data['attributes'] as $attribute_name => $values) {
+            if (!$attribute = $object->getAttribute($attribute_name)) {
+                $metadata = $object->getMetadata();
+                $class = !empty($metadata['attributes'][$attribute_name]) ?
+                  $metadata['attributes'][$attribute_name]['class'] : false;
+
+                if ($class && class_exists($class)) {
+                    $object->addAttribute(
+                        $attribute_name,
+                        $values['type'],
+                        null,
+                        CDFObject::LANGUAGE_UNDETERMINED,
+                        $class
+                    );
+                } else {
+                    $object->addAttribute(
+                        $attribute_name,
+                        $values['type'],
+                        null
+                    );
+                }
+                $attribute = $object->getAttribute($attribute_name);
+            }
+            $value_property = (new \ReflectionClass($attribute))->getProperty('value');
+            $value_property->setAccessible(true);
+            $value_property->setValue($attribute, $values['value']);
         }
-        $value_property = (new \ReflectionClass($attribute))->getProperty('value');
-        $value_property->setAccessible(true);
-        $value_property->setValue($attribute, $values['value']);
-      }
-      return $object;
+        return $object;
     }
 
     /**
@@ -141,7 +161,7 @@ class CDFObject implements CDFObjectInterface
      */
     public static function fromJson(string $json)
     {
-      return self::fromArray(json_decode($json, TRUE));
+        return self::fromArray(json_decode($json, true));
     }
 
     /**
@@ -256,10 +276,16 @@ class CDFObject implements CDFObjectInterface
      *
      * @throws \Exception
      */
-    public function addAttribute($id, $type, $value = null, $language = self::LANGUAGE_UNDETERMINED, $className = CDFAttribute::class)
-    {
+    public function addAttribute(
+        $id,
+        $type,
+        $value = null,
+        $language = self::LANGUAGE_UNDETERMINED,
+        $className = CDFAttribute::class
+    ) {
         if ($className !== CDFAttribute::class && !is_subclass_of($className, CDFAttribute::class)) {
-            throw new \Exception(sprintf("The %s class must be a subclass of \Acquia\ContentHubClient\CDFAttribute", $className));
+            $message = sprintf("The %s class must be a subclass of \Acquia\ContentHubClient\CDFAttribute", $className);
+            throw new \Exception($message);
         }
         $attribute = new $className($id, $type, $value, $language);
         $this->attributes[$attribute->getId()] = $attribute;

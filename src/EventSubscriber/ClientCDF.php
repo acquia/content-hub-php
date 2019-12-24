@@ -39,9 +39,9 @@ class ClientCDF implements EventSubscriberInterface
             $data = $event->getData();
             /* @deprecated Backwards Compatibility, Remove by 2.0 */
             if (!isset($data['metadata']['settings'])) {
-              $data['metadata'] = [
-                'settings' => $data['metadata']
-              ];
+                $data['metadata'] = [
+                  'settings' => $data['metadata']
+                ];
             }
             /* End deprecated code */
             $object = ClientCDFObject::fromArray($data);

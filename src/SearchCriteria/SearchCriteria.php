@@ -134,18 +134,18 @@ class SearchCriteria implements \JsonSerializable
      *   Languages list.
      */
     public function __construct(
-      string $searchTerm,
-      array $entityType,
-      array $bundle,
-      array $tags,
-      string $label,
-      ?DateTimeInterface $startDate,
-      ?DateTimeInterface $endDate,
-      int $from,
-      int $size,
-      string $sorting,
-      string $version,
-      array $languages
+        string $searchTerm,
+        array $entityType,
+        array $bundle,
+        array $tags,
+        string $label,
+        ?DateTimeInterface $startDate,
+        ?DateTimeInterface $endDate,
+        int $from,
+        int $size,
+        string $sorting,
+        string $version,
+        array $languages
     ) {
         $this->searchTerm = $searchTerm;
         $this->entityType = $entityType;
