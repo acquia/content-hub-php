@@ -15,6 +15,7 @@
     },
     "require": {
         "php": ">=7.1",
+        "ext-json": "*",
         "guzzlehttp/guzzle": "~6.0",
         "symfony/serializer": "~2.7|^3.2",
         "symfony/http-foundation": "~2.7|^3.2",
