@@ -62,7 +62,6 @@ abstract class SettingsTestBase extends \PHPUnit_Framework_TestCase
         $this->assertFalse($settings->getWebhook('http://example.com/webhook'));
         $this->assertEquals($data['clients'][0], $settings->getClient('My Client Site 1'));
         $this->assertFalse($settings->getClient('My Client Site 2'));
-
     }
 
     public function testRegisterClients()
@@ -97,15 +96,15 @@ abstract class SettingsTestBase extends \PHPUnit_Framework_TestCase
     {
         // Setup
         $data = [
-            'success' => 1,
+          'success' => 1,
         ];
         $responses = [
-            new Response(200, [], json_encode($data)),
+          new Response(200, [], json_encode($data)),
         ];
         $client = $this->getClient($responses);
 
         // Deletes a Webhook
         $webhook = $client->deleteWebhook('http://example1.com/webhooks');
-        $this->assertEquals($data, json_decode($webhook->getBody(), TRUE));
+        $this->assertEquals($data, json_decode($webhook->getBody(), true));
     }
 }
