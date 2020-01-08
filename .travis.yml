@@ -13,5 +13,6 @@ before_script:
 
 after_script:
   - set -e
-  - vendor/bin/phpcs -n --standard=PSR2 src/
+  - vendor/bin/phpcs --config-set installed_paths vendor/drupal/coder/coder_sniffer
+  - vendor/bin/phpcs -n --standard=Drupal,DrupalPractice src/ test/
   # - vendor/bin/ocular code-coverage:upload --format=php-clover build/logs/clover.xml

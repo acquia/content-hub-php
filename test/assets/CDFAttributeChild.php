@@ -4,7 +4,11 @@ namespace Acquia\ContentHubClient\assets;
 
 use Acquia\ContentHubClient\CDFAttribute;
 
-class CDFAttributeChild extends CDFAttribute
-{
+/**
+ * Class CDFAttributeChild.
+ *
+ * @package Acquia\ContentHubClient\assets
+ */
+class CDFAttributeChild extends CDFAttribute {
 
 }

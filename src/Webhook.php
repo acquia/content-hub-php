@@ -9,138 +9,127 @@ namespace Acquia\ContentHubClient;
  *
  * @package Acquia\ContentHubClient
  */
-class Webhook
-{
+class Webhook {
 
-    /**
-     * Webhook definition.
-     *
-     * @var array
-     */
-    protected $definition;
+  /**
+   * Webhook definition.
+   *
+   * @var array
+   */
+  protected $definition;
 
-    /**
-     * Webhook constructor.
-     *
-     * @param array $definition
-     *   Webhook definition.
-     */
-    public function __construct(array $definition)
-    {
-        $this->definition = $definition;
-    }
+  /**
+   * Webhook constructor.
+   *
+   * @param array $definition
+   *   Webhook definition.
+   */
+  public function __construct(array $definition) {
+    $this->definition = $definition;
+  }
 
-    /**
-     * Returns webhook UUID.
-     *
-     * @return string
-     *   Webhook UUID.
-     */
-    public function getUuid()
-    {
-        return $this->definition['uuid'];
-    }
+  /**
+   * Returns webhook UUID.
+   *
+   * @return string
+   *   Webhook UUID.
+   */
+  public function getUuid() {
+    return $this->definition['uuid'];
+  }
 
-    /**
-     * Returns client UUID of the webhook.
-     *
-     * @return string
-     *   Client's UUID.
-     */
-    public function getClientUuid()
-    {
-        return $this->definition['client_uuid'];
-    }
+  /**
+   * Returns client UUID of the webhook.
+   *
+   * @return string
+   *   Client's UUID.
+   */
+  public function getClientUuid() {
+    return $this->definition['client_uuid'];
+  }
 
-    /**
-     * Returns client name of the webhook.
-     *
-     * @return string
-     *   Client's name.
-     */
-    public function getClientName()
-    {
-        return $this->definition['client_name'];
-    }
+  /**
+   * Returns client name of the webhook.
+   *
+   * @return string
+   *   Client's name.
+   */
+  public function getClientName() {
+    return $this->definition['client_name'];
+  }
 
-    /**
-     * Returns URL of the webhook.
-     *
-     * @return string
-     *   Webhook URL.
-     */
-    public function getUrl()
-    {
-        return $this->definition['url'];
-    }
+  /**
+   * Returns URL of the webhook.
+   *
+   * @return string
+   *   Webhook URL.
+   */
+  public function getUrl() {
+    return $this->definition['url'];
+  }
 
-    /**
-     * Returns version of the webhook.
-     *
-     * @return string
-     *   Webhook version string.
-     */
-    public function getVersion()
-    {
-        return $this->definition['version'];
-    }
+  /**
+   * Returns version of the webhook.
+   *
+   * @return string
+   *   Webhook version string.
+   */
+  public function getVersion() {
+    return $this->definition['version'];
+  }
 
-    /**
-     * Returns state of the 'disable_retries' option.
-     *
-     * @return string
-     *   State of the 'disable_retries' option.
-     */
-    public function getDisableRetries()
-    {
-        return $this->definition['disable_retries'];
-    }
+  /**
+   * Returns state of the 'disable_retries' option.
+   *
+   * @return string
+   *   State of the 'disable_retries' option.
+   */
+  public function getDisableRetries() {
+    return $this->definition['disable_retries'];
+  }
 
-    /**
-     * Returns filters list of the webhook.
-     *
-     * @return array
-     *   Filters list.
-     */
-    public function getFilters()
-    {
-        return $this->definition['filters'];
-    }
+  /**
+   * Returns filters list of the webhook.
+   *
+   * @return array
+   *   Filters list.
+   */
+  public function getFilters() {
+    return $this->definition['filters'];
+  }
 
-    /**
-     * Returns status of the webhook.
-     *
-     * @return string
-     *   Webhook status.
-     */
-    public function getStatus()
-    {
-        return $this->definition['status'];
-    }
+  /**
+   * Returns status of the webhook.
+   *
+   * @return string
+   *   Webhook status.
+   */
+  public function getStatus() {
+    return $this->definition['status'];
+  }
 
-    /**
-     * Returns definition of the webhook.
-     *
-     * @return array
-     *   Webhook definition.
-     */
-    public function getDefinition()
-    {
-        return $this->definition;
-    }
+  /**
+   * Returns definition of the webhook.
+   *
+   * @return array
+   *   Webhook definition.
+   */
+  public function getDefinition() {
+    return $this->definition;
+  }
 
-    /**
-     * Returns the state of the webhook.
-     *
-     * @return bool
-     *   Whether the webhook is in enabled or in the disabled state.
-     */
-    public function isEnabled()
-    {
-        $enabled = [
-          'ENABLED',
-          '',
-        ];
-        return in_array($this->getStatus(), $enabled, true);
-    }
+  /**
+   * Returns the state of the webhook.
+   *
+   * @return bool
+   *   Whether the webhook is in enabled or in the disabled state.
+   */
+  public function isEnabled() {
+    $enabled = [
+      'ENABLED',
+      '',
+    ];
+    return in_array($this->getStatus(), $enabled, TRUE);
+  }
+
 }
