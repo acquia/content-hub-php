@@ -65,4 +65,7 @@ coverage:
 ## run infection to see how quality the tests are
 infection:
 	@[ -d $(INFECTION_DATA_DIR) ] || $(PHPUNIT_EXEC)
+	@composer require --dev infection/infection
 	@$(INFECTION_EXEC) --coverage=$(INFECTION_DATA_DIR)
+	@composer remove --dev infection/infection
+
