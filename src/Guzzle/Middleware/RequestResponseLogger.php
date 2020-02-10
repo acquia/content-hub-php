@@ -92,12 +92,11 @@ class RequestResponseLogger
     protected function buildLogMessage(): string
     {
         return sprintf(
-            'Request ID: %s. Method: %s. Path: %s. Status code: %d. Body: %s',
+            'Request ID: %s. Method: %s. Path: %s. Status code: %d.',
             $this->decodedResponseBody['request_id'],
             $this->request->getMethod(),
             $this->request->getUri()->getPath(),
-            $this->response->getStatusCode(),
-            $this->response->getBody()
+            $this->response->getStatusCode()
         );
     }
 
