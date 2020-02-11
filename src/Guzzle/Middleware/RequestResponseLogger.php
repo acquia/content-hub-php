@@ -70,12 +70,17 @@ class RequestResponseLogger
      */
     protected function isTrackable(): bool
     {
-        // Dont't track requests without ID.
+        // Skip tracking for requests without ID.
         if (empty($this->decodedResponseBody['request_id'])) {
             return false;
         }
 
-        // Dont't track requests with sensitive data.
+        // Skip tracking for requests with a shared secret.
+        if (isset($this->decodedResponseBody['shared_secret'])) {
+            return false;
+        }
+
+        // Skip tracking for requests with sensitive data.
         if (isset($this->decodedResponseBody['data']['data']['metadata']['settings'])) {
             return false;
         }
