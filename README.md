@@ -189,3 +189,23 @@ $client->updateEntity($resourceUrl, $uuid);
 $client->deleteEntity($uuid);
 
 ```
+
+#### Running Tests
+
+To better facilitate running tests, this library is now equipped with a Makefile with the following targets:
+(running `make help` also shows this information)
+- install: To install the dependencies
+  - example: make install
+- method_test file=path/to/test/file: To run a specific test
+  - example: make method_test method=testFromJSONStringCreation file=test/CDFObjectTest.php
+- file_test file=path/to/test/file: To run a specific test
+  - example: make file_test file=test/CDFObjectTest.php
+- dir_tests dir=path/to/test-directory: To run all the tests inside a directory
+  - example: make dir_tests test
+- all_tests: To run all Unit Tests
+  - example: make all_tests
+- coverage: To create test coverage for the Unit Tests
+  - example: make coverage
+- infection: To run infection on the existing tests
+  - example: make infection
+

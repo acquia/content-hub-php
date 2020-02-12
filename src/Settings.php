@@ -102,12 +102,12 @@ class Settings
     public function toArray()
     {
         return [
-          'name' => $this->name,
-          'uuid' => $this->uuid,
-          'apiKey' => $this->apiKey,
-          'secretKey' => $this->secretKey,
-          'url' => $this->url,
-          'sharedSecret' => $this->sharedSecret,
+          'name' => $this->getName(),
+          'uuid' => $this->getUuid(),
+          'apiKey' => $this->getApiKey(),
+          'secretKey' => $this->getSecretKey(),
+          'url' => $this->getUrl(),
+          'sharedSecret' => $this->getSharedSecret(),
           'webhook' => $this->webhook,
         ];
     }
@@ -168,7 +168,7 @@ class Settings
 
     /**
      * Returns middleware.
-     *
+     * @codeCoverageIgnore
      * @return \Acquia\Hmac\Guzzle\HmacAuthMiddleware
      *   Auth middleware.
      */

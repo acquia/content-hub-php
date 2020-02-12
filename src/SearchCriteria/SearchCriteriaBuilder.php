@@ -11,14 +11,6 @@ use Acquia\ContentHubClient\CDF\CDFObject;
  */
 class SearchCriteriaBuilder
 {
-
-    /**
-     * SearchCriteriaBuilder constructor.
-     */
-    protected function __construct()
-    {
-    }
-
     /**
      * Creates search-criteria instance from array.
      *
@@ -80,11 +72,8 @@ class SearchCriteriaBuilder
     protected static function extractPropertyFromArray(string $propertyName, array $data, $default = '')
     {
         $map = self::propertiesMap();
-        if (!isset($map[$propertyName])) {
-            return $default;
-        }
-
         $values = array_values(array_intersect($map[$propertyName], array_keys($data)));
+
         if (empty($values[0])) {
             return $default;
         }

@@ -36,7 +36,7 @@ class ClientCDF implements EventSubscriberInterface
     public function onGetCDFType(GetCDFTypeEvent $event)
     {
         if ($event->getType() === 'client') {
-            $data = $event->getData();
+              $data = $event->getData();
             /* @deprecated Backwards Compatiblity, Remove by 2.0 */
             if (!isset($data['metadata']['settings'])) {
               $data['metadata'] = [
