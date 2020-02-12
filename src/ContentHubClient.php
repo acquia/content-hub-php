@@ -337,6 +337,30 @@ class ContentHubClient extends Client
         return $event->getObject();
     }
 
+  /**
+   * Updates many entities asynchronously.
+   *
+   * @param \Acquia\ContentHubClient\CDF\CDFObject[] $objects
+   *   The CDFObjects to update.
+   *
+   * @return \Psr\Http\Message\ResponseInterface
+   *
+   */
+    public function putEntities(CDFObject ...$objects)
+    {
+        $json = [
+            'resource' => '',
+        ];
+
+        foreach ($objects as $object) {
+            $json['data']['entities'][] = $object->toArray();
+        }
+
+        $options['body'] = json_encode($json);
+
+        return $this->put('entities', $options);
+    }
+
     /**
      * @param \Acquia\ContentHubClient\CDF\CDFObject ...$objects
      *

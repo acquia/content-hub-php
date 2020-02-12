@@ -519,6 +519,35 @@ class ContentHubClientTest extends TestCase {
     $this->assertInstanceOf(CDFObject::class, $result);
   }
 
+  public function testPutEntitiesReturnsSuccessIfAllGoesWell(): void {
+    $response_code = SymfonyResponse::HTTP_ACCEPTED;
+    $response_body = [
+      'success' => TRUE,
+      'request_id' => 'some-uuid',
+    ];
+
+    $request_body = [
+      'resource' => '',
+      'data' => [
+        'entities' => [
+          $this->cdf1_array,
+          $this->cdf2_array,
+        ],
+      ],
+    ];
+
+    $this->ch_client
+      ->shouldReceive('put')
+      ->once()
+      ->with('entities', ['body' => json_encode($request_body)])
+      ->andReturn($this->makeMockResponse($response_code, [], json_encode($response_body)));
+
+    $api_response = $this->ch_client->putEntities($this->cdf1, $this->cdf2);
+
+    $this->assertSame($response_code, $api_response->getStatusCode());
+    $this->assertSame($response_body, $this->ch_client::getResponseJson($api_response));
+  }
+
   public function testPostEntitiesReturnHTTPAcceptedHeaderAndAnEmptyBodyIfAllGoesWell(): void {
     $response_code = SymfonyResponse::HTTP_ACCEPTED;
     $request_body = [
