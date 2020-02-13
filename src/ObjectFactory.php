@@ -77,7 +77,7 @@ class ObjectFactory {
   }
 
   public static function getCDFDocument(CDFObject ...$entities): CDFDocument {
-    return new CDFDocument($entities);
+    return new CDFDocument(...$entities);
   }
 
   public static function getWebhook(array $definition): Webhook {
