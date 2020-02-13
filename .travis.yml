@@ -13,4 +13,4 @@ before_script:
 
 after_script:
   - travis_retry php vendor/bin/php-coveralls -v
-  - vendor/bin/ocular code-coverage:upload --format=php-clover build/logs/clover.xml
+  - vendor/bin/ocular code-coverage:upload --format=php-clover infection/clover.xml
