@@ -8,136 +8,125 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Class RequestResponseLogger.
+ * Class RequestResponseLogger
  *
  * @package Acquia\ContentHubClient\Guzzle\Middleware
  */
-class RequestResponseLogger {
+class RequestResponseLogger
+{
+    /**
+     * @var \Psr\Http\Message\RequestInterface
+     */
+    protected $request;
 
-  /**
-   * Request object.
-   *
-   * @var \Psr\Http\Message\RequestInterface
-   */
-  protected $request;
+    /**
+     * @var \Psr\Http\Message\ResponseInterface
+     */
+    protected $response;
 
-  /**
-   * Response object.
-   *
-   * @var \Psr\Http\Message\ResponseInterface
-   */
-  protected $response;
+    /**
+     * @var \Psr\Log\LoggerInterface
+     */
+    protected $logger;
 
-  /**
-   * Logger instance.
-   *
-   * @var \Psr\Log\LoggerInterface
-   */
-  protected $logger;
+    /**
+     * @var mixed
+     */
+    protected $decodedResponseBody;
 
-  /**
-   * Array representation of response body.
-   *
-   * @var mixed
-   */
-  protected $decodedResponseBody;
-
-  /**
-   * RequestResponseLogger constructor.
-   *
-   * @param \Psr\Http\Message\RequestInterface $request
-   *   Request object.
-   * @param \Psr\Http\Message\ResponseInterface $response
-   *   Response object.
-   * @param \Psr\Log\LoggerInterface $logger
-   *   Logger instance.
-   */
-  public function __construct(
-    RequestInterface $request,
-    ResponseInterface $response,
-    LoggerInterface $logger
-  ) {
-    $this->request = $request;
-    $this->response = $response;
-    $this->logger = $logger;
-    $this->decodedResponseBody = json_decode($response->getBody(), TRUE);
-  }
-
-  /**
-   * Logs response/request data.
-   */
-  public function log(): void {
-    if (!$this->isTrackable()) {
-      return;
+    /**
+     * RequestResponseLogger constructor.
+     *
+     * @param \Psr\Http\Message\RequestInterface $request
+     * @param \Psr\Http\Message\ResponseInterface $response
+     * @param \Psr\Log\LoggerInterface $logger
+     */
+    public function __construct(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
+    {
+        $this->request = $request;
+        $this->response = $response;
+        $this->logger = $logger;
+        $this->decodedResponseBody = json_decode($response->getBody(), true);
     }
 
-    $message = $this->buildLogMessage();
+    /**
+     * Logs response/request data.
+     */
+    public function log(): void
+    {
+        if (!$this->isTrackable()) {
+            return;
+        }
 
-    $this->logMessage($message, $this->response->getStatusCode());
-  }
+        $message = $this->buildLogMessage();
 
-  /**
-   * Checks if a response can be tracked.
-   *
-   * @return bool
-   *   TRUE in the case when the response should be tracked.
-   */
-  protected function isTrackable(): bool {
-    // Dont't track requests without ID.
-    if (empty($this->decodedResponseBody['request_id'])) {
-      return FALSE;
+        $this->logMessage($message, $this->response->getStatusCode());
     }
 
-    // Dont't track requests with sensitive data.
-    if (isset($this->decodedResponseBody['data']['data']['metadata']['settings'])) {
-      return FALSE;
+    /**
+     * Checks if a response can be tracked.
+     *
+     * @return bool
+     */
+    protected function isTrackable(): bool
+    {
+        // Skip tracking for requests without ID.
+        if (empty($this->decodedResponseBody['request_id'])) {
+            return false;
+        }
+
+        // Skip tracking for requests with a shared secret.
+        if (isset($this->decodedResponseBody['shared_secret'])) {
+            return false;
+        }
+
+        // Skip tracking for requests with sensitive data.
+        if (isset($this->decodedResponseBody['data']['data']['metadata']['settings'])) {
+            return false;
+        }
+
+        return true;
     }
 
-    return TRUE;
-  }
-
-  /**
-   * Builds log message.
-   *
-   * @return string
-   *   Log message.
-   */
-  protected function buildLogMessage(): string {
-    return sprintf(
-      'Request ID: %s. Method: %s. Path: %s. Status code: %d. Body: %s',
-      $this->decodedResponseBody['request_id'],
-      $this->request->getMethod(),
-      $this->request->getUri()->getPath(),
-      $this->response->getStatusCode(),
-      $this->response->getBody()
-    );
-  }
-
-  /**
-   * Logs message depending on response status code.
-   *
-   * @param string $message
-   *   Log message.
-   * @param int $responseStatusCode
-   *   Response status code.
-   */
-  protected function logMessage(
-    string $message,
-    int $responseStatusCode
-  ): void {
-    if ($responseStatusCode >= Response::HTTP_INTERNAL_SERVER_ERROR) {
-      $this->logger->error($message);
-
-      return;
+    /**
+     * Builds log message.
+     *
+     * @return string
+     *   Log message.
+     */
+    protected function buildLogMessage(): string
+    {
+        return sprintf(
+            'Request ID: %s. Method: %s. Path: %s. Status code: %d.',
+            $this->decodedResponseBody['request_id'],
+            $this->request->getMethod(),
+            $this->request->getUri()->getPath(),
+            $this->response->getStatusCode()
+        );
     }
 
-    if ($responseStatusCode >= Response::HTTP_BAD_REQUEST) {
-      $this->logger->warning($message);
+    /**
+     * Logs message depending on response status code.
+     *
+     * @param string $message
+     *   Log message.
+     * @param int $responseStatusCode
+     *   Response status code.
+     */
+    protected function logMessage(string $message, int $responseStatusCode): void
+    {
+        if ($responseStatusCode >= Response::HTTP_INTERNAL_SERVER_ERROR) {
+            $this->logger->error($message);
 
-      return;
+            return;
+        }
+
+        if ($responseStatusCode >= Response::HTTP_BAD_REQUEST) {
+            $this->logger->warning($message);
+
+            return;
+        }
+
+        $this->logger->info($message);
     }
-
-    $this->logger->info($message);
-  }
-
 }

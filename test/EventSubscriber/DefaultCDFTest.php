@@ -1,6 +1,6 @@
 <?php
 
-namespace Acquia\ContentHubClient\test;
+namespace Acquia\ContentHubClient\test\EventSubscriber;
 
 use Acquia\ContentHubClient\CDF\CDFObject;
 use Acquia\ContentHubClient\CDF\CDFObjectInterface;
@@ -10,28 +10,26 @@ use Acquia\ContentHubClient\EventSubscriber\DefaultCDF;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Class DefaultCDFTest.
- *
- * @package Acquia\ContentHubClient\test
- *
  * @runTestsInSeparateProcesses
  * @preserveGlobalState disabled
  */
 class DefaultCDFTest extends TestCase {
 
   /**
-   * DefaultCDF instance.
-   *
-   * @var \Acquia\ContentHubClient\EventSubscriber\DefaultCDF
+   * @var DefaultCDF
    */
   private $defaultCdf;
+
+  private $handler;
 
   /**
    * {@inheritdoc}
    */
   public function setUp(): void {
     parent::setUp();
+
     $this->defaultCdf = new DefaultCDF();
+    $this->handler = current(current($this->defaultCdf::getSubscribedEvents()[ContentHubLibraryEvents::GET_CDF_CLASS]));
   }
 
   /**
@@ -39,38 +37,21 @@ class DefaultCDFTest extends TestCase {
    */
   public function tearDown(): void {
     parent::tearDown();
-    unset($this->defaultCdf);
+
+    unset($this->clientCdf, $this->handler);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function testGetSubscribedEvents() {
-    $subscribedEvents = [
-      ContentHubLibraryEvents::GET_CDF_CLASS => [
-        [
-          'onGetCDFType',
-        ],
-      ],
-    ];
-    $this->assertEquals($subscribedEvents,
-      $this->defaultCdf->getSubscribedEvents());
+  public function testGetSubscribedEventsAddsHandlerToEvent() {
+    $this->assertNotNull($this->handler);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function testOnGetCDFType() { // phpcs:ignore
-    $this->assertNull($this->defaultCdf->onGetCDFType($this->getGetCDFTypeEvent()));
-  }
-
-  /**
-   * Returns GetCDFTypeEvent mock.
-   *
-   * @return mixed
-   *   GetCDFTypeEvent mock.
-   */
-  public function getGetCDFTypeEvent() { // phpcs:ignore
+  public function testHandler() {
     $cdfObjectInterfaceMock = \Mockery::mock(CDFObjectInterface::class);
     $cdfObjectMock = \Mockery::mock('overload:' . CDFObject::class);
 
@@ -83,17 +64,16 @@ class DefaultCDFTest extends TestCase {
       ->setMethods(['setObject', 'stopPropagation', 'getData'])
       ->getMock();
 
-    $getCDFTypeEventMock->expects($this->any())
-      ->method('getData')
-      ->willReturn([]);
-    $getCDFTypeEventMock->expects($this->any())
-      ->method('setObject')
-      ->willReturn(NULL);
-    $getCDFTypeEventMock->expects($this->any())
-      ->method('stopPropagation')
-      ->willReturn(NULL);
+    $getCDFTypeEventMock->expects($this->once())
+      ->method('getData');
 
-    return $getCDFTypeEventMock;
+    $getCDFTypeEventMock->expects($this->once())
+      ->method('setObject');
+
+    $getCDFTypeEventMock->expects($this->once())
+      ->method('stopPropagation');
+
+    $this->defaultCdf->{$this->handler}($getCDFTypeEventMock);
   }
 
 }

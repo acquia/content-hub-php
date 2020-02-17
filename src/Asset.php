@@ -10,28 +10,12 @@ namespace Acquia\ContentHubClient;
 class Asset extends \ArrayObject {
 
   /**
-   * Asset constructor.
-   *
-   * @param array $array
-   *   Asset data.
-   */
-  public function __construct(array $array = []) {
-    parent::__construct($array);
-  }
-
-  /**
    * URL setter.
    *
    * @param string $url
-   *   URL.
-   *
-   * @return \Acquia\ContentHubClient\Asset
-   *   Asset with URL.
    */
-  public function setUrl($url) {
+  public function setUrl(string $url): void {
     $this['url'] = $url;
-
-    return $this;
   }
 
   /**
@@ -40,13 +24,9 @@ class Asset extends \ArrayObject {
    * @param string $replaceToken
    *   Token value.
    *
-   * @return \Acquia\ContentHubClient\Asset
-   *   Asset.
    */
-  public function setReplaceToken($replaceToken) {
+  public function setReplaceToken(string $replaceToken): void {
     $this['replace-token'] = $replaceToken;
-
-    return $this;
   }
 
   /**
@@ -55,7 +35,7 @@ class Asset extends \ArrayObject {
    * @return string
    *   URL property.
    */
-  public function getUrl() {
+  public function getUrl(): string {
     return $this->getValue('url', '');
   }
 
@@ -65,7 +45,7 @@ class Asset extends \ArrayObject {
    * @return string
    *   'replace-token' value.
    */
-  public function getReplaceToken() {
+  public function getReplaceToken(): string {
     return $this->getValue('replace-token', '');
   }
 
@@ -81,7 +61,7 @@ class Asset extends \ArrayObject {
    *   Property value.
    */
   protected function getValue($key, $default) {
-    return isset($this[$key]) ? $this[$key] : $default;
+    return $this[$key] ?? $default;
   }
 
 }

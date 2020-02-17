@@ -4,15 +4,18 @@ dist: trusty
 group: edge
 
 php:
-  - 7.3
   - 7.2
   - 7.1
 
 before_script:
-  - composer install --dev
+  - composer require --dev php-coveralls/php-coveralls
+  - composer install
 
 after_script:
+  - travis_retry php vendor/bin/php-coveralls -v
+  - vendor/bin/ocular code-coverage:upload --format=php-clover build/logs/clover.xml
   - set -e
-  - vendor/bin/phpcs --config-set installed_paths vendor/drupal/coder/coder_sniffer
-  - vendor/bin/phpcs -n --standard=Drupal,DrupalPractice src/ test/
+    - vendor/bin/phpcs --config-set installed_paths vendor/drupal/coder/coder_sniffer
+    - vendor/bin/phpcs -n --standard=Drupal,DrupalPractice src/ test/
   # - vendor/bin/ocular code-coverage:upload --format=php-clover build/logs/clover.xml
+
