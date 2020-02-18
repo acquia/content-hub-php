@@ -11,6 +11,7 @@ use PHPUnit\Framework\TestCase;
  * Class SearchCriteriaBuilderTest.
  *
  * @covers \Acquia\ContentHubClient\SearchCriteria\SearchCriteriaBuilder
+ * @covers \Acquia\ContentHubClient\SearchCriteria\SearchCriteria
  *
  * @package Acquia\ContentHubClient\test\SearchCriteria
  */
@@ -81,6 +82,17 @@ class SearchCriteriaBuilderTest extends TestCase {
     $search_criteria = SearchCriteriaBuilder::createFromArray($this->search_criteria_data);
 
     $this->assertEquals($search_criteria->jsonSerialize(), $this->search_criteria_data);
+    $this->assertEquals($search_criteria->getSearchTerm(), $this->search_criteria_data['search_term']);
+    $this->assertEquals($search_criteria->getEntityType(), $this->search_criteria_data['type']);
+    $this->assertEquals($search_criteria->getBundle(), $this->search_criteria_data['bundle']);
+    $this->assertEquals($search_criteria->getTags(), $this->search_criteria_data['tags']);
+    $this->assertEquals($search_criteria->getLabel(), $this->search_criteria_data['label']);
+    $this->assertEquals($search_criteria->getStartDate(), $this->search_criteria_data['start_date']);
+    $this->assertEquals($search_criteria->getEndDate(), $this->search_criteria_data['end_date']);
+    $this->assertEquals($search_criteria->getFrom(), $this->search_criteria_data['from']);
+    $this->assertEquals($search_criteria->getSize(), $this->search_criteria_data['size']);
+    $this->assertEquals($search_criteria->getSorting(), $this->search_criteria_data['sorting']);
+    $this->assertEquals($search_criteria->getVersion(), $this->search_criteria_data['version']);
   }
 
   /**

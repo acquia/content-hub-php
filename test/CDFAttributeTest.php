@@ -9,6 +9,8 @@ use PHPUnit\Framework\TestCase;
 /**
  * Class CDFAttributeTest.
  *
+ * @covers \Acquia\ContentHubClient\CDFAttribute
+ *
  * @package Acquia\ContentHubClient\test
  */
 class CDFAttributeTest extends TestCase {
@@ -77,6 +79,24 @@ class CDFAttributeTest extends TestCase {
     }
 
     $this->assertEquals($numericAttribute['value'], $attribute->getValue());
+  }
+
+  /**
+   * @covers \Acquia\ContentHubClient\CDFAttribute
+   * @throws \Exception
+   */
+  public function testAttributeToArrayConvert() {
+    $value = $this->attributeData['attributes']['num']['value']['en'];
+
+    $attribute = new CDFAttribute($this->attributeId, CDFAttribute::TYPE_NUMBER, $value);
+
+    $expected = [
+      'type' => CDFAttribute::TYPE_NUMBER,
+      'value' => [CDFObject::LANGUAGE_UNDETERMINED => $value],
+    ];
+
+    $this->assertEquals($this->attributeId, $attribute->getId());
+    $this->assertEquals($expected, $attribute->toArray());
   }
 
   /**
