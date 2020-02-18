@@ -77,17 +77,11 @@ class CDFAttribute {
    * @throws \Exception
    *   Unsupported data type exception.
    */
-  public function __construct(
-    $id,
-    $type,
-    $value = NULL,
-    $language = CDFObject::LANGUAGE_UNDETERMINED
-  ) {
+  public function __construct($id, $type, $value = NULL, $language = CDFObject::LANGUAGE_UNDETERMINED) {
     $r = new ReflectionClass(__CLASS__);
     if (!in_array($type, $r->getConstants())) {
       // @todo validate value against data type?
-      throw new \Exception(sprintf("Unsupported CDF Attribute data type \"%s\".",
-        $type));
+      throw new \Exception(sprintf("Unsupported CDF Attribute data type \"%s\".", $type));
     }
     $this->id = $id;
     $this->type = $type;
@@ -135,10 +129,7 @@ class CDFAttribute {
    * @param string $language
    *   Attribute language.
    */
-  public function setValue(
-    $value,
-    $language = CDFObject::LANGUAGE_UNDETERMINED
-  ) {
+  public function setValue($value, $language = CDFObject::LANGUAGE_UNDETERMINED) {
     $this->value[$language] = $value;
   }
 

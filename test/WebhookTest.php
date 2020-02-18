@@ -6,18 +6,32 @@ use PHPUnit\Framework\TestCase;
 
 use Acquia\ContentHubClient\Webhook;
 
+/**
+ * Class WebhookTest.
+ *
+ * @covers \Acquia\ContentHubClient\Webhook
+ *
+ * @package Acquia\ContentHubClient\test
+ */
 class WebhookTest extends TestCase {
 
   /**
-   * @var Webhook
+   * Webhook instance.
+   *
+   * @var \Acquia\ContentHubClient\Webhook
    */
   private $webhook;
 
   /**
+   * Webhook definition.
+   *
    * @var array
    */
   private $definition;
 
+  /**
+   * {@inheritDoc}
+   */
   protected function setUp() {
     parent::setUp();
 
@@ -40,12 +54,18 @@ class WebhookTest extends TestCase {
     $this->webhook = new Webhook($this->definition);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   protected function tearDown() {
     parent::tearDown();
 
     unset($this->webhook, $this->definition);
   }
 
+  /**
+   * Tests webhook creation.
+   */
   public function testGettersReturnWhatPropertiesWereSetTo(): void {
     $this->assertEquals(
       [
@@ -66,19 +86,28 @@ class WebhookTest extends TestCase {
     $this->assertEquals($this->webhook->getDefinition(), $this->definition);
   }
 
+  /**
+   * Tests webhook status.
+   */
   public function testGetIsEnabledReturnsTrueIfStatusIsEnabled(): void {
     $this->definition['status'] = 'ENABLED';
     $this->webhook = new Webhook($this->definition);
     $this->assertTrue($this->webhook->isEnabled());
   }
 
+  /**
+   * Tests webhook status.
+   */
   public function testGetIsEnabledReturnsTrueIfStatusIsEmptyString(): void {
     $this->definition['status'] = '';
     $this->webhook = new Webhook($this->definition);
     $this->assertTrue($this->webhook->isEnabled());
   }
 
-  public function testGetIsEnabledReturnsFalseIfStatusIsNeitherENABLEDnorEmptyString(): void {
+  /**
+   * Tests webhook status.
+   */
+  public function testGetIsEnabledReturnsFalseIfStatusIsNeitherENABLEDnorEmptyString(): void { // phpcs:ignore
     $this->definition['status'] = 'some-status';
     $this->webhook = new Webhook($this->definition);
     $this->assertFalse($this->webhook->isEnabled());

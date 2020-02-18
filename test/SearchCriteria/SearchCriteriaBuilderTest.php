@@ -7,19 +7,32 @@ use Acquia\ContentHubClient\SearchCriteria\SearchCriteria;
 use Acquia\ContentHubClient\SearchCriteria\SearchCriteriaBuilder;
 use PHPUnit\Framework\TestCase;
 
-
+/**
+ * Class SearchCriteriaBuilderTest.
+ *
+ * @covers \Acquia\ContentHubClient\SearchCriteria\SearchCriteriaBuilder
+ *
+ * @package Acquia\ContentHubClient\test\SearchCriteria
+ */
 class SearchCriteriaBuilderTest extends TestCase {
 
   /**
+   * Search criteria data.
+   *
    * @var array
    */
-  private $search_criteria_data;
+  private $search_criteria_data; // phpcs:ignore
 
   /**
+   * Default search criteria data.
+   *
    * @var array
    */
-  private $default_search_criteria_data;
+  private $default_search_criteria_data; // phpcs:ignore
 
+  /**
+   * {@inheritDoc}
+   */
   protected function setUp() {
     parent::setUp();
 
@@ -29,8 +42,8 @@ class SearchCriteriaBuilderTest extends TestCase {
       'bundle' => [],
       'tags' => [],
       'label' => '',
-      'start_date' => null,
-      'end_date' => null,
+      'start_date' => NULL,
+      'end_date' => NULL,
       'from' => SearchCriteria::DEFAULT_OFFSET,
       'size' => SearchCriteria::DEFAULT_LIMIT,
       'sorting' => '',
@@ -54,28 +67,43 @@ class SearchCriteriaBuilderTest extends TestCase {
     ];
   }
 
+  /**
+   * {@inheritDoc}
+   */
   protected function tearDown() {
     parent::tearDown();
   }
 
+  /**
+   * Tests SearchCriteria creation with all required params.
+   */
   public function testObjectCreationWithAllRequiredParams(): void {
     $search_criteria = SearchCriteriaBuilder::createFromArray($this->search_criteria_data);
 
     $this->assertEquals($search_criteria->jsonSerialize(), $this->search_criteria_data);
   }
 
+  /**
+   * Tests SearchCriteria creation with all default params.
+   */
   public function testObjectCreationWithAllDefaultParams(): void {
     $search_criteria = SearchCriteriaBuilder::createFromArray($this->default_search_criteria_data);
 
     $this->assertEquals($search_criteria->jsonSerialize(), $this->default_search_criteria_data);
   }
 
+  /**
+   * Tests SearchCriteria creation from empty array.
+   */
   public function testObjectCreationWithUnsetParamsUsesDefault(): void {
     $search_criteria = SearchCriteriaBuilder::createFromArray([]);
 
     $this->assertEquals($search_criteria->jsonSerialize(), $this->default_search_criteria_data);
   }
 
+  /**
+   * Tests language switching.
+   */
   public function testSetLanguagesOnSearchCriteriaChangesLanguages(): void {
     $new_languages = ['new-lang1', 'new-lang2'];
 
@@ -86,4 +114,5 @@ class SearchCriteriaBuilderTest extends TestCase {
 
     $this->assertEquals($search_criteria->getLanguages(), $new_languages);
   }
+
 }

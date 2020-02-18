@@ -108,13 +108,26 @@ class Webhook {
     return $this->definition['status'];
   }
 
-  public function getIsMigrated():bool {
+  /**
+   * Returns 'is_migrated' property.
+   *
+   * @return bool
+   *   'is_migrated' property.
+   */
+  public function getIsMigrated(): bool {
     return $this->definition['is_migrated'];
   }
 
+  /**
+   * Returns 'suppressed_until' property.
+   *
+   * @return int
+   *   'suppressed_until' property.
+   */
   public function getSuppressedUntil(): int {
     return $this->definition['suppressed_until'];
   }
+
   /**
    * Returns definition of the webhook.
    *

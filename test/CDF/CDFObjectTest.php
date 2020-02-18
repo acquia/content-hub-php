@@ -2,15 +2,24 @@
 
 namespace Acquia\ContentHubClient\test\CDF;
 
-
 use Acquia\ContentHubClient\CDF\CDFObject;
 use Acquia\ContentHubClient\CDFAttribute;
 use Acquia\ContentHubClient\assets\CDFAttributeChild;
 use phpDocumentor\Reflection\Types\Self_;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * Class CDFObjectTest.
+ *
+ * @covers \Acquia\ContentHubClient\CDF\CDFObject
+ *
+ * @package Acquia\ContentHubClient\test\CDF
+ */
 class CDFObjectTest extends TestCase {
 
+  /**
+   * Test data.
+   */
   private const SAMPLE_CDF_OBJECT_PARAMS = [
     'type' => 'some-type',
     'uuid' => 'some-uuid',
@@ -39,10 +48,15 @@ class CDFObjectTest extends TestCase {
   ];
 
   /**
-   * @var CDFObject
+   * CDFObject instance.
+   *
+   * @var \Acquia\ContentHubClient\CDF\CDFObject
    */
   private $cdfObject;
 
+  /**
+   * {@inheritDoc}
+   */
   public function setUp(): void {
     parent::setUp();
 
@@ -56,19 +70,29 @@ class CDFObjectTest extends TestCase {
     );
   }
 
+  /**
+   * {@inheritDoc}
+   */
   public function tearDown(): void {
     parent::tearDown();
     unset($this->cdfObject);
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\CDF\CDFObject::toArray
+   */
   public function testToArray(): void {
-    $this->cdfObject->addAttribute('id', CDFAttribute::TYPE_ARRAY_INTEGER, 1, CDFObject::LANGUAGE_UNDETERMINED, CDFAttribute::class);
+    $this->cdfObject->addAttribute('id', CDFAttribute::TYPE_ARRAY_INTEGER, 1,
+      CDFObject::LANGUAGE_UNDETERMINED, CDFAttribute::class);
     $base_array = self::SAMPLE_CDF_OBJECT_PARAMS;
     $base_array['attributes'] = $this->attributesToArray($this->cdfObject->getAttributes());
 
     $this->assertEquals($this->cdfObject->toArray(), $base_array);
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\CDF\CDFObject::getAttributes
+   */
   public function testFromArrayCreation(): void {
     $cdf_object = CDFObject::fromArray(self::SAMPLE_CDF_OBJECT_PARAMS);
 
@@ -78,7 +102,10 @@ class CDFObjectTest extends TestCase {
     $this->assertInstanceOf(CDFAttributeChild::class, $attributes['name2']);
   }
 
-  public function testFromJSONStringCreation(): void {
+  /**
+   * @covers \Acquia\ContentHubClient\CDF\CDFObject::fromJson
+   */
+  public function testFromJSONStringCreation(): void { // phpcs:ignore
     $cdf_object = CDFObject::fromJson(json_encode(self::SAMPLE_CDF_OBJECT_PARAMS));
 
     $this->assertEquals(
@@ -87,14 +114,23 @@ class CDFObjectTest extends TestCase {
     );
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\CDF\CDFObject::getAttribute
+   */
   public function testGetAttributeReturnsNullIfNoAttributeIsPresent(): void {
     $this->assertNull($this->cdfObject->getAttribute('some-id'));
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\CDF\CDFObject::getModuleDependencies
+   */
   public function testGetModuleDependenciesReturnsEmptyArrayWhenEmpty(): void {
     $this->assertEquals($this->cdfObject->getModuleDependencies(), []);
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\CDF\CDFObject::getModuleDependencies
+   */
   public function testGetModuleDependenciesReturnsNoEmptyArrayWhenNonEmpty(): void {
     $some_value = 'some-value';
     $this->cdfObject->setMetadata([
@@ -106,10 +142,16 @@ class CDFObjectTest extends TestCase {
     $this->assertEquals($this->cdfObject->getModuleDependencies(), $some_value);
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\CDF\CDFObject::getDependencies
+   */
   public function testGetDependenciesReturnsEmptyArrayWhenEmpty(): void {
     $this->assertEquals($this->cdfObject->getDependencies(), []);
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\CDF\CDFObject::getDependencies
+   */
   public function testGetDependenciesReturnsNoEmptyArrayWhenNonEmpty(): void {
     $some_value = 'some-value';
     $this->cdfObject->setMetadata([
@@ -121,25 +163,34 @@ class CDFObjectTest extends TestCase {
     $this->assertEquals($this->cdfObject->getDependencies(), $some_value);
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\CDF\CDFObject::hasProcessedDependencies
+   */
   public function testProcessedDependencies(): void {
     $this->assertFalse($this->cdfObject->hasProcessedDependencies());
     $this->cdfObject->markProcessedDependencies();
     $this->assertTrue($this->cdfObject->hasProcessedDependencies());
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\CDF\CDFObject::addAttribute
+   */
   public function testAddIncorrectAttributeThrowsException(): void {
     $this->expectException(\Exception::class);
     $this->cdfObject->addAttribute('dummy_attribute_id', CDFAttribute::TYPE_ARRAY_BOOLEAN, [], CDFObject::LANGUAGE_UNDETERMINED, 'DummyClass');
   }
 
   /**
+   * @covers \Acquia\ContentHubClient\CDF\CDFObject::addAttribute
+   *
    * @dataProvider attributeDataProvider
    *
-   * @param $value
+   * @param mixed $value
+   *   Test data.
    *
    * @throws \Exception
    */
-  public function testAddAttributeAltersMetadataWithCDFAttributeSubclasses($value): void {
+  public function testAddAttributeAltersMetadataWithCDFAttributeSubclasses($value): void { // phpcs:ignore
     $attribute_id = 'attribute_id_1';
     $cdf_attribute_child_class = CDFAttributeChild::class;
 
@@ -151,19 +202,28 @@ class CDFObjectTest extends TestCase {
   }
 
   /**
+   * @covers \Acquia\ContentHubClient\CDF\CDFObject::addAttribute
+   *
    * @dataProvider attributeDataProvider
    *
-   * @param $value
+   * @param mixed $value
+   *   Test data.
    *
    * @throws \Exception
    */
-  public function testAddAttributeUnsetsAttributeFromMetadataWithCDFAttributeClass($value): void {
+  public function testAddAttributeUnsetsAttributeFromMetadataWithCDFAttributeClass($value): void { // phpcs:ignore
     $attribute_id = 'attribute_id_1';
     $this->cdfObject->addAttribute($attribute_id, CDFAttribute::TYPE_ARRAY_INTEGER, $value, CDFObject::LANGUAGE_UNDETERMINED, CDFAttribute::class);
 
     $this->assertFalse(isset($this->cdfObject->getMetadata()['attributes'][$attribute_id]));
   }
 
+  /**
+   * Data provider.
+   *
+   * @return array
+   *   Test data.
+   */
   public function attributeDataProvider(): array {
     return [
       [
@@ -185,6 +245,15 @@ class CDFObjectTest extends TestCase {
     ];
   }
 
+  /**
+   * Converts attributes to array.
+   *
+   * @param array $attributes
+   *   Attributes array.
+   *
+   * @return array
+   *   Converted data.
+   */
   private function attributesToArray(array $attributes) {
     return array_map(static function (CDFAttribute $attribute) {
       return $attribute->toArray();

@@ -12,41 +12,39 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  *
  * @see \Drupal\acquia_contenthub\Event\CreateCdfEntityEvent
  */
-class ClientCDF implements EventSubscriberInterface
-{
+class ClientCDF implements EventSubscriberInterface {
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
-    {
-        $events[ContentHubLibraryEvents::GET_CDF_CLASS][] = ['onGetCDFType', 100];
+  /**
+   * {@inheritdoc}
+   */
+  public static function getSubscribedEvents() {
+    $events[ContentHubLibraryEvents::GET_CDF_CLASS][] = ['onGetCDFType', 100];
 
-        return $events;
+    return $events;
+  }
+
+  /**
+   * Reacts on GET_CDF_CLASS event.
+   *
+   * @param \Acquia\ContentHubClient\Event\GetCDFTypeEvent $event
+   *   Event.
+   *
+   * @throws \Exception
+   */
+  public function onGetCDFType(GetCDFTypeEvent $event) {  // phpcs:ignore
+    if ($event->getType() === 'client') {
+      $data = $event->getData();
+      /* @deprecated Backwards Compatibility, Remove by 2.0 */
+      if (!isset($data['metadata']['settings'])) {
+        $data['metadata'] = [
+          'settings' => $data['metadata'],
+        ];
+      }
+      /* End deprecated code */
+      $object = ClientCDFObject::fromArray($data);
+      $event->setObject($object);
+      $event->stopPropagation();
     }
+  }
 
-    /**
-     * Reacts on GET_CDF_CLASS event.
-     *
-     * @param \Acquia\ContentHubClient\Event\GetCDFTypeEvent $event
-     *   Event.
-     *
-     * @throws \Exception
-     */
-    public function onGetCDFType(GetCDFTypeEvent $event)
-    {
-        if ($event->getType() === 'client') {
-              $data = $event->getData();
-            /* @deprecated Backwards Compatiblity, Remove by 2.0 */
-            if (!isset($data['metadata']['settings'])) {
-              $data['metadata'] = [
-                'settings' => $data['metadata']
-              ];
-            }
-            /* End deprecated code */
-            $object = ClientCDFObject::fromArray($data);
-            $event->setObject($object);
-            $event->stopPropagation();
-        }
-    }
 }

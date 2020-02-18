@@ -30,46 +30,72 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 /**
+ * @covers \Acquia\ContentHubClient\ContentHubClient
+ *
  * @runTestsInSeparateProcesses
  * @preserveGlobalState disabled
  */
 class ContentHubClientTest extends TestCase {
 
   /**
-   * @var ContentHubClient ContentHubClient Mock Object
+   * CH client.
+   *
+   * @var \Acquia\ContentHubClient\ContentHubClient
    */
-  private $ch_client;
+  private $ch_client; // phpcs:ignore
 
   /**
+   * Guzzle client.
+   *
    * @var \GuzzleHttp\Client|\Mockery\MockInterface
    */
-  private $guzzle_client;
+  private $guzzle_client; // phpcs:ignore
 
   /**
+   * Test data.
+   *
    * @var array
    */
-  private $test_data;
+  private $test_data; // phpcs:ignore
 
   /**
+   * Object factory.
+   *
    * @var \Mockery\MockInterface
    */
-  private $object_factory;
+  private $object_factory; // phpcs:ignore
 
   /**
+   * Event dispatcher.
+   *
    * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
    */
   private $dispatcher;
 
-  private $cdf1_array;
-
-  private $cdf2_array;
+  /**
+   * Test data.
+   *
+   * @var array
+   */
+  private $cdf1_array; // phpcs:ignore
 
   /**
+   * Test data.
+   *
+   * @var array
+   */
+  private $cdf2_array; // phpcs:ignore
+
+  /**
+   * CDFObject instance.
+   *
    * @var \Acquia\ContentHubClient\CDF\CDFObject
    */
   private $cdf1;
 
   /**
+   * CDFObject instance.
+   *
    * @var \Acquia\ContentHubClient\CDF\CDFObject
    */
   private $cdf2;
@@ -190,12 +216,29 @@ class ContentHubClientTest extends TestCase {
     $this->object_factory->shouldReceive('getAuthenticationKey')
       ->andReturn(\Mockery::mock(Key::class));
     $this->object_factory->shouldReceive('instantiateSettings')
-      ->andReturnUsing(function (string $name, string $uuid, string $api_key, string $secret, string $url, ?string $shared_secret = NULL, array $webhook = []) {
-        return $this->makeMockSettings($name, $uuid, $api_key, $secret, $url, $shared_secret, $webhook);
+      ->andReturnUsing(function (
+        string $name,
+        string $uuid,
+        string $api_key,
+        string $secret,
+        string $url,
+        ?string $shared_secret = NULL,
+        array $webhook = []
+      ) {
+        return $this->makeMockSettings($name, $uuid, $api_key, $secret, $url,
+          $shared_secret, $webhook);
       });
     $this->object_factory->shouldReceive('getCHClient')
-      ->andReturnUsing(function (array $config, LoggerInterface $logger, Settings $settings, HmacAuthMiddleware $middleware, EventDispatcherInterface $dispatcher, string $api_version = 'v2') {
-        return $this->makeMockCHClient($config, $logger, $settings, $middleware, $dispatcher, $api_version);
+      ->andReturnUsing(function (
+        array $config,
+        LoggerInterface $logger,
+        Settings $settings,
+        HmacAuthMiddleware $middleware,
+        EventDispatcherInterface $dispatcher,
+        string $api_version = 'v2'
+      ) {
+        return $this->makeMockCHClient($config, $logger, $settings, $middleware,
+          $dispatcher, $api_version);
       });
     $this->object_factory->shouldReceive('getCDFDocument')
       ->andReturnUsing(function (...$entities) {
@@ -224,6 +267,10 @@ class ContentHubClientTest extends TestCase {
     \Mockery::close();
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::ping
+   * @throws \Exception
+   */
   public function testPing(): void {
     $response_body = [
       'success' => TRUE,
@@ -243,6 +290,10 @@ class ContentHubClientTest extends TestCase {
     $this->assertSame($this->guzzle_client->getConfig(), $config);
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::register
+   * @throws \Exception
+   */
   public function testSuccessfulRegistration(): void {
     $response_body = [
       'name' => $this->test_data['name'],
@@ -260,6 +311,10 @@ class ContentHubClientTest extends TestCase {
     $this->assertGuzzleConfig();
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::register
+   * @throws \Exception
+   */
   public function testRegistrationFailsIfCallToRegisterThrowsBadResponseException(): void {
     $request = new Request('post', 'register');
     $response = new Response(SymfonyResponse::HTTP_BAD_REQUEST);
@@ -275,6 +330,10 @@ class ContentHubClientTest extends TestCase {
     $this->assertGuzzleConfig();
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::register
+   * @throws \Exception
+   */
   public function testRegistrationFailsWhenUnauthorizedCallToRegisterIsMade(): void {
     $request = new Request('post', 'register');
     $response = new Response(SymfonyResponse::HTTP_BAD_REQUEST);
@@ -290,6 +349,10 @@ class ContentHubClientTest extends TestCase {
     $this->assertGuzzleConfig();
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::register
+   * @throws \Exception
+   */
   public function testRegistrationFailsWhenRegisterThrowsAnException(): void {
     $this->guzzle_client
       ->shouldReceive('post')
@@ -303,6 +366,9 @@ class ContentHubClientTest extends TestCase {
     $this->assertGuzzleConfig();
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::clientNameExists
+   */
   public function testClientNameExistsReturnsTrueIfSuccessful(): void {
     $this->guzzle_client
       ->shouldReceive('get')
@@ -324,6 +390,9 @@ class ContentHubClientTest extends TestCase {
     $this->assertSame($config['headers']['Content-Type'], 'application/json');
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::clientNameExists
+   */
   public function testClientNameExistsReturnsFalseIfCallToPlexusFails(): void {
     $request = \Mockery::mock(Request::class);
     $response = $this->makeMockResponse(SymfonyResponse::HTTP_NOT_FOUND, [], json_encode(FALSE));
@@ -348,6 +417,10 @@ class ContentHubClientTest extends TestCase {
     $this->assertSame($config['headers']['Content-Type'], 'application/json');
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::createEntities
+   * @throws \Exception
+   */
   public function testCreateEntities(): void {
     $request_body = [
       'resource' => '',
@@ -375,7 +448,11 @@ class ContentHubClientTest extends TestCase {
     $this->assertSame($response_body, $this->ch_client::getResponseJson($result));
   }
 
-  public function testGetEntityReturnsCDFObjectUponSuccess(): void {
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::getEntity
+   * @throws \ReflectionException
+   */
+  public function testGetEntityReturnsCDFObjectUponSuccess(): void { // phpcs:ignore
     $uuid = 'some-existing-entity-uuid';
     $response_body = [
       'success' => TRUE,
@@ -400,6 +477,10 @@ class ContentHubClientTest extends TestCase {
     $this->assertInstanceOf(CDFObject::class, $this->ch_client->getEntity($uuid));
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::getEntity
+   * @throws \ReflectionException
+   */
   public function testGetEntityReturnsSimpleObjectUponFailure(): void {
     $uuid = 'some-non-existing-entity-uuid';
     $response_body = [
@@ -421,7 +502,11 @@ class ContentHubClientTest extends TestCase {
     $this->assertSame($response_body, $this->ch_client->getEntity($uuid));
   }
 
-  public function testGetEntitiesChunksUpUUIDsToSetOf50sAndReturnACDFDocument(): void {
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::getEntities
+   * @throws \ReflectionException
+   */
+  public function testGetEntitiesChunksUpUUIDsToSetOf50sAndReturnACDFDocument(): void { // phpcs:ignore
     $total = 56;
     $chunk_size = 50;
     $uuids = array_fill(0, $total, 'some-existing-uuid');
@@ -446,13 +531,15 @@ class ContentHubClientTest extends TestCase {
         ->shouldReceive('get')
         ->once()
         ->with('_search', ['body' => json_encode($call_params)])
-        ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode([
-          'hits' => [
-            'hits' => array_fill(0, count($chunk), $this->getElasticSearchItemWithId()),
-            'max_score' => 1,
-            'total' => count($chunk),
-          ],
-        ])));
+        ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [],
+          json_encode([
+            'hits' => [
+              'hits' => array_fill(0, count($chunk),
+                $this->getElasticSearchItemWithId()),
+              'max_score' => 1,
+              'total' => count($chunk),
+            ],
+          ])));
     }
 
     $result = $this->ch_client->getEntities($uuids);
@@ -461,7 +548,11 @@ class ContentHubClientTest extends TestCase {
     $this->assertCount($total, $result->getEntities());
   }
 
-  public function testGetEntitiesReturnsCDFDocumentWithEmptyObjectSetIfNothingFound(): void {
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::getEntities
+   * @throws \ReflectionException
+   */
+  public function testGetEntitiesReturnsCDFDocumentWithEmptyObjectSetIfNothingFound(): void { // phpcs:ignore
     $total = 56;
     $chunk_size = 50;
     $uuids = array_fill(0, $total, 'some-non-existing-uuid');
@@ -483,13 +574,14 @@ class ContentHubClientTest extends TestCase {
         ->shouldReceive('get')
         ->once()
         ->with('_search', ['body' => json_encode($call_params)])
-        ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode([
-          'hits' => [
-            'hits' => [],
-            'max_score' => NULL,
-            'total' => 0,
-          ],
-        ])));
+        ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [],
+          json_encode([
+            'hits' => [
+              'hits' => [],
+              'max_score' => NULL,
+              'total' => 0,
+            ],
+          ])));
     }
 
     $result = $this->ch_client->getEntities($uuids);
@@ -498,7 +590,11 @@ class ContentHubClientTest extends TestCase {
     $this->assertCount(0, $result->getEntities());
   }
 
-  public function testGetCDFObjectAlsoDispatchesGetCDFClassEvent(): void {
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::getCDFObject
+   * @throws \ReflectionException
+   */
+  public function testGetCDFObjectAlsoDispatchesGetCDFClassEvent(): void { // phpcs:ignore
     $data = [
       'type' => 'some-type-1',
       'uuid' => 'some-uuid-1',
@@ -519,6 +615,10 @@ class ContentHubClientTest extends TestCase {
     $this->assertInstanceOf(CDFObject::class, $result);
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::putEntities
+   * @throws \Exception
+   */
   public function testPutEntitiesReturnsSuccessIfAllGoesWell(): void {
     $response_code = SymfonyResponse::HTTP_ACCEPTED;
     $response_body = [
@@ -548,7 +648,10 @@ class ContentHubClientTest extends TestCase {
     $this->assertSame($response_body, $this->ch_client::getResponseJson($api_response));
   }
 
-  public function testPostEntitiesReturnHTTPAcceptedHeaderAndAnEmptyBodyIfAllGoesWell(): void {
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::postEntities
+   */
+  public function testPostEntitiesReturnHTTPAcceptedHeaderAndAnEmptyBodyIfAllGoesWell(): void { // phpcs:ignore
     $response_code = SymfonyResponse::HTTP_ACCEPTED;
     $request_body = [
       'resource' => '',
@@ -572,7 +675,10 @@ class ContentHubClientTest extends TestCase {
     $this->assertSame('', $api_response->getBody()->getContents());
   }
 
-  public function testDeleteEntityReturnsHTTPDeletedIfAllGoesWell(): void {
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::deleteEntity
+   */
+  public function testDeleteEntityReturnsHTTPDeletedIfAllGoesWell(): void { // phpcs:ignore
     $uuid = $this->test_data['uuid'];
     $response_code = SymfonyResponse::HTTP_ACCEPTED;
 
@@ -586,7 +692,10 @@ class ContentHubClientTest extends TestCase {
     $this->assertSame($response_code, $api_response->getStatusCode());
   }
 
-  public function testDeleteInterestReturnsHTTPAcceptedIfAllGoesWell(): void {
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::deleteInterest
+   */
+  public function testDeleteInterestReturnsHTTPAcceptedIfAllGoesWell(): void { // phpcs:ignore
     $uuid = $this->test_data['uuid'];
     $webhook_uuid = $this->test_data['webhook-uuid'];
     $response_code = SymfonyResponse::HTTP_ACCEPTED;
@@ -601,6 +710,10 @@ class ContentHubClientTest extends TestCase {
     $this->assertSame($response_code, $api_response->getStatusCode());
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::purge
+   * @throws \Exception
+   */
   public function testPurgeReturnsSuccess(): void {
     $response = [
       'success' => TRUE,
@@ -616,6 +729,10 @@ class ContentHubClientTest extends TestCase {
     $this->assertSame($response, $this->ch_client->purge());
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::restore
+   * @throws \Exception
+   */
   public function testRestoreReturnsSuccess(): void {
     $response = [
       'success' => TRUE,
@@ -631,6 +748,10 @@ class ContentHubClientTest extends TestCase {
     $this->assertSame($response, $this->ch_client->restore());
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::reindex
+   * @throws \Exception
+   */
   public function testReindexReturnsSuccess(): void {
     $response = [
       'success' => TRUE,
@@ -646,6 +767,10 @@ class ContentHubClientTest extends TestCase {
     $this->assertSame($response, $this->ch_client->reindex());
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::logs
+   * @throws \Exception
+   */
   public function testLogsReturnsCustomerFacingDataConsideringParams(): void {
     $query_params = [
       'size' => 3,
@@ -682,6 +807,10 @@ class ContentHubClientTest extends TestCase {
     }
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::mapping
+   * @throws \Exception
+   */
   public function testMappingReturnsCorrectInfo(): void {
     $response = [
       'entity' =>
@@ -733,6 +862,10 @@ class ContentHubClientTest extends TestCase {
     $this->assertSameSize($api_response['entity']['properties']['data']['properties'], $response['entity']['properties']['data']['properties']);
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::listEntities
+   * @throws \Exception
+   */
   public function testListEntities(): void {
     $return_fields = [
       'field_1',
@@ -797,7 +930,11 @@ class ContentHubClientTest extends TestCase {
     $this->assertCount($total, $api_response['data']);
   }
 
-  public function testSearchEntityRetrievesEntityFromES(): void {
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::searchEntity
+   * @throws \Exception
+   */
+  public function testSearchEntityRetrievesEntityFromES(): void { // phpcs:ignore
     $query_params = [
       'from' => 0,
       'query' => [
@@ -841,6 +978,10 @@ class ContentHubClientTest extends TestCase {
     }
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::getClientByName
+   * @throws \Exception
+   */
   public function testGetClientByNameReturnsClientInfoIfSuccessful(): void {
     $response = [
       'name' => $this->test_data['name'],
@@ -856,6 +997,10 @@ class ContentHubClientTest extends TestCase {
     $this->assertSame($api_response, $response);
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::getClientByName
+   * @throws \Exception
+   */
   public function testGetClientByNameReturnsUnsuccessfulIfClientIsNotFound(): void {
     $response = [
       'success' => FALSE,
@@ -875,14 +1020,26 @@ class ContentHubClientTest extends TestCase {
     $this->assertSame($this->ch_client->getClientByName($this->test_data['name']), $response);
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::getClients
+   * @throws \Exception
+   */
   public function testGetClientsReturnsAnArrayOfClientsIfAny(): void {
     $this->assertSame($this->ch_client->getClients(), $this->test_data['clients']);
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::getWebHooks
+   * @throws \Exception
+   */
   public function testGetWebhooksReturnsAnArrayOfWebhooksIfAny(): void {
     $this->assertSame(current($this->ch_client->getWebHooks())->getDefinition(), current($this->test_data['webhooks']));
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::getInterestsByWebhook
+   * @throws \Exception
+   */
   public function testGetWebhookInterestListReturnsEmptyArrayIfNone(): void {
     $response = [
       'success' => FALSE,
@@ -902,6 +1059,10 @@ class ContentHubClientTest extends TestCase {
     $this->assertSame($this->ch_client->getInterestsByWebhook($webhook_uuid), []);
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::getInterestsByWebhook
+   * @throws \Exception
+   */
   public function testGetWebhookInterestListReturnsAnArrayIfAny(): void {
     $response = [
       'success' => TRUE,
@@ -923,6 +1084,10 @@ class ContentHubClientTest extends TestCase {
     $this->assertSame($this->ch_client->getInterestsByWebhook($webhook_uuid), $response['data']['interests']);
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::addWebhook
+   * @throws \Exception
+   */
   public function testAddWebhookReturnsInfoAboutTheNewlyAddedWebhook(): void {
     $response = [
       'uuid' => 'some-webhook-uuid',
@@ -933,7 +1098,12 @@ class ContentHubClientTest extends TestCase {
       'status' => 'ENABLED',
     ];
 
-    $arr = ['body' => json_encode(['url' => $response['url'], 'version' => 2.0])];
+    $arr = [
+      'body' => json_encode([
+        'url' => $response['url'],
+        'version' => 2.0,
+      ]),
+    ];
     $this->ch_client
       ->shouldReceive('post')
       ->once()
@@ -943,6 +1113,10 @@ class ContentHubClientTest extends TestCase {
     $this->assertSame($this->ch_client->addWebhook($response['url']), $response);
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::addWebhook
+   * @throws \Exception
+   */
   public function testAddingTheSameWebhookMoreThanOnceReturnsSameInfoAboutTheWebhook(): void {
     $response = [
       'uuid' => 'some-webhook-uuid',
@@ -953,7 +1127,12 @@ class ContentHubClientTest extends TestCase {
       'status' => 'ENABLED',
     ];
 
-    $params = ['body' => json_encode(['url' => $response['url'], 'version' => 2.0])];
+    $params = [
+      'body' => json_encode([
+        'url' => $response['url'],
+        'version' => 2.0,
+      ]),
+    ];
     $this->ch_client
       ->shouldReceive('post')
       ->once()
@@ -972,7 +1151,10 @@ class ContentHubClientTest extends TestCase {
     $this->assertSame($api_response_attempt_1, $api_response_attempt_2);
   }
 
-  public function testDeleteWebhookReturns200IfSucessful(): void {
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::deleteWebhook
+   */
+  public function testDeleteWebhookReturns200IfSuccessful(): void {
     $webhook_uuid = 'some-webhook-uuid';
     $response = json_encode([
       'success' => TRUE,
@@ -991,6 +1173,9 @@ class ContentHubClientTest extends TestCase {
     $this->assertSame($api_response->getBody()->getContents(), $response);
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::deleteWebhook
+   */
   public function testDeleteWebhookReturns404IfNoSuchWebhookFound(): void {
     $webhook_uuid = 'some-non-existing-webhook-uuid';
     $response = json_encode([
@@ -1014,6 +1199,9 @@ class ContentHubClientTest extends TestCase {
     $this->assertSame($api_response->getBody()->getContents(), $response);
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::updateWebhook
+   */
   public function testUpdateWebhookFailsIfWebhookNotFound(): void {
     $webhook_uuid = 'some-non-existing-webhook-uuid';
     $new_webhook_data = [
@@ -1044,7 +1232,10 @@ class ContentHubClientTest extends TestCase {
     $this->assertSame($api_response->getBody()->getContents(), $response);
   }
 
-  public function testUpdateWebhookFailsIfURLIsNotAcceptable(): void {
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::updateWebhook
+   */
+  public function testUpdateWebhookFailsIfURLIsNotAcceptable(): void { // phpcs:ignore
     $webhook_uuid = 'some-existing-webhook-uuid';
     $new_webhook_data = [
       'version' => 1,
@@ -1074,6 +1265,9 @@ class ContentHubClientTest extends TestCase {
     $this->assertSame($api_response->getBody()->getContents(), $response);
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::updateWebhook
+   */
   public function testUpdateWebhookSetsVersionTo2IfNot1Or2(): void {
     $webhook_uuid = 'some-existing-webhook-uuid';
     $new_webhook_data = [
@@ -1101,7 +1295,9 @@ class ContentHubClientTest extends TestCase {
     $this->ch_client
       ->shouldReceive('put')
       ->once()
-      ->with('settings/webhooks/' . $webhook_uuid, ['body' => json_encode(array_merge($new_webhook_data, ['version' => 2]))])
+      ->with('settings/webhooks/' . $webhook_uuid, [
+        'body' => json_encode(array_merge($new_webhook_data, ['version' => 2])),
+      ])
       ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], $response));
 
     $api_response = $this->ch_client->updateWebhook($webhook_uuid, $new_webhook_data);
@@ -1110,6 +1306,9 @@ class ContentHubClientTest extends TestCase {
     $this->assertSame($api_response->getBody()->getContents(), $response);
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::addEntitiesToInterestList
+   */
   public function testAddEntitiesToInterestListReturnsSuccess(): void {
     $webhook_uuid = 'some-webhook-uuid';
     $response = json_encode([
@@ -1133,6 +1332,10 @@ class ContentHubClientTest extends TestCase {
     $this->assertSame($api_response->getBody()->getContents(), $response);
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::deleteClient
+   * @throws \Exception
+   */
   public function testDeleteClientProceedsOnlyIfDeleteEntityIsSuccessful(): void {
     $client_uuid = 'some-client-uuid';
 
@@ -1157,6 +1360,10 @@ class ContentHubClientTest extends TestCase {
     $this->assertSame($api_response->getBody()->getContents(), $response);
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::deleteClient
+   * @throws \Exception
+   */
   public function testDeleteClientThrowsExceptionIfAnythingGoesWrongWithDeleteEntity(): void {
     $client_uuid = 'some-client-uuid';
 
@@ -1170,6 +1377,9 @@ class ContentHubClientTest extends TestCase {
     $this->ch_client->deleteClient($client_uuid);
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::updateClient
+   */
   public function testUpdateClientRejectsDuplicateClientName(): void {
     $client_uuid = 'some-uuid';
     $new_name = 'some-existing-client-name';
@@ -1188,12 +1398,14 @@ class ContentHubClientTest extends TestCase {
       ->with('settings/client/uuid/' . $client_uuid, ['body' => json_encode(['name' => $new_name])])
       ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_CONFLICT, [], $response));
 
-
     $api_response = $this->ch_client->updateClient($client_uuid, $new_name);
     $this->assertSame($api_response->getStatusCode(), SymfonyResponse::HTTP_CONFLICT);
     $this->assertSame($api_response->getBody()->getContents(), $response);
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::updateClient
+   */
   public function testUpdateClientRejectsNonExistingClient(): void {
     $client_uuid = 'some-non-existing-uuid';
     $new_name = 'some-unique-name';
@@ -1212,13 +1424,15 @@ class ContentHubClientTest extends TestCase {
       ->with('settings/client/uuid/' . $client_uuid, ['body' => json_encode(['name' => $new_name])])
       ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_NOT_FOUND, [], $response));
 
-
     $api_response = $this->ch_client->updateClient($client_uuid, $new_name);
     $this->assertSame($api_response->getStatusCode(), SymfonyResponse::HTTP_NOT_FOUND);
     $this->assertSame($api_response->getBody()->getContents(), $response);
   }
 
-  public function testUpdateClientAcceptsAUniqueNameForAnExistingClient(): void {
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::updateClient
+   */
+  public function testUpdateClientAcceptsAUniqueNameForAnExistingClient(): void { // phpcs:ignore
     $client_uuid = 'some-existing-uuid';
     $new_name = 'some-unique-name';
 
@@ -1232,12 +1446,15 @@ class ContentHubClientTest extends TestCase {
       ->with('settings/client/uuid/' . $client_uuid, ['body' => json_encode(['name' => $new_name])])
       ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], $response));
 
-
     $api_response = $this->ch_client->updateClient($client_uuid, $new_name);
     $this->assertSame($api_response->getStatusCode(), SymfonyResponse::HTTP_OK);
     $this->assertSame($api_response->getBody()->getContents(), $response);
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::regenerateSharedSecret
+   * @throws \Exception
+   */
   public function testRegenerateSharedSecretReturnsSuccessIfAllGoesWell(): void {
     $response = [
       'success' => TRUE,
@@ -1252,7 +1469,11 @@ class ContentHubClientTest extends TestCase {
     $this->assertSame($this->ch_client->regenerateSharedSecret(), $response);
   }
 
-  public function testGetFilterByUUIDFailsIfFilterNotExists(): void {
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::getFilter
+   * @throws \Exception
+   */
+  public function testGetFilterByUUIDFailsIfFilterNotExists(): void { // phpcs:ignore
     $filter_uuid = 'some-non-existing-uuid';
     $response = [
       'success' => FALSE,
@@ -1271,7 +1492,11 @@ class ContentHubClientTest extends TestCase {
     $this->assertSame($this->ch_client->getFilter($filter_uuid), $response);
   }
 
-  public function testGetFilterByUUIDSucceedsIfFilterExists(): void {
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::getFilter
+   * @throws \Exception
+   */
+  public function testGetFilterByUUIDSucceedsIfFilterExists(): void {  // phpcs:ignore
     $filter_uuid = 'some-existing-uuid';
     $response = [
       'data' => [
@@ -1311,6 +1536,10 @@ class ContentHubClientTest extends TestCase {
     $this->assertSame($this->ch_client->getFilter($filter_uuid), $response);
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::getFilterByName
+   * @throws \Exception
+   */
   public function testGetFilterByNameFailsIfFilterNotExists(): void {
     $filter_name = 'some-non-existing-name';
     $response = [
@@ -1330,6 +1559,10 @@ class ContentHubClientTest extends TestCase {
     $this->assertNull($this->ch_client->getFilterByName($filter_name));
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::getFilterByName
+   * @throws \Exception
+   */
   public function testGetFilterByNameSucceedsIfFilterExists(): void {
     $filter_name = 'some-existing-name';
     $response = [
@@ -1370,6 +1603,10 @@ class ContentHubClientTest extends TestCase {
     $this->assertSame($this->ch_client->getFilterByName($filter_name), $response['data']);
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::listFilters
+   * @throws \Exception
+   */
   public function testListFiltersReturnsArrayOfWebhooks(): void {
     $response = [
       'data' => [
@@ -1403,6 +1640,10 @@ class ContentHubClientTest extends TestCase {
     $this->assertSame($this->ch_client->listFilters(), $response);
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::listFilters
+   * @throws \Exception
+   */
   public function testListFiltersReturnsAnArrayWithDataNullIfNoFilterExists(): void {
     $response = [
       'success' => TRUE,
@@ -1418,6 +1659,10 @@ class ContentHubClientTest extends TestCase {
     $this->assertSame($this->ch_client->listFilters(), $response);
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::putFilter
+   * @throws \Exception
+   */
   public function testPutFilterAddsFilterToTheClientIfNameNotAlreadyExists(): void {
     $filter_uuid = 'some-filter-uuid';
     $filter_name = 'some-unique-filter-name';
@@ -1458,6 +1703,10 @@ class ContentHubClientTest extends TestCase {
     $this->assertSame($this->ch_client->putFilter($query, $filter_name, $filter_uuid), $response);
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::putFilter
+   * @throws \Exception
+   */
   public function testPutFilterErrorsOutIfNameAlreadyExists(): void {
     $filter_uuid = 'some-filter-uuid';
     $filter_name = 'some-existing-filter-name';
@@ -1477,7 +1726,7 @@ class ContentHubClientTest extends TestCase {
     $response = [
       'error' => [
         'code' => 400,
-        'message' => 'Filter is already exisiting with the given name.',
+        'message' => 'Filter is already existing with the given name.',
       ],
       'request_id' => 'some-request-id',
       'success' => FALSE,
@@ -1501,6 +1750,9 @@ class ContentHubClientTest extends TestCase {
     $this->assertSame($this->ch_client->putFilter($query, $filter_name, $filter_uuid), $response);
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::deleteFilter
+   */
   public function testDeleteFilterReturnsAnArrayOfExistingFilters(): void {
     $filter_uuid = 'some-uuid';
     $response = json_encode([
@@ -1518,6 +1770,10 @@ class ContentHubClientTest extends TestCase {
     $this->assertSame($api_response->getBody()->getContents(), $response);
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::listFiltersForWebhook
+   * @throws \Exception
+   */
   public function testListFiltersForWebhookSucceedsIfWebhookExists(): void {
     $webhook_uuid = 'some-existing-webhook-uuid';
     $response = [
@@ -1538,6 +1794,10 @@ class ContentHubClientTest extends TestCase {
     $this->assertSame($this->ch_client->listFiltersForWebhook($webhook_uuid), $response);
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::addFilterToWebhook
+   * @throws \Exception
+   */
   public function testAddFilterToWebhookSucceedsIfAllGoesWell(): void {
     $filter_id = 'some-existing-filter-uuid';
     $webhook_id = 'some-existing-webhook-uuid';
@@ -1555,6 +1815,10 @@ class ContentHubClientTest extends TestCase {
     $this->assertSame($this->ch_client->addFilterToWebhook($filter_id, $webhook_id), $response);
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::addFilterToWebhook
+   * @throws \Exception
+   */
   public function testAddFilterToWebhookFailsIfFilterNotExists(): void {
     $filter_id = 'some-non-existing-filter-uuid';
     $webhook_id = 'some-existing-webhook-uuid';
@@ -1576,6 +1840,10 @@ class ContentHubClientTest extends TestCase {
     $this->assertSame($this->ch_client->addFilterToWebhook($filter_id, $webhook_id), $response);
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::addFilterToWebhook
+   * @throws \Exception
+   */
   public function testAddFilterToWebhookFailsIfWebhookNotExists(): void {
     $filter_id = 'some-non-existing-filter-uuid';
     $webhook_id = 'some-existing-webhook-uuid';
@@ -1597,6 +1865,10 @@ class ContentHubClientTest extends TestCase {
     $this->assertSame($this->ch_client->addFilterToWebhook($filter_id, $webhook_id), $response);
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::removeFilterFromWebhook
+   * @throws \Exception
+   */
   public function testRemoveFilterFromWebhookFailsIfWebhookNotExists(): void {
     $filter_id = 'some-existing-filter-uuid';
     $webhook_id = 'some-non-existing-webhook-uuid';
@@ -1618,6 +1890,10 @@ class ContentHubClientTest extends TestCase {
     $this->assertSame($this->ch_client->removeFilterFromWebhook($filter_id, $webhook_id), $response);
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::removeFilterFromWebhook
+   * @throws \Exception
+   */
   public function testRemoveFilterFromWebhookSucceedsEvenIfFilterNotExists(): void {
     $filter_id = 'some-non-existing-filter-uuid';
     $webhook_id = 'some-existing-webhook-uuid';
@@ -1635,12 +1911,20 @@ class ContentHubClientTest extends TestCase {
     $this->assertSame($this->ch_client->removeFilterFromWebhook($filter_id, $webhook_id), $response);
   }
 
-  public function testGetResponseJsonReturnsJSONDecodedResponse(): void {
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::getResponseJson
+   * @throws \Exception
+   */
+  public function testGetResponseJsonReturnsJSONDecodedResponse(): void {  // phpcs:ignore
     $response_body_array = [1, 2, 3];
     $mocked_response = $this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response_body_array));
     $this->assertSame($this->ch_client::getResponseJson($mocked_response), $response_body_array);
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::getResponseJson
+   * @throws \Exception
+   */
   public function testGetResponseJsonThrowsExceptionIfAnythingFails(): void {
     $response = \Mockery::mock(Response::class);
     $response
@@ -1652,18 +1936,27 @@ class ContentHubClientTest extends TestCase {
     $this->ch_client::getResponseJson($response);
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::addSearchCriteriaHeader
+   */
   public function testAddSearchCriteriaHeaderKeepsTheInputIntactIfNoQuestionMarkIsPresentInTheEndpointPath(): void {
     $input = ['path/to/some/endpoint/without/any/question-mark'];
 
     $this->assertSame($this->ch_client->addSearchCriteriaHeader($input), $input);
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::addSearchCriteriaHeader
+   */
   public function testAddSearchCriteriaHeaderKeepsTheInputIntactIfNothingIsPresentInTheEndpointPathAfterTheQuestionMark(): void {
     $input = ['path/to/some/endpoint/with/question-mark/but-nothing-after-it?'];
 
     $this->assertSame($this->ch_client->addSearchCriteriaHeader($input), $input);
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::addSearchCriteriaHeader
+   */
   public function testAddSearchCriteriaAddsLanguagesToQueryStringIfAny(): void {
     $input = ['path/to/some/endpoint/with/question-mark?a=b&c=d'];
     $output = $this->ch_client->addSearchCriteriaHeader($input);
@@ -1671,6 +1964,9 @@ class ContentHubClientTest extends TestCase {
     $this->assertTrue(isset($output[1]['headers'][SearchCriteria::HEADER_NAME]));
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::getErrorResponse
+   */
   public function testGetErrorResponseReturnsResponse(): void {
     $code = SymfonyResponse::HTTP_FORBIDDEN;
     $reason = 'some-reason';
@@ -1679,18 +1975,65 @@ class ContentHubClientTest extends TestCase {
     $this->assertSame($response->getStatusCode(), $code);
     $this->assertSame($response->getReasonPhrase(), $reason);
   }
-  /*--------------------------------------------------*/
-  private function makeMockResponse(int $status, array $headers, string $body): ResponseInterface {
+
+  /**
+   * Mock response.
+   *
+   * @param int $status
+   *   Response status code.
+   * @param array $headers
+   *   Headers.
+   * @param string $body
+   *   Response body.
+   *
+   * @return \Psr\Http\Message\ResponseInterface
+   *   Mocked object.
+   */
+  private function makeMockResponse(
+    int $status,
+    array $headers,
+    string $body
+  ): ResponseInterface {
     $response = \Mockery::mock(Response::class);
 
     $response->shouldReceive('getStatusCode')->andReturn($status);
     $response->shouldReceive('getHeaders')->andReturn($headers);
-    $response->shouldReceive('getBody')->andReturn(\GuzzleHttp\Psr7\stream_for($body));
+    $response->shouldReceive('getBody')
+      ->andReturn(\GuzzleHttp\Psr7\stream_for($body));
 
     return $response;
   }
 
-  private function makeMockSettings(string $name, string $uuid, string $api_key, string $secret, string $url, ?string $shared_secret = NULL, array $webhook = []): Settings {
+  /**
+   * Mock settings.
+   *
+   * @param string $name
+   *   Name.
+   * @param string $uuid
+   *   UUID.
+   * @param string $api_key
+   *   API key.
+   * @param string $secret
+   *   API secret.
+   * @param string $url
+   *   URL.
+   * @param string|null $shared_secret
+   *   Shared secret.
+   * @param array $webhook
+   *   Webhook definition.
+   *
+   * @return \Acquia\ContentHubClient\Settings
+   *   Mocked object.
+   */
+  private function makeMockSettings(
+    string $name,
+    string $uuid,
+    string $api_key,
+    string $secret,
+    string $url,
+    ?string $shared_secret = NULL,
+    array $webhook = []
+  ): Settings {
     $settings = \Mockery::mock(Settings::class);
 
     $settings->shouldReceive('getName')->andReturn($name);
@@ -1699,25 +2042,55 @@ class ContentHubClientTest extends TestCase {
     $settings->shouldReceive('getSecretKey')->andReturn($secret);
     $settings->shouldReceive('getUrl')->andReturn($url);
     $settings->shouldReceive('getSharedSecret')->andReturn($shared_secret);
-    $settings->shouldReceive('getMiddleware')->andReturn(\Mockery::mock(HmacAuthMiddleware::class));
+    $settings->shouldReceive('getMiddleware')
+      ->andReturn(\Mockery::mock(HmacAuthMiddleware::class));
 
     return $settings;
   }
 
-  public function makeMockCHClient(array $config, LoggerInterface $logger, Settings $settings, HmacAuthMiddleware $middleware, EventDispatcherInterface $dispatcher, string $api_version = 'v2'): ContentHubClient {
-    $client = \Mockery::mock(ContentHubClient::class)->makePartial()->shouldAllowMockingProtectedMethods();
+  /**
+   * Mock CH client.
+   *
+   * @param array $config
+   *   Config.
+   * @param \Psr\Log\LoggerInterface $logger
+   *   Logger.
+   * @param \Acquia\ContentHubClient\Settings $settings
+   *   Settings.
+   * @param \Acquia\Hmac\Guzzle\HmacAuthMiddleware $middleware
+   *   Middleware.
+   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
+   *   Event dispatcher.
+   * @param string $api_version
+   *   API version.
+   *
+   * @return \Acquia\ContentHubClient\ContentHubClient
+   *   Mocked object.
+   *
+   * @throws \ReflectionException
+   */
+  public function makeMockCHClient( // phpcs:ignore
+    array $config,
+    LoggerInterface $logger,
+    Settings $settings,
+    HmacAuthMiddleware $middleware,
+    EventDispatcherInterface $dispatcher,
+    string $api_version = 'v2'
+  ): ContentHubClient {
+    $client = \Mockery::mock(ContentHubClient::class)
+      ->makePartial()
+      ->shouldAllowMockingProtectedMethods();
 
     self::mockProperty($client, 'dispatcher', $dispatcher);
 
-
     $client
       ->shouldReceive('getConfig')
-      ->andReturnUsing(static function ($key = null) use ($config) {
-        if (null === $key) {
+      ->andReturnUsing(static function ($key = NULL) use ($config) {
+        if (NULL === $key) {
           return $config;
         }
 
-        return $config[$key] ?? null;
+        return $config[$key] ?? NULL;
       });
 
     $client->shouldReceive('getSettings')->andReturn($settings);
@@ -1749,6 +2122,17 @@ class ContentHubClientTest extends TestCase {
     return $client;
   }
 
+  /**
+   * Make registration request.
+   *
+   * @param \Psr\Log\LoggerInterface $logger
+   *   Logger.
+   *
+   * @return \Acquia\ContentHubClient\ContentHubClient
+   *   ContentHubClient instance.
+   *
+   * @throws \Exception
+   */
   private function makeRegistrationRequest(LoggerInterface $logger): ContentHubClient {
     return $this->ch_client::register(
       $logger,
@@ -1761,6 +2145,9 @@ class ContentHubClientTest extends TestCase {
     );
   }
 
+  /**
+   * Tests Guzzle config.
+   */
   private function assertGuzzleConfig(): void {
     $config = $this->guzzle_client->getConfig();
 
@@ -1769,7 +2156,10 @@ class ContentHubClientTest extends TestCase {
   }
 
   /**
+   * Tests response items.
+   *
    * @param \Acquia\ContentHubClient\ContentHubClient $response
+   *   ContentHubClient instance.
    */
   private function assertResponseItems(ContentHubClient $response): void {
     $settings = $response->getSettings();
@@ -1781,6 +2171,15 @@ class ContentHubClientTest extends TestCase {
     $this->assertSame($settings->getSharedSecret(), $this->test_data['shared-secret']);
   }
 
+  /**
+   * Mock logger.
+   *
+   * @param string $method
+   *   Method name.
+   *
+   * @return \Psr\Log\LoggerInterface
+   *   Mocked object.
+   */
   private function getMockLogger($method = 'log'): LoggerInterface {
     $logger = \Mockery::mock(LoggerInterface::class);
     $logger->shouldReceive($method)->once();
@@ -1788,7 +2187,16 @@ class ContentHubClientTest extends TestCase {
     return $logger;
   }
 
-  private function makeMockCDFDocument(CDFObject ...$entities): CDFDocument {
+  /**
+   * Mock CDFDocument.
+   *
+   * phpcs:ignore @param \Acquia\ContentHubClient\CDF\CDFObject ...$entities
+   *   CDF objects.
+   *
+   * @return \Acquia\ContentHubClient\CDFDocument
+   *   Mocked object.
+   */
+  private function makeMockCDFDocument(CDFObject ...$entities): CDFDocument { // phpcs:ignore
     $cdf_document = \Mockery::mock(CDFDocument::class);
 
     $cdf_document->shouldReceive('getEntities')->andReturn($entities);
@@ -1796,10 +2204,25 @@ class ContentHubClientTest extends TestCase {
     return $cdf_document;
   }
 
+  /**
+   * Mock event dispatcher.
+   *
+   * @return \Symfony\Component\EventDispatcher\EventDispatcherInterface
+   *   Mocked object.
+   */
   private function getMockDispatcher(): EventDispatcherInterface {
     return \Mockery::mock(EventDispatcher::class);
   }
 
+  /**
+   * Mock GetCDFTypeEvent.
+   *
+   * @param array $cdf_array
+   *   Data.
+   *
+   * @return \Acquia\ContentHubClient\Event\GetCDFTypeEvent
+   *   Mocked object.
+   */
   private function makeMockCdfTypeEvent(array $cdf_array): GetCDFTypeEvent {
     $cdf = \Mockery::mock(CDFObject::class);
     $cdf->shouldReceive('toArray')->andReturn($cdf_array);
@@ -1811,6 +2234,15 @@ class ContentHubClientTest extends TestCase {
     return $cdf_type_event;
   }
 
+  /**
+   * Mock webhook.
+   *
+   * @param array $definition
+   *   Webhook definition.
+   *
+   * @return \Acquia\ContentHubClient\Webhook|\Mockery\LegacyMockInterface|\Mockery\MockInterface
+   *   Mocked object.
+   */
   private function makeMockWebhook(array $definition) {
     $webhook = \Mockery::mock(Webhook::class);
 
@@ -1819,6 +2251,18 @@ class ContentHubClientTest extends TestCase {
     return $webhook;
   }
 
+  /**
+   * Mock property.
+   *
+   * @param mixed $object
+   *   Object.
+   * @param string $property_name
+   *   Property name.
+   * @param mixed $value
+   *   Property value.
+   *
+   * @throws \ReflectionException
+   */
   private static function mockProperty($object, string $property_name, $value): void {
     $reflectionClass = new \ReflectionClass($object);
 
@@ -1829,10 +2273,15 @@ class ContentHubClientTest extends TestCase {
   }
 
   /**
+   * Returns test search result.
+   *
    * @param int $id
+   *   Request ID.
    * @param string $type
+   *   Search type.
    *
    * @return array
+   *   Test data.
    */
   private function getElasticSearchItemWithId(int $id = 1, string $type = 'some-type'): array {
     return [

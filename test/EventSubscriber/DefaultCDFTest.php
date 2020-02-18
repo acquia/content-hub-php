@@ -10,16 +10,25 @@ use Acquia\ContentHubClient\EventSubscriber\DefaultCDF;
 use PHPUnit\Framework\TestCase;
 
 /**
+ * @covers \Acquia\ContentHubClient\EventSubscriber\DefaultCDF
+ *
  * @runTestsInSeparateProcesses
  * @preserveGlobalState disabled
  */
 class DefaultCDFTest extends TestCase {
 
   /**
-   * @var DefaultCDF
+   * DefaultCDF instance.
+   *
+   * @var \Acquia\ContentHubClient\EventSubscriber\DefaultCDF
    */
   private $defaultCdf;
 
+  /**
+   * Event handler.
+   *
+   * @var mixed
+   */
   private $handler;
 
   /**
