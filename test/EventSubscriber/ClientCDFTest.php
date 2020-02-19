@@ -11,16 +11,27 @@ use Acquia\ContentHubClient\EventSubscriber\ClientCDF;
 use PHPUnit\Framework\TestCase;
 
 /**
+ * Class ClientCDFTest.
+ *
+ * @covers \Acquia\ContentHubClient\EventSubscriber\ClientCDF
+ *
  * @runTestsInSeparateProcesses
  * @preserveGlobalState disabled
  */
 class ClientCDFTest extends TestCase {
 
   /**
-   * @var ClientCDF
+   * ClientCDF instance.
+   *
+   * @var \Acquia\ContentHubClient\EventSubscriber\ClientCDF
    */
-  private $client_cdf;
+  private $client_cdf; // phpcs:ignore
 
+  /**
+   * Event handler.
+   *
+   * @var mixed
+   */
   private $handler;
 
   /**
@@ -91,7 +102,13 @@ class ClientCDFTest extends TestCase {
     $this->client_cdf->{$this->handler}($event);
   }
 
-  private function getGetCDFTypeEvent(): GetCDFTypeEvent {
+  /**
+   * Mock builder for GetCDFTypeEvent class.
+   *
+   * @return \Acquia\ContentHubClient\Event\GetCDFTypeEvent
+   *   Mocked object.
+   */
+  private function getGetCDFTypeEvent(): GetCDFTypeEvent { // phpcs:ignore
     $mock_cdf_object = \Mockery::mock(CDFObject::class);
     $mock_client_cdf_object = \Mockery::mock('overload:' . ClientCDFObject::class);
 
@@ -101,7 +118,13 @@ class ClientCDFTest extends TestCase {
 
     return $this->getMockBuilder(GetCDFTypeEvent::class)
       ->disableOriginalConstructor()
-      ->setMethods(['getType', 'setObject', 'stopPropagation', 'getData', 'getObject'])
+      ->setMethods([
+        'getType',
+        'setObject',
+        'stopPropagation',
+        'getData',
+        'getObject',
+      ])
       ->getMock();
   }
 

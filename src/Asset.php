@@ -13,6 +13,7 @@ class Asset extends \ArrayObject {
    * URL setter.
    *
    * @param string $url
+   *   URL.
    */
   public function setUrl(string $url): void {
     $this['url'] = $url;
@@ -23,7 +24,6 @@ class Asset extends \ArrayObject {
    *
    * @param string $replaceToken
    *   Token value.
-   *
    */
   public function setReplaceToken(string $replaceToken): void {
     $this['replace-token'] = $replaceToken;

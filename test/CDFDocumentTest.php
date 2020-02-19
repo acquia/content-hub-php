@@ -6,65 +6,84 @@ use Acquia\ContentHubClient\CDF\CDFObject;
 use Acquia\ContentHubClient\CDFDocument;
 use PHPUnit\Framework\TestCase;
 
-class CDFDocumentTest extends TestCase
-{
+/**
+ * Class CDFDocumentTest.
+ *
+ * @covers \Acquia\ContentHubClient\CDFDocument
+ *
+ * @package Acquia\ContentHubClient\test
+ */
+class CDFDocumentTest extends TestCase {
+
   /**
-   * @var CDFDocument
+   * CDF document.
+   *
+   * @var \Acquia\ContentHubClient\CDFDocument
    */
   protected $cdfDocument;
 
   /**
-   *
+   * {@inheritDoc}
    */
-  public function setUp() : void
-  {
+  public function setUp(): void {
     parent::setUp();
     $this->cdfDocument = new CDFDocument();
   }
 
   /**
-   *
+   * {@inheritDoc}
    */
-  public function tearDown() : void
-  {
+  public function tearDown(): void {
     parent::tearDown();
     unset($this->cdfDocument);
   }
 
   /**
+   * @covers \Acquia\ContentHubClient\CDFDocument::hasEntities
+   *
    * @dataProvider providerEntityOperations
-   * @param $objectToAdd
-   * @param $notAddedObject
+   *
+   * @param \Acquia\ContentHubClient\CDF\CDFObject $objectToAdd
+   *   CDF object.
+   * @param \Acquia\ContentHubClient\CDF\CDFObject $notAddedObject
+   *   CDF object.
    */
-  public function testHasEntities($objectToAdd, $notAddedObject)
-  {
-    //Check hasEntities method before and after we add an Object
-    $this->assertEquals($this->cdfDocument->hasEntities(), false);
+  public function testHasEntities(CDFObject $objectToAdd, CDFObject $notAddedObject) {
+    // Check hasEntities method before and after we add an Object.
+    $this->assertEquals($this->cdfDocument->hasEntities(), FALSE);
     $this->cdfDocument->addCdfEntity($objectToAdd);
-    $this->assertEquals($this->cdfDocument->hasEntities(), true);
+    $this->assertEquals($this->cdfDocument->hasEntities(), TRUE);
   }
 
   /**
+   * @covers \Acquia\ContentHubClient\CDFDocument::getCdfEntity
+   *
    * @dataProvider providerEntityOperations
-   * @param $objectToAdd
-   * @param $notAddedObject
+   *
+   * @param \Acquia\ContentHubClient\CDF\CDFObject $objectToAdd
+   *   CDF object.
+   * @param \Acquia\ContentHubClient\CDF\CDFObject $notAddedObject
+   *   CDF object.
    */
-  public function testGetEntity($objectToAdd, $notAddedObject)
-  {
-    //Check getting added and not added Object
+  public function testGetEntity(CDFObject $objectToAdd, CDFObject $notAddedObject) {
+    // Check getting added and not added Object.
     $this->cdfDocument->addCdfEntity($objectToAdd);
     $this->assertEquals($this->cdfDocument->getCdfEntity($objectToAdd->getUuid()), $objectToAdd);
-    $this->assertEquals($this->cdfDocument->getCdfEntity($notAddedObject->getUuid()), null);
+    $this->assertEquals($this->cdfDocument->getCdfEntity($notAddedObject->getUuid()), NULL);
   }
 
   /**
+   * @covers \Acquia\ContentHubClient\CDFDocument::getEntities
+   *
    * @dataProvider providerEntityOperations
-   * @param $objectOne
-   * @param $objectTwo
+   *
+   * @param \Acquia\ContentHubClient\CDF\CDFObject $objectOne
+   *   CDF object.
+   * @param \Acquia\ContentHubClient\CDF\CDFObject $objectTwo
+   *   CDF object.
    */
-  public function testGetEntities($objectOne, $objectTwo)
-  {
-    //Check getting added and not added Object
+  public function testGetEntities(CDFObject $objectOne, CDFObject $objectTwo) {
+    // Check getting added and not added Object.
     $this->cdfDocument->setCdfEntities($objectOne, $objectTwo);
 
     foreach ($this->cdfDocument->getEntities() as $entity) {
@@ -73,38 +92,49 @@ class CDFDocumentTest extends TestCase
   }
 
   /**
+   * @covers \Acquia\ContentHubClient\CDFDocument::addCdfEntity
+   *
    * @dataProvider providerEntityOperations
-   * @param $objectToAdd
-   * @param $notAddedObject
+   *
+   * @param \Acquia\ContentHubClient\CDF\CDFObject $objectToAdd
+   *   CDF object.
+   * @param \Acquia\ContentHubClient\CDF\CDFObject $notAddedObject
+   *   CDF object.
    */
-  public function testAddEntity($objectToAdd, $notAddedObject)
-  {
-    //Check if hasEntity will return correct values for added and not added Objects
+  public function testAddEntity(CDFObject $objectToAdd, CDFObject $notAddedObject) {
+    // Check if hasEntity will return correct values for added and not added Objects.
     $this->cdfDocument->addCdfEntity($objectToAdd);
-    $this->assertEquals($this->cdfDocument->hasEntity($objectToAdd->getUuid()), true);
-    $this->assertEquals($this->cdfDocument->hasEntity($notAddedObject->getUuid()), false);
+    $this->assertEquals($this->cdfDocument->hasEntity($objectToAdd->getUuid()), TRUE);
+    $this->assertEquals($this->cdfDocument->hasEntity($notAddedObject->getUuid()), FALSE);
   }
 
   /**
+   * @covers \Acquia\ContentHubClient\CDFDocument::removeCdfEntity
+   *
    * @dataProvider providerEntityOperations
-   * @param $objectToAdd
+   *
+   * @param \Acquia\ContentHubClient\CDF\CDFObject $objectToAdd
+   *   CDF object.
    */
-  public function testRemoveEntity($objectToAdd)
-  {
-    //Test removing Entity
+  public function testRemoveEntity(CDFObject $objectToAdd) {
+    // Test removing Entity.
     $this->cdfDocument->addCdfEntity($objectToAdd);
-    $this->assertEquals($this->cdfDocument->hasEntity($objectToAdd->getUuid()), true);
+    $this->assertEquals($this->cdfDocument->hasEntity($objectToAdd->getUuid()), TRUE);
     $this->cdfDocument->removeCdfEntity($objectToAdd->getUuid());
-    $this->assertEquals($this->cdfDocument->hasEntity($objectToAdd->getUuid()), false);
+    $this->assertEquals($this->cdfDocument->hasEntity($objectToAdd->getUuid()), FALSE);
   }
 
   /**
+   * @covers \Acquia\ContentHubClient\CDFDocument::mergeDocuments
+   *
    * @dataProvider providerMergeDocuments
-   * @param $setOne
-   * @param $setTwo
+   *
+   * @param array $setOne
+   *   Data set.
+   * @param array $setTwo
+   *   Data set.
    */
-  public function testMergeDocuments($setOne, $setTwo)
-  {
+  public function testMergeDocuments(array $setOne, array $setTwo) {
     $this->cdfDocument->setCdfEntities(...$setOne);
     $documentToMerge = new CDFDocument(...$setTwo);
 
@@ -118,12 +148,16 @@ class CDFDocumentTest extends TestCase
   }
 
   /**
+   * @covers \Acquia\ContentHubClient\CDFDocument::mergeDocuments
+   *
    * @dataProvider providerMergeDocuments
-   * @param $setOne
-   * @param $setTwo
+   *
+   * @param array $setOne
+   *   Data set.
+   * @param array $setTwo
+   *   Data set.
    */
-  public function testMergeDocumentsByKeys($setOne, $setTwo)
-  {
+  public function testMergeDocumentsByKeys(array $setOne, array $setTwo) {
     $this->cdfDocument->setCdfEntities(...$setOne);
     $documentToMerge = new CDFDocument(...$setTwo);
 
@@ -138,13 +172,18 @@ class CDFDocumentTest extends TestCase
   }
 
   /**
+   * @covers \Acquia\ContentHubClient\CDFDocument::mergeDocuments
+   *
    * @dataProvider providerMergeDocumentsNoOverlap
-   * @param $setOne
-   * @param $setTwo
-   * @param $elementFromSetTwo
+   *
+   * @param array $setOne
+   *   Data set.
+   * @param array $setTwo
+   *   Data set.
+   * @param \Acquia\ContentHubClient\CDF\CDFObject $elementFromSetTwo
+   *   CDF object.
    */
-  public function testMergeDocumentsNoOverlap($setOne, $setTwo, $elementFromSetTwo)
-  {
+  public function testMergeDocumentsNoOverlap(array $setOne, array $setTwo, CDFObject $elementFromSetTwo) {
     $this->cdfDocument->setCdfEntities(...$setOne);
     $documentToMerge = new CDFDocument(...$setTwo);
 
@@ -154,13 +193,18 @@ class CDFDocumentTest extends TestCase
   }
 
   /**
+   * @covers \Acquia\ContentHubClient\CDFDocument::mergeDocuments
+   *
    * @dataProvider providerMergeDocumentsOverlap
-   * @param $setOne
-   * @param $setTwo
-   * @param $overlappingElement
+   *
+   * @param array $setOne
+   *   Data set.
+   * @param array $setTwo
+   *   Data set.
+   * @param \Acquia\ContentHubClient\CDF\CDFObject $overlappingElement
+   *   CDF object.
    */
-  public function testMergeDocumentsOverlap($setOne, $setTwo, $overlappingElement)
-  {
+  public function testMergeDocumentsOverlap(array $setOne, array $setTwo, CDFObject $overlappingElement) {
     $this->cdfDocument->setCdfEntities(...$setOne);
     $documentToMerge = new CDFDocument(...$setTwo);
 
@@ -170,20 +214,30 @@ class CDFDocumentTest extends TestCase
   }
 
   /**
+   * @covers \Acquia\ContentHubClient\CDFDocument::toString
+   *
    * @dataProvider providerToString
-   * @param $objectsList
-   * @param $emptyObjectsJson
-   * @param $filledObjectsJson
+   *
+   * @param array $objectsList
+   *   Objects list.
+   * @param string $emptyObjectsJson
+   *   JSON string.
+   * @param string $filledObjectsJson
+   *   JSON string.
    */
-  public function testToString($objectsList, $emptyObjectsJson, $filledObjectsJson)
-  {
+  public function testToString(array $objectsList, $emptyObjectsJson, $filledObjectsJson) {
     $this->assertJsonStringEqualsJsonString($this->cdfDocument->toString(), $emptyObjectsJson);
     $this->cdfDocument->setCdfEntities(...$objectsList);
     $this->assertJsonStringEqualsJsonString($this->cdfDocument->toString(), $filledObjectsJson);
   }
 
-  public function providerEntityOperations()
-  {
+  /**
+   * Data provider for ::testHasEntities.
+   *
+   * @return array
+   *   Test data.
+   */
+  public function providerEntityOperations() {
     $cdfObjectMockFirst = $this->getMockBuilder(CDFObject::class)
       ->disableOriginalConstructor()
       ->setMethods(['getUuid'])
@@ -204,13 +258,18 @@ class CDFDocumentTest extends TestCase
     return [
       [
         $cdfObjectMockFirst,
-        $cdfObjectMockSecond
-      ]
+        $cdfObjectMockSecond,
+      ],
     ];
   }
 
-  public function providerMergeDocuments()
-  {
+  /**
+   * Data provider for ::testMergeDocuments.
+   *
+   * @return array
+   *   Test data.
+   */
+  public function providerMergeDocuments() {
     $cdfObjectMockFirst = $this->getMockBuilder(CDFObject::class)
       ->disableOriginalConstructor()
       ->setMethods(['getUuid'])
@@ -232,15 +291,20 @@ class CDFDocumentTest extends TestCase
       array_merge($this->providerEntityOperations(), [
         [
           $cdfObjectMockFirst,
-          $cdfObjectMockSecond
-        ]
-      ])
+          $cdfObjectMockSecond,
+        ],
+      ]),
     ];
   }
 
-  public function providerMergeDocumentsNoOverlap()
-  {
-    //First set of objects
+  /**
+   * Data provider for ::testMergeDocumentsNoOverlap.
+   *
+   * @return array
+   *   Test data.
+   */
+  public function providerMergeDocumentsNoOverlap() {
+    // First set of objects.
     $setOneFirst = $this->getMockBuilder(CDFObject::class)
       ->disableOriginalConstructor()
       ->setMethods(['getUuid'])
@@ -258,7 +322,7 @@ class CDFDocumentTest extends TestCase
       ->method('getUuid')
       ->willReturn('22222222-0000-0000-0000-000000000000');
 
-    //Second set of objects
+    // Second set of objects.
     $setTwoFirst = $this->getMockBuilder(CDFObject::class)
       ->disableOriginalConstructor()
       ->setMethods(['getUuid'])
@@ -302,9 +366,14 @@ class CDFDocumentTest extends TestCase
     ];
   }
 
-  public function providerMergeDocumentsOverlap()
-  {
-    //First set of objects
+  /**
+   * Data provider for ::testMergeDocumentsOverlap.
+   *
+   * @return array
+   *   Test data.
+   */
+  public function providerMergeDocumentsOverlap() {
+    // First set of objects.
     $setOneFirst = $this->getMockBuilder(CDFObject::class)
       ->disableOriginalConstructor()
       ->setMethods(['getUuid'])
@@ -322,7 +391,7 @@ class CDFDocumentTest extends TestCase
       ->method('getUuid')
       ->willReturn('22222222-0000-0000-0000-000000000000');
 
-    //Second set of objects
+    // Second set of objects.
     $setTwoFirst = $this->getMockBuilder(CDFObject::class)
       ->disableOriginalConstructor()
       ->setMethods(['getUuid'])
@@ -366,8 +435,13 @@ class CDFDocumentTest extends TestCase
     ];
   }
 
-  public function providerToString()
-  {
+  /**
+   * Data provider for ::testToString.
+   *
+   * @return array
+   *   Test data.
+   */
+  public function providerToString() {
     $cdfObjectMockFirst = $this->getMockBuilder(CDFObject::class)
       ->disableOriginalConstructor()
       ->setMethods(['getUuid', 'toArray'])
@@ -413,14 +487,16 @@ class CDFDocumentTest extends TestCase
       [
         [
           $cdfObjectMockFirst,
-          $cdfObjectMockSecond
+          $cdfObjectMockSecond,
         ],
         json_encode(['entities' => []]),
-        json_encode(['entities' => [
-          $cdfObjectMockFirstToArray,
-          $cdfObjectMockSecondToArray
-        ]]),
-      ]
+        json_encode([
+          'entities' => [
+            $cdfObjectMockFirstToArray,
+            $cdfObjectMockSecondToArray,
+          ],
+        ]),
+      ],
     ];
   }
 

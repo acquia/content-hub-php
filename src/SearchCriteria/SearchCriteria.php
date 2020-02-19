@@ -5,248 +5,310 @@ namespace Acquia\ContentHubClient\SearchCriteria;
 use DateTimeInterface;
 
 /**
- * Class SearchCriteria
+ * Class SearchCriteria.
  *
  * @package Drupal\acquia_contenthub\Client
  */
-class SearchCriteria implements \JsonSerializable
-{
-    const HEADER_NAME = 'X-Acquia-Content-Hub-Search-Criteria';
+class SearchCriteria implements \JsonSerializable {
 
-    const DEFAULT_SEARCH_TERM = 'drupal8_content_entity';
+  const HEADER_NAME = 'X-Acquia-Content-Hub-Search-Criteria';
 
-    const DEFAULT_OFFSET = 0;
+  const DEFAULT_SEARCH_TERM = 'drupal8_content_entity';
 
-    const DEFAULT_LIMIT = 1000;
+  const DEFAULT_OFFSET = 0;
 
-    const DEFAULT_VERSION = '2.0';
+  const DEFAULT_LIMIT = 1000;
 
-    /**
-     * @var string
-     */
-    protected $searchTerm;
+  const DEFAULT_VERSION = '2.0';
 
-    /**
-     * @var array
-     */
-    protected $entityType;
+  /**
+   * Search term.
+   *
+   * @var string
+   */
+  protected $searchTerm;
 
-    /**
-     * @var array
-     */
-    protected $bundle;
+  /**
+   * Entity types.
+   *
+   * @var array
+   */
+  protected $entityType;
 
-    /**
-     * @var array
-     */
-    protected $tags;
+  /**
+   * Entity bundles.
+   *
+   * @var array
+   */
+  protected $bundle;
 
-    /**
-     * @var string
-     */
-    protected $label;
+  /**
+   * Entity tags list.
+   *
+   * @var array
+   */
+  protected $tags;
 
-    /**
-     * @var \DateTimeInterface
-     */
-    protected $startDate;
+  /**
+   * Entity label.
+   *
+   * @var string
+   */
+  protected $label;
 
-    /**
-     * @var \DateTimeInterface
-     */
-    protected $endDate;
+  /**
+   * Start date of the search interval.
+   *
+   * @var \DateTimeInterface
+   */
+  protected $startDate;
 
-    /**
-     * @var int
-     */
-    protected $from;
+  /**
+   * End date of the search interval.
+   *
+   * @var \DateTimeInterface
+   */
+  protected $endDate;
 
-    /**
-     * @var int
-     */
-    protected $size;
+  /**
+   * Search offset.
+   *
+   * @var int
+   */
+  protected $from;
 
-    /**
-     * @var string
-     */
-    protected $sorting;
+  /**
+   * Search limit.
+   *
+   * @var int
+   */
+  protected $size;
 
-    /**
-     * @var string
-     */
-    protected $version;
+  /**
+   * Sorting order.
+   *
+   * @var string
+   */
+  protected $sorting;
 
-    /**
-     * @var array
-     */
-    protected $languages;
+  /**
+   * Search version.
+   *
+   * @var string
+   */
+  protected $version;
 
-    /**
-     * SearchCriteria constructor.
-     *
-     * @param string $searchTerm
-     * @param array $entityType
-     * @param array $bundle
-     * @param array $tags
-     * @param string $label
-     * @param \DateTimeInterface $startDate
-     * @param \DateTimeInterface $endDate
-     * @param int $from
-     * @param int $size
-     * @param string $sorting
-     * @param string $version
-     * @param array $languages
-     */
-    public function __construct(
-      string $searchTerm,
-      array $entityType,
-      array $bundle,
-      array $tags,
-      string $label,
-      ?DateTimeInterface $startDate,
-      ?DateTimeInterface $endDate,
-      int $from,
-      int $size,
-      string $sorting,
-      string $version,
-      array $languages
-    ) {
-        $this->searchTerm = $searchTerm;
-        $this->entityType = $entityType;
-        $this->bundle = $bundle;
-        $this->tags = $tags;
-        $this->label = $label;
-        $this->startDate = $startDate;
-        $this->endDate = $endDate;
-        $this->from = $from;
-        $this->size = $size;
-        $this->sorting = $sorting;
-        $this->version = $version;
-        $this->languages = $languages;
-    }
+  /**
+   * Languages list.
+   *
+   * @var array
+   */
+  protected $languages;
 
-    /**
-     * {@inheritDoc}
-     */
-    public function jsonSerialize()
-    {
-        return [
-          'search_term' => $this->getSearchTerm(),
-          'type' => $this->getEntityType(),
-          'bundle' => $this->getBundle(),
-          'tags' => $this->getTags(),
-          'label' => $this->getLabel(),
-          'start_date' => $this->getStartDate(),
-          'end_date' => $this->getEndDate(),
-          'from' => $this->getFrom(),
-          'size' => $this->getSize(),
-          'sorting' => $this->getSorting(),
-          'version' => $this->getVersion(),
-          'languages' => $this->getLanguages(),
-        ];
-    }
+  /**
+   * SearchCriteria constructor.
+   *
+   * @param string $searchTerm
+   *   Search term.
+   * @param array $entityType
+   *   Entity types.
+   * @param array $bundle
+   *   Bundles list.
+   * @param array $tags
+   *   Tags list.
+   * @param string $label
+   *   Entity label.
+   * @param \DateTimeInterface|null $startDate
+   *   Start date of the search interval.
+   * @param \DateTimeInterface|null $endDate
+   *   End date of the search interval.
+   * @param int $from
+   *   Search offset.
+   * @param int $size
+   *   Search limit.
+   * @param string $sorting
+   *   Sorting order.
+   * @param string $version
+   *   Search version.
+   * @param array $languages
+   *   Languages list.
+   */
+  public function __construct(
+    string $searchTerm,
+    array $entityType,
+    array $bundle,
+    array $tags,
+    string $label,
+    ?DateTimeInterface $startDate,
+    ?DateTimeInterface $endDate,
+    int $from,
+    int $size,
+    string $sorting,
+    string $version,
+    array $languages
+  ) {
+    $this->searchTerm = $searchTerm;
+    $this->entityType = $entityType;
+    $this->bundle = $bundle;
+    $this->tags = $tags;
+    $this->label = $label;
+    $this->startDate = $startDate;
+    $this->endDate = $endDate;
+    $this->from = $from;
+    $this->size = $size;
+    $this->sorting = $sorting;
+    $this->version = $version;
+    $this->languages = $languages;
+  }
 
-    /**
-     * @return string
-     */
-    public function getSearchTerm(): string
-    {
-        return $this->searchTerm;
-    }
+  /**
+   * {@inheritDoc}
+   */
+  public function jsonSerialize() {
+    return [
+      'search_term' => $this->getSearchTerm(),
+      'type' => $this->getEntityType(),
+      'bundle' => $this->getBundle(),
+      'tags' => $this->getTags(),
+      'label' => $this->getLabel(),
+      'start_date' => $this->getStartDate(),
+      'end_date' => $this->getEndDate(),
+      'from' => $this->getFrom(),
+      'size' => $this->getSize(),
+      'sorting' => $this->getSorting(),
+      'version' => $this->getVersion(),
+      'languages' => $this->getLanguages(),
+    ];
+  }
 
-    /**
-     * @return array
-     */
-    public function getEntityType(): array
-    {
-        return $this->entityType;
-    }
+  /**
+   * Search term getter.
+   *
+   * @return string
+   *   Search term.
+   */
+  public function getSearchTerm(): string {
+    return $this->searchTerm;
+  }
 
-    /**
-     * @return array
-     */
-    public function getBundle(): array
-    {
-        return $this->bundle;
-    }
+  /**
+   * Entity types getter.
+   *
+   * @return array
+   *   Entity types list.
+   */
+  public function getEntityType(): array {
+    return $this->entityType;
+  }
 
-    /**
-     * @return array
-     */
-    public function getTags(): array
-    {
-        return $this->tags;
-    }
+  /**
+   * Bundle getter.
+   *
+   * @return array
+   *   Bundles list.
+   */
+  public function getBundle(): array {
+    return $this->bundle;
+  }
 
-    /**
-     * @return string
-     */
-    public function getLabel(): string
-    {
-        return $this->label;
-    }
+  /**
+   * Tags getter.
+   *
+   * @return array
+   *   Tags list.
+   */
+  public function getTags(): array {
+    return $this->tags;
+  }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
-    public function getStartDate(): ?DateTimeInterface
-    {
-        return $this->startDate;
-    }
+  /**
+   * Label getter.
+   *
+   * @return string
+   *   Label.
+   */
+  public function getLabel(): string {
+    return $this->label;
+  }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
-    public function getEndDate(): ?DateTimeInterface
-    {
-        return $this->endDate;
-    }
+  /**
+   * Start date getter.
+   *
+   * @return \DateTimeInterface|null
+   *   Search start date.
+   */
+  public function getStartDate(): ?DateTimeInterface {
+    return $this->startDate;
+  }
 
-    /**
-     * @return int
-     */
-    public function getFrom(): int
-    {
-        return $this->from;
-    }
+  /**
+   * End date getter.
+   *
+   * @return \DateTimeInterface|null
+   *   Search end date.
+   */
+  public function getEndDate(): ?DateTimeInterface {
+    return $this->endDate;
+  }
 
-    /**
-     * @return int
-     */
-    public function getSize(): int
-    {
-        return $this->size;
-    }
+  /**
+   * Returns number of items that should be skipped before selection.
+   *
+   * @return int
+   *   A number of items that should be skipped before selection.
+   */
+  public function getFrom(): int {
+    return $this->from;
+  }
 
-    /**
-     * @return string
-     */
-    public function getSorting(): string
-    {
-        return $this->sorting;
-    }
+  /**
+   * Returns how many items should be selected.
+   *
+   * @return int
+   *   Number of items that should be selected.
+   */
+  public function getSize(): int {
+    return $this->size;
+  }
 
-    /**
-     * @return string
-     */
-    public function getVersion(): string
-    {
-        return $this->version;
-    }
+  /**
+   * Sorting getter.
+   *
+   * @return string
+   *   Sorting value.
+   */
+  public function getSorting(): string {
+    return $this->sorting;
+  }
 
-    /**
-     * @return array
-     */
-    public function getLanguages(): array
-    {
-        return $this->languages;
-    }
+  /**
+   * Version getter.
+   *
+   * @return string
+   *   Version string.
+   */
+  public function getVersion(): string {
+    return $this->version;
+  }
 
-    /**
-     * @param array $languages
-     */
-    public function setLanguages(array $languages): void
-    {
-        $this->languages = $languages;
-    }
+  /**
+   * Languages getter.
+   *
+   * @return array
+   *   Languages list.
+   */
+  public function getLanguages(): array {
+    return $this->languages;
+  }
+
+  /**
+   * Languages setter.
+   *
+   * @param array $languages
+   *   Languages list.
+   */
+  public function setLanguages(array $languages): void {
+    $this->languages = $languages;
+  }
+
 }

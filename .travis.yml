@@ -14,3 +14,6 @@ before_script:
 after_script:
   - travis_retry php vendor/bin/php-coveralls -v
   - vendor/bin/ocular code-coverage:upload --format=php-clover build/logs/clover.xml
+  - vendor/bin/phpcs --config-set installed_paths vendor/drupal/coder/coder_sniffer
+  - vendor/bin/phpcs -n --standard=Drupal,DrupalPractice src/ test/
+

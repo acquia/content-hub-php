@@ -2,24 +2,34 @@
 
 namespace Acquia\ContentHubClient\test;
 
-
 use Acquia\ContentHubClient\Settings;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * Class SettingsTest.
+ *
+ * @covers \Acquia\ContentHubClient\Settings
+ *
+ * @package Acquia\ContentHubClient\test
+ */
 class SettingsTest extends TestCase {
 
   /**
-   * @var Settings
+   * Settings instance.
+   *
+   * @var \Acquia\ContentHubClient\Settings
    */
   private $settings;
 
   /**
+   * Test data.
+   *
    * @var array
    */
-  private $setting_data;
+  private $setting_data; // phpcs:ignore
 
   /**
-   *
+   * {@inheritDoc}
    */
   public function setUp(): void {
     parent::setUp();
@@ -40,33 +50,51 @@ class SettingsTest extends TestCase {
     $this->settings = new Settings(...array_values($this->setting_data));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   public function tearDown(): void {
     parent::tearDown();
 
     unset($this->settings, $this->setting_data);
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\Settings::toArray
+   */
   public function testToArrayReturnsExactlyTheArraySettingWasCreatedOff(): void {
     $this->assertEquals($this->settings->toArray(), $this->setting_data);
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\Settings::getUuid
+   */
   public function testToGetUuidReturnsFalseIfInitializedWithEmptyValue(): void {
     $this->setting_data['uuid'] = '';
     $this->settings = new Settings(...array_values($this->setting_data));
     $this->assertFalse($this->settings->getUuid());
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\Settings::getWebhook
+   */
   public function testToGetWebhookReturnsFalseIfInitializedWithEmptyValue(): void {
     $this->setting_data['webhook'] = [];
     $this->settings = new Settings(...array_values($this->setting_data));
     $this->assertFalse($this->settings->getWebhook());
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\Settings::getWebhook
+   */
   public function testToGetWebhookReturnsFalseIfCalledWithNonExistentKey(): void {
     $this->assertFalse($this->settings->getWebhook('some-non-existent-key'));
   }
 
-  public function testToGetWebhookReturnsRespectiveValuefCalledWithExistentKey(): void {
+  /**
+   * @covers \Acquia\ContentHubClient\Settings::getWebhook
+   */
+  public function testToGetWebhookReturnsRespectiveValueCalledWithExistentKey(): void {
     $webhook = $this->settings->getWebhook('webhook1');
 
     $this->assertNotFalse($webhook);
