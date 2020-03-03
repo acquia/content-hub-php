@@ -793,10 +793,11 @@ class ContentHubClient extends Client {
    * @param string $webhook_uuid
    *   Webhook uuid.
    *
-   * @return \Psr\Http\Message\ResponseInterface
+   * @return mixed
+   *   Response body of backend call.
    */
   public function supressWebhook(string $webhook_uuid) {
-    return $this->put("webhook/$webhook_uuid/suppress");
+    return self::getResponseJson($this->put("webhook/$webhook_uuid/suppress"));
   }
 
   /**
@@ -805,10 +806,11 @@ class ContentHubClient extends Client {
    * @param string $webhook_uuid
    *   Webhook uuid.
    *
-   * @return \Psr\Http\Message\ResponseInterface
+   * @return mixed
+   *   Response body of backend call.
    */
   public function unSuppressWebhook(string $webhook_uuid) {
-    return $this->delete("webhook/$webhook_uuid/suppress");
+    return self::getResponseJson($this->delete("webhook/$webhook_uuid/suppress"));
   }
 
   /**
