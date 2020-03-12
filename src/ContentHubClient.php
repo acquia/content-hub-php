@@ -788,6 +788,32 @@ class ContentHubClient extends Client {
   }
 
   /**
+   * Suppress webhook.
+   *
+   * @param string $webhook_uuid
+   *   Webhook uuid.
+   *
+   * @return mixed
+   *   Response body of backend call.
+   */
+  public function suppressWebhook(string $webhook_uuid) {
+    return self::getResponseJson($this->put("webhook/$webhook_uuid/suppress"));
+  }
+
+  /**
+   * Remove suppression from webhook.
+   *
+   * @param string $webhook_uuid
+   *   Webhook uuid.
+   *
+   * @return mixed
+   *   Response body of backend call.
+   */
+  public function unSuppressWebhook(string $webhook_uuid) {
+    return self::getResponseJson($this->delete("webhook/$webhook_uuid/suppress"));
+  }
+
+  /**
    * Add entities to Interest List.
    *
    * @param string $webhook_uuid
