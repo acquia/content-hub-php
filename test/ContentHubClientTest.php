@@ -1307,6 +1307,42 @@ class ContentHubClientTest extends TestCase {
   }
 
   /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::suppressWebhook
+   */
+  public function testSuppressWebhook() {
+    $webhook_uuid = 'some_uuid';
+    $response = [
+      'success' => TRUE,
+      'request_id' => 'some-request-uuid',
+    ];
+
+    $this->ch_client
+      ->shouldReceive('put')
+      ->once()
+      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response)));
+
+    $this->assertSame($this->ch_client->suppressWebhook($webhook_uuid), $response);
+  }
+
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::unSuppressWebhook
+   */
+  public function testUnsuppressWebhook() {
+    $webhook_uuid = 'some_uuid';
+    $response = [
+      'success' => TRUE,
+      'request_id' => 'some-request-uuid',
+    ];
+
+    $this->ch_client
+      ->shouldReceive('delete')
+      ->once()
+      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response)));
+
+    $this->assertSame($this->ch_client->unSuppressWebhook($webhook_uuid), $response);
+  }
+
+  /**
    * @covers \Acquia\ContentHubClient\ContentHubClient::addEntitiesToInterestList
    */
   public function testAddEntitiesToInterestListReturnsSuccess(): void {

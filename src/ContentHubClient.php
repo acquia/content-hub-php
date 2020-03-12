@@ -796,7 +796,7 @@ class ContentHubClient extends Client {
    * @return mixed
    *   Response body of backend call.
    */
-  public function supressWebhook(string $webhook_uuid) {
+  public function suppressWebhook(string $webhook_uuid) {
     return self::getResponseJson($this->put("webhook/$webhook_uuid/suppress"));
   }
 
