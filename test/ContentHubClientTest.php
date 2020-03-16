@@ -771,40 +771,13 @@ class ContentHubClientTest extends TestCase {
    * @covers \Acquia\ContentHubClient\ContentHubClient::logs
    * @throws \Exception
    */
-  public function testLogsReturnsCustomerFacingDataConsideringParams(): void {
-    $query_params = [
-      'size' => 3,
-      'from' => 0,
-      'sort' => 'timestamp:desc',
-    ];
-    $query = '{"query": {"match_all": {}}}';
-    $result_item_type = 'history';
-    $response = [
-      'hits' => [
-        'hits' => [],
-        'max_score' => 1,
-      ],
-    ];
+  public function testLogsReturnsDiscontinued(): void {
+    $api_response = $this->ch_client->logs();
 
-    for ($i = $query_params['from']; $i < $query_params['size']; ++$i) {
-      $response['hits']['hits'][] = $this->getElasticSearchItemWithId($i + 1, $result_item_type);
-    }
-
-    $response['hits']['total'] = count($response['hits']);
-
-    $this->ch_client
-      ->shouldReceive('post')
-      ->once()
-      ->with('history?' . http_build_query($query_params), ['body' => $query])
-      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response)));
-
-    $api_response = $this->ch_client->logs($query, $query_params);
-
-    $this->assertTrue(count($api_response['hits']['hits']) <= $query_params['size']);
-    foreach ($api_response['hits']['hits'] as $key => $item) {
-      $this->assertSame($item['_id'], $key + 1);
-      $this->assertSame($item['_type'], $result_item_type);
-    }
+    $body = $this->ch_client::FEATURE_DISCONTINUED_RESPONSE;
+    $this->assertEquals($body['error']['code'], $api_response->getStatusCode());
+    $this->assertEquals($body['error']['message'], $api_response->getReasonPhrase());
+    $this->assertEquals($body, json_decode($api_response->getBody()->getContents(), TRUE));
   }
 
   /**
