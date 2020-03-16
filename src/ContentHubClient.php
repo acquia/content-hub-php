@@ -39,11 +39,11 @@ class ContentHubClient extends Client {
 
   const OPTION_NAME_LANGUAGES = 'client-languages';
 
-  const FEATURE_DISCONTINUED_RESPONSE = [
+  const FEATURE_DEPRECATED_RESPONSE = [
       'success' => FALSE,
       'error' => [
         'code' => SymfonyResponse::HTTP_GONE,
-        'message' => 'This feature is discontinued',
+        'message' => 'This feature is deprecated',
       ],
   ];
 
@@ -540,11 +540,11 @@ class ContentHubClient extends Client {
    */
   public function logs($query = '', array $query_options = []) {
     return new Response(
-      self::FEATURE_DISCONTINUED_RESPONSE['error']['code'],
+      self::FEATURE_DEPRECATED_RESPONSE['error']['code'],
       [],
-      json_encode(self::FEATURE_DISCONTINUED_RESPONSE),
+      json_encode(self::FEATURE_DEPRECATED_RESPONSE),
       '1.1',
-      self::FEATURE_DISCONTINUED_RESPONSE['error']['message']
+      self::FEATURE_DEPRECATED_RESPONSE['error']['message']
     );
   }
 

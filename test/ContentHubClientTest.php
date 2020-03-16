@@ -774,7 +774,7 @@ class ContentHubClientTest extends TestCase {
   public function testLogsReturnsDiscontinued(): void {
     $api_response = $this->ch_client->logs();
 
-    $body = $this->ch_client::FEATURE_DISCONTINUED_RESPONSE;
+    $body = $this->ch_client::FEATURE_DEPRECATED_RESPONSE;
     $this->assertEquals($body['error']['code'], $api_response->getStatusCode());
     $this->assertEquals($body['error']['message'], $api_response->getReasonPhrase());
     $this->assertEquals($body, json_decode($api_response->getBody()->getContents(), TRUE));
