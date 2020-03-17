@@ -2,18 +2,27 @@
 
 namespace Acquia\ContentHubClient;
 
+use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\RequestInterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Request;
 use Acquia\ContentHubClient\Data\Adapter;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
+
 
 class ContentHub extends Client
 {
     // Override VERSION inherited from GuzzleHttp::ClientInterface
     const VERSION = '1.3.3';
     const LIBRARYNAME = 'AcquiaContentHubPHPLib';
-
+    const FEATURE_DEPRECATED_RESPONSE = [
+      'success' => FALSE,
+      'error' => [
+        'code' => SymfonyResponse::HTTP_GONE,
+        'message' => 'This feature is deprecated',
+      ],
+    ];
     private $adapter;
 
     /**
@@ -386,15 +395,13 @@ class ContentHub extends Client
      */
     public function logs($query, $options = [])
     {
-        $options = $options + [
-            'size' => 20,
-            'from' => 0,
-            'sort' => 'timestamp:desc'
-        ];
-        $query = empty($query) ? '{"query": {"match_all": {}}}' : $query;
-        $endpoint = "/{$this->api_version}/history?size={$options['size']}&from={$options['from']}&sort={$options['sort']}";
-        $request = new Request('POST', $endpoint, [], $query);
-        return $this->getResponseJson($request);
+      return new Response(
+        self::FEATURE_DEPRECATED_RESPONSE['error']['code'],
+        [],
+        json_encode(self::FEATURE_DEPRECATED_RESPONSE),
+        '1.1',
+        self::FEATURE_DEPRECATED_RESPONSE['error']['message']
+      );
     }
 
     /**
