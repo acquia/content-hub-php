@@ -18,6 +18,7 @@ use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -37,6 +38,14 @@ class ContentHubClient extends Client {
   const LIBRARYNAME = 'AcquiaContentHubPHPLib';
 
   const OPTION_NAME_LANGUAGES = 'client-languages';
+
+  const FEATURE_DEPRECATED_RESPONSE = [
+      'success' => FALSE,
+      'error' => [
+        'code' => SymfonyResponse::HTTP_GONE,
+        'message' => 'This feature is deprecated',
+      ],
+  ];
 
   /**
    * The settings.
@@ -530,15 +539,13 @@ class ContentHubClient extends Client {
    * @throws \GuzzleHttp\Exception\RequestException
    */
   public function logs($query = '', array $query_options = []) {
-    $query_options += [
-      'size' => 20,
-      'from' => 0,
-      'sort' => 'timestamp:desc',
-    ];
-    $options['body'] = empty($query) ? '{"query": {"match_all": {}}}' : $query;
-    $endpoint = 'history?' . http_build_query($query_options);
-    $response = $this->post($endpoint, $options);
-    return self::getResponseJson($response);
+    return new Response(
+      self::FEATURE_DEPRECATED_RESPONSE['error']['code'],
+      [],
+      json_encode(self::FEATURE_DEPRECATED_RESPONSE),
+      '1.1',
+      self::FEATURE_DEPRECATED_RESPONSE['error']['message']
+    );
   }
 
   /**
