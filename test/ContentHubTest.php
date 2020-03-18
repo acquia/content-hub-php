@@ -6,6 +6,8 @@ use Acquia\ContentHubClient\ContentHub;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
+
 
 class ContentHubTest extends \PHPUnit_Framework_TestCase
 {
@@ -447,16 +449,29 @@ class ContentHubTest extends \PHPUnit_Framework_TestCase
 
     public function testHistory() {
         // Setup
-        $data = $this->setHistoryLogs();
-        $responses = [
-          new Response(200, [], json_encode($data)),
+        $expectation = [
+          'success' => FALSE,
+          'error' => [
+            'code' => SymfonyResponse::HTTP_GONE,
+            'message' => 'This feature is deprecated',
+          ],
         ];
-        $client = $this->getClient($responses);
 
-        // Get History.
-        $response = $client->logs('');
-        $this->assertEquals($data['hits']['total'], $response['hits']['total']);
-        $this->assertEquals($data['hits']['hits'], $response['hits']['hits']);
+        $responses = [
+          new Response(
+            $expectation['error']['code'],
+            [],
+            json_encode($expectation),
+            '1.1',
+            $expectation['error']['message']
+          )
+        ];
+        /** @var $response \GuzzleHttp\Psr7\Response */
+        $response = $this->getClient($responses)->logs('');
+        $api_response = json_decode($response->getBody()->getContents(), TRUE);
+
+        $this->assertEquals(SymfonyResponse::HTTP_GONE, $response->getStatusCode());
+        $this->assertEquals($expectation, $api_response);
     }
 
     public function testMapping() {

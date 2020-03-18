@@ -19,13 +19,7 @@ class ContentHub extends Client
     // Override VERSION inherited from GuzzleHttp::ClientInterface
     const VERSION = '1.2.2';
     const LIBRARYNAME = 'AcquiaContentHubPHPLib';
-    const FEATURE_DEPRECATED_RESPONSE = [
-      'success' => FALSE,
-      'error' => [
-        'code' => SymfonyResponse::HTTP_GONE,
-        'message' => 'This feature is deprecated',
-      ],
-    ];
+
     private $adapter;
 
     /**
@@ -334,12 +328,20 @@ class ContentHub extends Client
      */
     public function logs($query, $options = [])
     {
+      $response = [
+        'success' => FALSE,
+        'error' => [
+          'code' => SymfonyResponse::HTTP_GONE,
+          'message' => 'This feature is deprecated',
+        ],
+      ];
+
       return new Response(
-        self::FEATURE_DEPRECATED_RESPONSE['error']['code'],
+        $response['error']['code'],
         [],
-        json_encode(self::FEATURE_DEPRECATED_RESPONSE),
+        json_encode($response),
         '1.1',
-        self::FEATURE_DEPRECATED_RESPONSE['error']['message']
+        $response['error']['message']
       );
     }
 
