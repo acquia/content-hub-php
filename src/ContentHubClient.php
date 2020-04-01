@@ -1119,6 +1119,8 @@ class ContentHubClient extends Client {
    *
    * @return ResponseInterface The text to write in the messages.
    * The text to write in the messages.
+   *
+   *  @codeCoverageIgnore
    */
   protected function getExceptionMessage($method, array $args, \Exception $exception)
   {
