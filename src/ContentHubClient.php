@@ -1061,7 +1061,7 @@ class ContentHubClient extends Client {
    */
   public static function getResponseJson(ResponseInterface $response) {
     try {
-      $body = $response->getBody()->getContents();
+      $body = (string) $response->getBody();
     }
     catch (Exception $exception) {
       $message = sprintf("An exception occurred in the JSON response. Message: %s",
@@ -1098,11 +1098,48 @@ class ContentHubClient extends Client {
       return parent::__call($method, $args);
     }
     catch (Exception $e) {
-      $exceptionResponse = $this->getExceptionMessage($method, $args, $e);
+      $exceptionResponse = $this->getExceptionResponse($method, $args, $e);
     }
-    $this->logger->error((string) $exceptionResponse->getReasonPhrase());
-
     return $exceptionResponse;
+  }
+
+  /**
+   * Obtains the appropriate exception Response.
+   *
+   * @param string $method
+   *   The Request to Plexus, as defined in the content-hub-php library.
+   * @param array $args
+   *   The Request arguments.
+   * @param \Exception $exception
+   *   The Exception object.
+   *
+   * @return ResponseInterface The response after raising an exception.
+   *   The response object.
+   *
+   *  @codeCoverageIgnore
+   */
+  protected function getExceptionResponse($method, array $args, \Exception $exception)
+  {
+    $api_call = $args[0];
+    $response = $exception->getResponse();
+    $response_body = json_decode($exception->getResponse()->getBody(), TRUE);
+    $code = $response_body['error']['code'];
+    $message = $response_body['error']['message'];
+    $reason = sprintf("Request ID: %s, Method: %s, Path: %s, Status Code: %s, Reason: %s, Error Code: %s, Error Message: \"%s\"",
+      $response_body['request_id'],
+      strtoupper($method),
+      $api_call,
+      $exception->getResponse()->getStatusCode(),
+      $exception->getResponse()->getReasonPhrase(),
+      $code,
+      $message,
+    );
+
+    # Here decide what type of error/warning we want to show.
+    $this->logger->error($reason);
+
+    // Return the response.
+    return $response;
   }
 
   /**
