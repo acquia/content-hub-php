@@ -18,6 +18,7 @@ use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
+use Psr\Log\LogLevel;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
@@ -1098,13 +1099,12 @@ class ContentHubClient extends Client {
       return parent::__call($method, $args);
     }
     catch (Exception $e) {
-      $exceptionResponse = $this->getExceptionResponse($method, $args, $e);
+      return $this->getExceptionResponse($method, $args, $e);
     }
-    return $exceptionResponse;
   }
 
   /**
-   * Obtains the appropriate exception Response.
+   * Obtains the appropriate exception Response, logging error messages according to API call.
    *
    * @param string $method
    *   The Request to Plexus, as defined in the content-hub-php library.
@@ -1120,147 +1120,42 @@ class ContentHubClient extends Client {
    */
   protected function getExceptionResponse($method, array $args, \Exception $exception)
   {
+    // If we reach here it is because there was an exception raised in the API call.
     $api_call = $args[0];
     $response = $exception->getResponse();
-    $response_body = json_decode($exception->getResponse()->getBody(), TRUE);
-    $code = $response_body['error']['code'];
-    $message = $response_body['error']['message'];
-    $reason = sprintf("Request ID: %s, Method: %s, Path: %s, Status Code: %s, Reason: %s, Error Code: %s, Error Message: \"%s\"",
-      $response_body['request_id'],
-      strtoupper($method),
-      $api_call,
-      $exception->getResponse()->getStatusCode(),
-      $exception->getResponse()->getReasonPhrase(),
-      $code,
-      $message,
-    );
+    $response_body = json_decode($response->getBody(), TRUE);
+    $error_code = $response_body['error']['code'];
+    $error_message = $response_body['error']['message'];
 
-    # Here decide what type of error/warning we want to show.
-    $this->logger->error($reason);
-
-    // Return the response.
-    return $response;
-  }
-
-  /**
-   * Obtains the appropriate exception message for the selected exception.
-   *
-   * This is the place to set up exception messages per request.
-   *
-   * @param string $method
-   *   The Request to Plexus, as defined in the content-hub-php library.
-   * @param array $args
-   *   The Request arguments.
-   * @param \Exception $exception
-   *   The Exception object.
-   *
-   * @return ResponseInterface The text to write in the messages.
-   * The text to write in the messages.
-   *
-   *  @codeCoverageIgnore
-   */
-  protected function getExceptionMessage($method, array $args, \Exception $exception)
-  {
-    $response = NULL;
-    $status_code = HttpResponse::HTTP_INTERNAL_SERVER_ERROR;
-    $error_details = $exception->getMessage();
-
-    if ($exception instanceof ServerException) {
-      return $this->getErrorResponse($status_code,
-        sprintf('Could not reach the Content Hub. Please verify your hostname and Credentials. [Error message: %s]',
-          $error_details));
-    }
-    if ($exception instanceof ConnectException) {
-      return $this->getErrorResponse($status_code,
-        sprintf('Could not reach the Content Hub. Please verify your hostname URL. [Error message: %s]',
-          $error_details));
-    }
-    if ($exception instanceof ClientException || $exception instanceof BadResponseException) {
-      $response = $exception->getResponse();
-      $status_code = $response->getStatusCode();
-      $error_details = $response->getReasonPhrase();
-    }
-
-    switch ($method) {
-      case 'getClientByName':
-        // All good, means the client name is available.
-        if ($response && HttpResponse::HTTP_NOT_FOUND === $status_code) {
-          return $response;
-        }
-
-        $message = sprintf('Error trying to connect to the Content Hub" (Error Code = %d: %s)',
-          $status_code, $error_details);
+    // Customize Error messages according to API Call.
+    switch ($api_call) {
+      case (preg_match('/filters\?name=*/', $api_call) ? true : false) :
+        $log_level = LogLevel::NOTICE;
         break;
 
-      case 'addWebhook':
-        $message = sprintf('There was a problem trying to register Webhook URL = %s. Please try again. (Error Code = %d: %s)',
-          $args[0], $status_code, $error_details);
-        break;
-
-      case 'deleteWebhook':
-        // This function only requires one argument (webhook_uuid), but
-        // we are using the second one to pass the webhook_url.
-        $webhook_url = $args[1] ?? $args[0];
-        $message = sprintf('There was a problem trying to unregister Webhook URL = %s. Please try again. (Error Code = %d: @%s)',
-          $webhook_url, $status_code, $error_details);
-        break;
-
-      case 'purge':
-        $message = sprintf('Error purging entities from the Content Hub [Error Code = %d: %s]',
-          $status_code, $error_details);
-        break;
-
-      case 'readEntity':
-        $message = sprintf('Error reading entity with UUID="%s" from Content Hub (Error Code = %d: %s)', $args[0],
-          $status_code, $error_details);
-        break;
-
-      case 'createEntity':
-        $message = sprintf('Error trying to create an entity in Content Hub (Error Code = %d: %s)',
-          $status_code, $error_details);
-        break;
-
-      case 'createEntities':
-        $message = sprintf('Error trying to create entities in Content Hub (Error Code = %d: %s)',
-          $status_code, $error_details);
-        break;
-
-      case 'updateEntity':
-        $message = sprintf('Error trying to update an entity with UUID="%s" in Content Hub (Error Code = %d: %s)', $args[1],
-          $status_code, $error_details);
-        break;
-
-      case 'updateEntities':
-        $message = sprintf('Error trying to update some entities in Content Hub (Error Code = %d: %s)',
-          $status_code, $error_details);
-        break;
-
-      case 'deleteEntity':
-        $message = sprintf('Error trying to delete entity with UUID="%s" in Content Hub (Error Code = %d: %s)',
-          $args[0], $status_code, $error_details);
-        break;
-
-      case 'searchEntity':
-        $message = sprintf('Error trying to make a search query to Content Hub. Are your credentials inserted correctly? (Error Code = %d: %s)',
-          $status_code, $error_details);
-        break;
-
-      case 'addEntitiesToInterestList':
-        $message = sprintf('Error trying to add entities to the interest list (Error Code = %d: %s)',
-          $status_code, $error_details);
-        break;
-
-      case 'deleteInterest':
-        $message = sprintf('Error trying to remove entity from the interest list (Error Code = %d: %s)',
-          $status_code, $error_details);
+      case (preg_match('/settings\/clients\/*/', $api_call) ? true : false) :
+        $log_level = LogLevel::NOTICE;
         break;
 
       default:
-        $message = sprintf('Error trying to connect to the Content Hub (Error Code = %d: %s)',
-          $status_code, $error_details);
+        // The default log level is ERROR.
+        $log_level = LogLevel::ERROR;
+        break;
     }
 
-    return $this->getErrorResponse($status_code, $message);
+    $reason = sprintf("Request ID: %s, Method: %s, Path: \"%s\", Status Code: %s, Reason: %s, Error Code: %s, Error Message: \"%s\"",
+      $response_body['request_id'],
+      strtoupper($method),
+      $api_call,
+      $response->getStatusCode(),
+      $response->getReasonPhrase(),
+      $error_code,
+      $error_message,
+    );
+    $this->logger->log($log_level, $reason);
+
+    // Return the response.
+    return $response;
   }
 
   /**
