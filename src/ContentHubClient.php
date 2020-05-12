@@ -1129,11 +1129,13 @@ class ContentHubClient extends Client {
 
     // Customize Error messages according to API Call.
     switch ($api_call) {
-      case (preg_match('/filters\?name=*/', $api_call) ? true : false) :
-        $log_level = LogLevel::NOTICE;
+      case'settings/webhooks':
+        $log_level = LogLevel::WARNING;
         break;
 
+      case (preg_match('/filters\?name=*/', $api_call) ? true : false) :
       case (preg_match('/settings\/clients\/*/', $api_call) ? true : false) :
+      case (preg_match('/settings\/webhooks\/.*\/filters/', $api_call) ? true : false) :
         $log_level = LogLevel::NOTICE;
         break;
 
@@ -1144,13 +1146,13 @@ class ContentHubClient extends Client {
     }
 
     $reason = sprintf("Request ID: %s, Method: %s, Path: \"%s\", Status Code: %s, Reason: %s, Error Code: %s, Error Message: \"%s\"",
-      $response_body['request_id'],
-      strtoupper($method),
-      $api_call,
-      $response->getStatusCode(),
-      $response->getReasonPhrase(),
-      $error_code,
-      $error_message,
+        $response_body['request_id'],
+        strtoupper($method),
+        $api_call,
+        $response->getStatusCode(),
+        $response->getReasonPhrase(),
+        $error_code,
+        $error_message
     );
     $this->logger->log($log_level, $reason);
 
