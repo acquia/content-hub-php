@@ -1983,6 +1983,10 @@ class ContentHubClientTest extends TestCase {
     $response = $this->ch_client->getErrorResponse($code, $reason);
     $this->assertSame($response->getStatusCode(), $code);
     $this->assertSame($response->getReasonPhrase(), $reason);
+
+    $response = $this->ch_client->getErrorResponse(0, $reason);
+    $this->assertSame($response->getStatusCode(), 500);
+    $this->assertSame($response->getReasonPhrase(), $reason);
   }
 
   /**
