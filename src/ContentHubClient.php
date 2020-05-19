@@ -1123,6 +1123,9 @@ class ContentHubClient extends Client {
     // If we reach here it is because there was an exception raised in the API call.
     $api_call = $args[0];
     $response = $exception->getResponse();
+    if (!$response) {
+      $response = $this->getErrorResponse($exception->getCode(), $exception->getMessage());
+    }
     $response_body = json_decode($response->getBody(), TRUE);
     $error_code = $response_body['error']['code'];
     $error_message = $response_body['error']['message'];
@@ -1167,12 +1170,24 @@ class ContentHubClient extends Client {
    *   Status code.
    * @param string $reason
    *   Reason.
+   * @param null $request_id
+   *   The request id from the ContentHub service if available.
    *
    * @return \GuzzleHttp\Psr7\Response
    *   Response.
    */
-  protected function getErrorResponse($code, $reason) {
-    return new Response($code, [], json_encode([]), '1.1', $reason);
+  protected function getErrorResponse($code, $reason, $request_id = NULL) {
+    if ($code < 100 || $code >= 600) {
+      $code = 500;
+    }
+    $body = [
+      'request_id' => $request_id,
+      'error' => [
+        'code' => $code,
+        'message' => $reason,
+      ]
+    ];
+    return new Response($code, [], json_encode($body), '1.1', $reason);
   }
 
   /**
