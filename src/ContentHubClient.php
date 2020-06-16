@@ -819,7 +819,7 @@ class ContentHubClient extends Client {
    *   Response body of backend call.
    */
   public function unSuppressWebhook(string $webhook_uuid) {
-    return self::getResponseJson($this->delete("webhook/$webhook_uuid/suppress"));
+    return self::getResponseJson($this->put("settings/webhooks/$webhook_uuid/enable"));
   }
 
   /**
