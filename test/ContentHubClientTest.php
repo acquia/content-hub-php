@@ -703,7 +703,7 @@ class ContentHubClientTest extends TestCase {
     $this->ch_client
       ->shouldReceive('delete')
       ->once()
-      ->with("/interest/${uuid}/${webhook_uuid}")
+      ->with("interest/${uuid}/${webhook_uuid}")
       ->andReturn($this->makeMockResponse($response_code, [], ''));
 
     $api_response = $this->ch_client->deleteInterest($uuid, $webhook_uuid);
@@ -1026,7 +1026,7 @@ class ContentHubClientTest extends TestCase {
     $this->ch_client
       ->shouldReceive('get')
       ->once()
-      ->with('/interest/webhook/' . $webhook_uuid)
+      ->with('interest/webhook/' . $webhook_uuid)
       ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response)));
 
     $this->assertSame($this->ch_client->getInterestsByWebhook($webhook_uuid), []);
@@ -1051,7 +1051,7 @@ class ContentHubClientTest extends TestCase {
     $this->ch_client
       ->shouldReceive('get')
       ->once()
-      ->with('/interest/webhook/' . $webhook_uuid)
+      ->with('interest/webhook/' . $webhook_uuid)
       ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response)));
 
     $this->assertSame($this->ch_client->getInterestsByWebhook($webhook_uuid), $response['data']['interests']);
