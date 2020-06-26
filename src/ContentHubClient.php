@@ -473,7 +473,7 @@ class ContentHubClient extends Client {
    *   Response.
    */
   public function deleteInterest($uuid, $webhook_uuid) {
-    return $this->delete("/interest/$uuid/$webhook_uuid");
+    return $this->delete("interest/$uuid/$webhook_uuid");
   }
 
   /**
@@ -700,7 +700,7 @@ class ContentHubClient extends Client {
    * @throws \Exception
    */
   public function getInterestsByWebhook($webhook_uuid) {
-    $data = self::getResponseJson($this->get("/interest/webhook/$webhook_uuid"));
+    $data = self::getResponseJson($this->get("interest/webhook/$webhook_uuid"));
 
     return $data['data']['interests'] ?? [];
   }
