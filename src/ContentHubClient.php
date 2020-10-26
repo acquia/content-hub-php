@@ -1302,4 +1302,58 @@ class ContentHubClient extends Client {
     return $args;
   }
 
+  /**
+   * Fetch snapshots.
+   *
+   * @return mixed
+   *   Response.
+   *
+   * @throws \Exception
+   */
+  public function getSnapshots() {
+    return self::getResponseJson($this->get('snapshots'));
+  }
+
+  /**
+   * Create a snapshot.
+   *
+   * @return mixed
+   *   Response.
+   *
+   * @throws \Exception
+   */
+  public function createSnapshot() {
+    return self::getResponseJson($this->post('snapshots'));
+  }
+
+  /**
+   * Deletes a snapshot.
+   *
+   * @param string $name
+   *   The name of the snapshot.
+   *
+   * @return \Psr\Http\Message\ResponseInterface
+   *   Response.
+   *
+   * @throws \GuzzleHttp\Exception\RequestException
+   */
+  public function deleteSnapshot($name) {
+    return self::getResponseJson($this->delete("snapshots/$name"));
+  }
+
+  /**
+   * Restore a snapshot.
+   *
+   * @param string $name
+   *   The name of the snapshot.
+   *
+   * @return \Psr\Http\Message\ResponseInterface
+   *   Response.
+   *
+   * @throws \GuzzleHttp\Exception\RequestException
+   */
+  public function restoreSnapshot($name) {
+    return self::getResponseJson($this->put("snapshots/$name/restore"));
+  }
+
 }
