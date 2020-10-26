@@ -2310,4 +2310,88 @@ class ContentHubClientTest extends TestCase {
     ];
   }
 
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::createSnapshot
+   * @throws \Exception
+   */
+  public function testCreateSnapshotIfSucceeds(): void {
+    $response = [
+      'request_id' => 'some-request-uuid',
+      'success' => TRUE,
+      'data' => 'some-data',
+    ];
+
+    $this->ch_client
+      ->shouldReceive('post')
+      ->once()
+      ->with("snapshots")
+      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_NOT_FOUND, [], json_encode($response)));
+
+    $this->assertSame($this->ch_client->createSnapshot(), $response);
+  }
+
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::getSnapshots
+   * @throws \Exception
+   */
+  public function testGetSnapshotIfSucceeds(): void {
+    $response = [
+      'request_id' => 'some-request-uuid',
+      'success' => TRUE,
+      'data' => [
+        'some-data',
+      ]
+    ];
+
+    $this->ch_client
+      ->shouldReceive('get')
+      ->once()
+      ->with("snapshots")
+      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_NOT_FOUND, [], json_encode($response)));
+
+    $this->assertSame($this->ch_client->getSnapshots(), $response);
+  }
+
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::deleteSnapshot
+   * @throws \Exception
+   */
+  public function testDeleteSnapshotIfSucceeds(): void {
+    $snapshot = 'some-snapshot';
+    $response = [
+      'request_id' => 'some-request-uuid',
+      'success' => TRUE,
+      'data' => 'some-data',
+    ];
+
+    $this->ch_client
+      ->shouldReceive('delete')
+      ->once()
+      ->with("snapshots/$snapshot")
+      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_NOT_FOUND, [], json_encode($response)));
+
+    $this->assertSame($this->ch_client->deleteSnapshot($snapshot), $response);
+  }
+
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::restoreSnapshot
+   * @throws \Exception
+   */
+  public function testRestoreSnapshotIfSucceeds(): void {
+    $snapshot = 'some-snapshot';
+    $response = [
+      'request_id' => 'some-request-uuid',
+      'success' => TRUE,
+      'data' => 'some-data',
+    ];
+
+    $this->ch_client
+      ->shouldReceive('put')
+      ->once()
+      ->with("snapshots/$snapshot/restore")
+      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_NOT_FOUND, [], json_encode($response)));
+
+    $this->assertSame($this->ch_client->restoreSnapshot($snapshot), $response);
+  }
+
 }
