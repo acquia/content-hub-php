@@ -689,6 +689,18 @@ class ContentHubClient extends Client {
   }
 
   /**
+   * Returns webhooks status information.
+   *
+   * @return array
+   *   Webhooks status information.
+   *
+   * @throws \Exception
+   */
+  public function getWebhookStatus() {
+    return self::getResponseJson($this->get('settings/webhooks/status'));
+  }
+
+  /**
    * Returns interests list.
    *
    * @param string $webhook_uuid
