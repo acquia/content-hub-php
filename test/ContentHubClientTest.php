@@ -1298,6 +1298,24 @@ class ContentHubClientTest extends TestCase {
   }
 
   /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::getWebhookStatus
+   */
+  public function testGetWebhookStatus() {
+    $response = [
+      'uuid' => 'UUID1',
+      'status' => 200,
+      'reason' => '',
+    ];
+
+    $this->ch_client
+      ->shouldReceive('get')
+      ->once()
+      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response)));
+
+    $this->assertSame($this->ch_client->getWebhookStatus(), $response);
+  }
+
+  /**
    * @covers \Acquia\ContentHubClient\ContentHubClient::unSuppressWebhook
    */
   public function testUnsuppressWebhook() {
