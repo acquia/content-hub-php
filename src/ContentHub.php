@@ -594,7 +594,9 @@ class ContentHub extends Client
      */
     public function getSnapshots()
     {
-      return self::getResponseJson($this->get('snapshots'));
+      $endpoint = "/v2/snapshots";
+      $request = new Request('GET', $endpoint);
+      return self::getResponseJson($request);
     }
 
     /**
@@ -607,7 +609,9 @@ class ContentHub extends Client
      */
     public function createSnapshot()
     {
-      return self::getResponseJson($this->post('snapshots'));
+      $endpoint = "/v2/snapshots";
+      $request = new Request('POST', $endpoint, []);
+      return self::getResponseJson($request);
     }
 
     /**
@@ -623,7 +627,9 @@ class ContentHub extends Client
      */
     public function deleteSnapshot($name)
     {
-      return self::getResponseJson($this->delete("snapshots/$name"));
+      $endpoint = "/v2/snapshots/$name";
+      $request = new Request('DELETE', $endpoint, []);
+      return self::getResponseJson($request);
     }
 
     /**
@@ -639,6 +645,8 @@ class ContentHub extends Client
      */
     public function restoreSnapshot($name)
     {
-      return self::getResponseJson($this->put("snapshots/$name/restore"));
+      $endpoint = "/v2/snapshots/$name/restore";
+      $request = new Request('PUT', $endpoint, []);
+      return self::getResponseJson($request);
     }
 }
