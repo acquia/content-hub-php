@@ -537,6 +537,18 @@ class ContentHub extends Client
         return $this->getResponseJson($request);
     }
 
+  /**
+   * Returns status information for all webhooks.
+   * 
+   * @return array
+   */
+    public function getWebhookStatus()
+    {
+      $endpoint = "/{$this->api_version}/settings/webhooks/status";
+      $request = new Request('GET', $endpoint);
+      return $this->getResponseJson($request);
+    }
+
     /**
      * Deletes a webhook from the active subscription.
      *
