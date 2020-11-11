@@ -689,7 +689,7 @@ class ContentHubClient extends Client {
   }
 
   /**
-   * Returns webhooks status information.
+   * Returns status information for all webhooks.
    *
    * @return array
    *   Webhooks status information.
