@@ -583,4 +583,70 @@ class ContentHub extends Client
         $body = (string) $response->getBody();
         return json_decode($body, TRUE);
     }
+
+    /**
+     * Fetch snapshots.
+     *
+     * @return mixed
+     *   Response.
+     *
+     * @throws \Exception
+     */
+    public function getSnapshots()
+    {
+      $endpoint = "/v2/snapshots";
+      $request = new Request('GET', $endpoint);
+      return self::getResponseJson($request);
+    }
+
+    /**
+     * Create a snapshot.
+     *
+     * @return mixed
+     *   Response.
+     *
+     * @throws \Exception
+     */
+    public function createSnapshot()
+    {
+      $endpoint = "/v2/snapshots";
+      $request = new Request('POST', $endpoint, []);
+      return self::getResponseJson($request);
+    }
+
+    /**
+     * Deletes a snapshot.
+     *
+     * @param string $name
+     *   The name of the snapshot.
+     *
+     * @return \Psr\Http\Message\ResponseInterface
+     *   Response.
+     *
+     * @throws \GuzzleHttp\Exception\RequestException
+     */
+    public function deleteSnapshot($name)
+    {
+      $endpoint = "/v2/snapshots/$name";
+      $request = new Request('DELETE', $endpoint, []);
+      return self::getResponseJson($request);
+    }
+
+    /**
+     * Restore a snapshot.
+     *
+     * @param string $name
+     *   The name of the snapshot.
+     *
+     * @return \Psr\Http\Message\ResponseInterface
+     *   Response.
+     *
+     * @throws \GuzzleHttp\Exception\RequestException
+     */
+    public function restoreSnapshot($name)
+    {
+      $endpoint = "/v2/snapshots/$name/restore";
+      $request = new Request('PUT', $endpoint, []);
+      return self::getResponseJson($request);
+    }
 }
