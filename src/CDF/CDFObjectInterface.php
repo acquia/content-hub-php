@@ -82,6 +82,17 @@ interface CDFObjectInterface {
   public function getDependencies();
 
   /**
+   * Update the hash of a dependent entity.
+   *
+   * @param string $uuid
+   *   Dependent entity uuid.
+   *
+   * @param string $hash
+   *   Hash of the dependent entity.
+   */
+  public function updateDependencyHash($uuid, $hash);
+
+  /**
    * Checks that object has processed dependencies.
    *
    * @return bool
