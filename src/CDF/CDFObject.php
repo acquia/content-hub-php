@@ -215,6 +215,13 @@ class CDFObject implements CDFObjectInterface {
   /**
    * {@inheritdoc}
    */
+  public function updateDependencyHash($uuid, $hash) {
+    $this->metadata['dependencies']['entity'][$uuid] = $hash;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function hasProcessedDependencies() {
     return $this->processed;
   }
