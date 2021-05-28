@@ -179,7 +179,7 @@ class ContentHubLoggingClient extends Client {
    */
   public function getContextArray(string $status, string $message, array $context): array {
     if (isset(
-      $context['uuid'],
+      $context['object_id'],
       $context['event_name'],
       $context['object_type'],
       $context['relevant_score']
@@ -188,7 +188,7 @@ class ContentHubLoggingClient extends Client {
       $context['content'] = json_encode(['message' => $message]);
     }
     else {
-      throw new \Exception('Uuid / Event Name/ Object Type/ Relevant score missing from event log attributes');
+      throw new \Exception('Object Id(UUID) / Event Name/ Object Type/ Relevant score missing from event log attributes');
     }
     return $context;
   }
