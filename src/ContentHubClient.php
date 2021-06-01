@@ -3,6 +3,7 @@
 namespace Acquia\ContentHubClient;
 
 use Acquia\ContentHubClient\CDF\CDFObject;
+use Acquia\ContentHubClient\ContentHubClientTrait;
 use Acquia\ContentHubClient\Event\GetCDFTypeEvent;
 use Acquia\ContentHubClient\Guzzle\Middleware\RequestResponseHandler;
 use Acquia\ContentHubClient\SearchCriteria\SearchCriteria;
@@ -33,6 +34,8 @@ use function GuzzleHttp\default_user_agent;
  * @package Acquia\ContentHubClient
  */
 class ContentHubClient extends Client {
+
+  use ContentHubClientTrait;
 
   // Override VERSION inherited from GuzzleHttp::ClientInterface.
   const VERSION = '2.0.0';
@@ -123,23 +126,34 @@ class ContentHubClient extends Client {
   // phpcs:enable
 
   /**
-   * Pings the service to ensure that it is available.
+   * {@inheritdoc}
    *
-   * @return \Psr\Http\Message\ResponseInterface
-   *   Response.
-   *
-   * @throws \GuzzleHttp\Exception\RequestException
-   * @throws \Exception
-   *
-   * @since 0.2.0
+   * @codeCoverageIgnore
    */
-  public function ping() {
-    $makeBaseURL = self::makeBaseURL($this->getConfig()['base_url']);
-    $client = ObjectFactory::getGuzzleClient([
-      'base_uri' => $makeBaseURL,
-    ]);
+  public function __call($method, $args) {
+    try {
+      if (strpos($args[0], '?')) {
+        [$uri, $query] = explode('?', $args[0]);
+        $parts = explode('/', $uri);
+        if ($query) {
+          $last = array_pop($parts);
+          $last .= "?$query";
+          $parts[] = $last;
+        }
+      }
+      else {
+        $parts = explode('/', $args[0]);
+      }
+      $args[0] = self::makePath(...$parts);
 
-    return self::getResponseJson($client->get('ping'));
+      $args = $this->addSearchCriteriaHeader($args);
+
+      return parent::__call($method, $args);
+
+    }
+    catch (Exception $e) {
+      return $this->getExceptionResponse($method, $args, $e);
+    }
   }
 
   /**
@@ -717,17 +731,7 @@ class ContentHubClient extends Client {
     return $data['data']['interests'] ?? [];
   }
 
-  /**
-   * Get the settings that were used to instantiate this client.
-   *
-   * @return \Acquia\ContentHubClient\Settings
-   *   Settings object.
-   *
-   * @codeCoverageIgnore
-   */
-  public function getSettings() {
-    return $this->settings;
-  }
+
 
   /**
    * Obtains the Settings for the active subscription.
@@ -1059,226 +1063,6 @@ class ContentHubClient extends Client {
     $response = $this->delete("settings/webhooks/$webhook_id/filters", $options);
 
     return self::getResponseJson($response);
-  }
-
-  /**
-   * Gets a Json Response from a request.
-   *
-   * @param \Psr\Http\Message\ResponseInterface $response
-   *   Response.
-   *
-   * @return mixed
-   *   Response array.
-   *
-   * @throws \Exception
-   */
-  public static function getResponseJson(ResponseInterface $response) {
-    try {
-      $body = (string) $response->getBody();
-    }
-    catch (Exception $exception) {
-      $message = sprintf("An exception occurred in the JSON response. Message: %s",
-        $exception->getMessage());
-      throw new Exception($message);
-    }
-
-    return json_decode($body, TRUE);
-  }
-
-  /**
-   * {@inheritdoc}
-   *
-   * @codeCoverageIgnore
-   */
-  public function __call($method, $args) {
-    try {
-      if (strpos($args[0], '?')) {
-        [$uri, $query] = explode('?', $args[0]);
-        $parts = explode('/', $uri);
-        if ($query) {
-          $last = array_pop($parts);
-          $last .= "?$query";
-          $parts[] = $last;
-        }
-      }
-      else {
-        $parts = explode('/', $args[0]);
-      }
-      $args[0] = self::makePath(...$parts);
-
-      $args = $this->addSearchCriteriaHeader($args);
-
-      return parent::__call($method, $args);
-    }
-    catch (Exception $e) {
-      return $this->getExceptionResponse($method, $args, $e);
-    }
-  }
-
-  /**
-   * Obtains the appropriate exception Response, logging error messages according to API call.
-   *
-   * @param string $method
-   *   The Request to Plexus, as defined in the content-hub-php library.
-   * @param array $args
-   *   The Request arguments.
-   * @param \Exception $exception
-   *   The Exception object.
-   *
-   * @return ResponseInterface The response after raising an exception.
-   *   The response object.
-   *
-   *  @codeCoverageIgnore
-   */
-  protected function getExceptionResponse($method, array $args, \Exception $exception)
-  {
-    // If we reach here it is because there was an exception raised in the API call.
-    $api_call = $args[0];
-    $response = $exception->getResponse();
-    if (!$response) {
-      $response = $this->getErrorResponse($exception->getCode(), $exception->getMessage());
-    }
-    $response_body = json_decode($response->getBody(), TRUE);
-    $error_code = $response_body['error']['code'];
-    $error_message = $response_body['error']['message'];
-
-    // Customize Error messages according to API Call.
-    switch ($api_call) {
-      case'settings/webhooks':
-        $log_level = LogLevel::WARNING;
-        break;
-
-      case (preg_match('/filters\?name=*/', $api_call) ? true : false) :
-      case (preg_match('/settings\/clients\/*/', $api_call) ? true : false) :
-      case (preg_match('/settings\/webhooks\/.*\/filters/', $api_call) ? true : false) :
-        $log_level = LogLevel::NOTICE;
-        break;
-
-      default:
-        // The default log level is ERROR.
-        $log_level = LogLevel::ERROR;
-        break;
-    }
-
-    $reason = sprintf("Request ID: %s, Method: %s, Path: \"%s\", Status Code: %s, Reason: %s, Error Code: %s, Error Message: \"%s\"",
-        $response_body['request_id'],
-        strtoupper($method),
-        $api_call,
-        $response->getStatusCode(),
-        $response->getReasonPhrase(),
-        $error_code,
-        $error_message
-    );
-    $this->logger->log($log_level, $reason);
-
-    // Return the response.
-    return $response;
-  }
-
-  /**
-   * Returns error response.
-   *
-   * @param int $code
-   *   Status code.
-   * @param string $reason
-   *   Reason.
-   * @param null $request_id
-   *   The request id from the ContentHub service if available.
-   *
-   * @return \GuzzleHttp\Psr7\Response
-   *   Response.
-   */
-  protected function getErrorResponse($code, $reason, $request_id = NULL) {
-    if ($code < 100 || $code >= 600) {
-      $code = 500;
-    }
-    $body = [
-      'request_id' => $request_id,
-      'error' => [
-        'code' => $code,
-        'message' => $reason,
-      ]
-    ];
-    return new Response($code, [], json_encode($body), '1.1', $reason);
-  }
-
-  /**
-   * Make a base url out of components and add a trailing slash to it.
-   *
-   * @param string[] $base_url_components
-   *   Base URL components.
-   *
-   * @return string
-   *   Processed string.
-   */
-  protected static function makeBaseURL(...$base_url_components): string { // phpcs:ignore
-    return self::makePath(...$base_url_components) . '/';
-  }
-
-  /**
-   * Make path out of its individual components.
-   *
-   * @param string[] $path_components
-   *   Path components.
-   *
-   * @return string
-   *   Processed string.
-   */
-  protected static function makePath(...$path_components): string { // phpcs:ignore
-    return self::gluePartsTogether($path_components, '/');
-  }
-
-  /**
-   * Glue all elements of an array together.
-   *
-   * @param array $parts
-   *   Parts array.
-   * @param string $glue
-   *   Glue symbol.
-   *
-   * @return string
-   *   Processed string.
-   */
-  protected static function gluePartsTogether(array $parts, string $glue): string {
-    return implode($glue, self::removeAllLeadingAndTrailingSlashes($parts));
-  }
-
-  /**
-   * Removes all leading and trailing slashes.
-   *
-   * Strip all leading and trailing slashes from all components of the given
-   * array.
-   *
-   * @param string[] $components
-   *   Array of strings.
-   *
-   * @return string[]
-   *   Processed array.
-   */
-  protected static function removeAllLeadingAndTrailingSlashes(array $components): array {
-    return array_map(function ($component) {
-      return trim($component, '/');
-    }, $components);
-  }
-
-  /**
-   * Attaches RequestResponseHandler to handlers stack.
-   *
-   * @param array $config
-   *   Client config.
-   *
-   * @codeCoverageIgnore
-   */
-  protected function addRequestResponseHandler(array $config): void {
-    if (empty($config['handler']) || empty($this->logger)) {
-      return;
-    }
-
-    if (!$config['handler'] instanceof HandlerStack) {
-      return;
-    }
-
-    $config['handler']->push(new RequestResponseHandler($this->logger));
   }
 
   /**
