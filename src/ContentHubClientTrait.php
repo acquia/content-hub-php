@@ -211,3 +211,4 @@ trait ContentHubClientTrait {
     return json_decode($body, TRUE);
   }
 }
+
