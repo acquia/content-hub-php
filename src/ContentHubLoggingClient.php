@@ -142,7 +142,6 @@ class ContentHubLoggingClient extends Client {
     $log_details['origin'] = $this->getSettings()->getUuid();
     $options['body'] = json_encode($log_details);
 
-    $client = ObjectFactory::getGuzzleClient($this->getConfig());
     return self::getResponseJson($this->post('events', $options));
   }
 
