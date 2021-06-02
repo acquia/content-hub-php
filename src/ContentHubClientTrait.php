@@ -188,26 +188,6 @@ trait ContentHubClientTrait {
   }
 
   /**
-   * Pings the service to ensure that it is available.
-   *
-   * @return \Psr\Http\Message\ResponseInterface
-   *   Response.
-   *
-   * @throws \GuzzleHttp\Exception\RequestException
-   * @throws \Exception
-   *
-   * @since 0.2.0
-   */
-  public function ping() {
-    $makeBaseURL = self::makeBaseURL($this->getConfig()['base_url']);
-    $client = ObjectFactory::getGuzzleClient([
-      'base_uri' => $makeBaseURL,
-    ]);
-
-    return self::getResponseJson($client->get('ping'));
-  }
-
-  /**
    * Gets a Json Response from a request.
    *
    * @param \Psr\Http\Message\ResponseInterface $response
