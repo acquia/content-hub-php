@@ -286,6 +286,31 @@ class ContentHubLoggingClientTest extends TestCase {
   }
 
   /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::getResponseJson
+   * @throws \Exception
+   */
+  public function testGetResponseJsonReturnsJSONDecodedResponse(): void {  // phpcs:ignore
+    $response_body_array = [1, 2, 3];
+    $mocked_response = $this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response_body_array));
+    $this->assertSame($this->ch_client::getResponseJson($mocked_response), $response_body_array);
+  }
+
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::getResponseJson
+   * @throws \Exception
+   */
+  public function testGetResponseJsonThrowsExceptionIfAnythingFails(): void {
+    $response = \Mockery::mock(Response::class);
+    $response
+      ->shouldReceive('getBody')
+      ->andThrow(new \Exception());
+
+    $this->expectException(\Exception::class);
+
+    $this->ch_client::getResponseJson($response);
+  }
+
+  /**
    * Mock Content Hub Logging Client.
    *
    * @param array $config
