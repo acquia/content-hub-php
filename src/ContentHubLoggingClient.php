@@ -2,29 +2,11 @@
 
 namespace Acquia\ContentHubClient;
 
-use Acquia\ContentHubClient\CDF\CDFObject;
-use Acquia\ContentHubClient\ContentHubClientTrait;
-use Acquia\ContentHubClient\Event\GetCDFTypeEvent;
-use Acquia\ContentHubClient\Guzzle\Middleware\RequestResponseHandler;
-use Acquia\ContentHubClient\SearchCriteria\SearchCriteria;
-use Acquia\ContentHubClient\SearchCriteria\SearchCriteriaBuilder;
 use Acquia\Hmac\Guzzle\HmacAuthMiddleware;
-use Acquia\Hmac\Key;
 use Exception;
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\BadResponseException;
-use GuzzleHttp\Exception\ClientException;
-use GuzzleHttp\Exception\ConnectException;
-use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\Exception\ServerException;
-use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Psr7\Response;
-use Psr\Log\LogLevel;
-use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
-use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpFoundation\Response as HttpResponse;
 
 use function GuzzleHttp\default_user_agent;
 
@@ -161,7 +143,7 @@ class ContentHubLoggingClient extends Client {
     $options['body'] = json_encode($log_details);
 
     $client = ObjectFactory::getGuzzleClient($this->getConfig());
-    return self::getResponseJson($client->post('events', $options));
+    return self::getResponseJson($this->post('events', $options));
   }
 
   /**
