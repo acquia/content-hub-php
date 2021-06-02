@@ -161,7 +161,7 @@ class ContentHubLoggingClient extends Client {
    *
    * @throws Exception
    */
-  private function getContextArray(string $status, string $message, array $context): array {
+  public function getContextArray(string $status, string $message, array $context): array {
     if (isset(
       $context['object_id'],
       $context['event_name'],

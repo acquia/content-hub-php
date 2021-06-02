@@ -202,10 +202,10 @@ trait ContentHubClientTrait {
     try {
       $body = (string) $response->getBody();
     }
-    catch (Exception $exception) {
+    catch (\Exception $exception) {
       $message = sprintf("An exception occurred in the JSON response. Message: %s",
         $exception->getMessage());
-      throw new Exception($message);
+      throw new \Exception($message);
     }
 
     return json_decode($body, TRUE);

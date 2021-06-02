@@ -286,6 +286,50 @@ class ContentHubLoggingClientTest extends TestCase {
   }
 
   /**
+   * Tests get context array method.
+   *
+   * @covers \Acquia\ContentHubClient\ContentHubLoggingClient::getContextArray
+   */
+  public function testGetContextArray(): void {
+    $status = 'status';
+    $message = 'message';
+    $context = [
+      'object_id' => 'object_id',
+      'event_name' => 'event_name',
+      'object_type' => 'object_type',
+      'relevant_score' => 5,
+    ];
+    $actual_outcome = $this->ch_client->getContextArray($status, $message, $context);
+
+    $expected_outcome = $context + [
+      'status' => $status,
+      'content' => json_encode(['message' => $message]),
+    ];
+
+    $this->assertSame($expected_outcome, $actual_outcome);
+  }
+
+  /**
+   * Tests get context array exception.
+   *
+   * @covers \Acquia\ContentHubClient\ContentHubLoggingClient::getContextArray
+   *
+   * @throws \Exception
+   */
+  public function testGetContextArrayException(): void {
+    $status = 'status';
+    $message = 'message';
+    $context = [
+      'object_id' => 'object_id',
+      'event_name' => 'event_name',
+      'object_type' => 'object_type',
+    ];
+
+    $this->expectExceptionMessage('Object Id(UUID) / Event Name/ Object Type/ Relevant score missing from event log attributes');
+    $this->ch_client->getContextArray($status, $message, $context);
+  }
+
+  /**
    * @covers \Acquia\ContentHubClient\ContentHubClient::getResponseJson
    * @throws \Exception
    */
