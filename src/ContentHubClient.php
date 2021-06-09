@@ -17,6 +17,7 @@ use GuzzleHttp\Psr7\Response;
 use Psr\Log\LogLevel;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
 use Psr\Http\Message\ResponseInterface;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -28,6 +29,8 @@ use function GuzzleHttp\default_user_agent;
  * @package Acquia\ContentHubClient
  */
 class ContentHubClient extends Client {
+
+  use ContentHubClientTrait;
 
   // Override VERSION inherited from GuzzleHttp::ClientInterface.
   const VERSION = '2.0.0';
@@ -118,23 +121,34 @@ class ContentHubClient extends Client {
   // phpcs:enable
 
   /**
-   * Pings the service to ensure that it is available.
+   * {@inheritdoc}
    *
-   * @return \Psr\Http\Message\ResponseInterface
-   *   Response.
-   *
-   * @throws \GuzzleHttp\Exception\RequestException
-   * @throws \Exception
-   *
-   * @since 0.2.0
+   * @codeCoverageIgnore
    */
-  public function ping() {
-    $makeBaseURL = self::makeBaseURL($this->getConfig()['base_url']);
-    $client = ObjectFactory::getGuzzleClient([
-      'base_uri' => $makeBaseURL,
-    ]);
+  public function __call($method, $args) {
+    try {
+      if (strpos($args[0], '?')) {
+        [$uri, $query] = explode('?', $args[0]);
+        $parts = explode('/', $uri);
+        if ($query) {
+          $last = array_pop($parts);
+          $last .= "?$query";
+          $parts[] = $last;
+        }
+      }
+      else {
+        $parts = explode('/', $args[0]);
+      }
+      $args[0] = self::makePath(...$parts);
 
-    return self::getResponseJson($client->get('ping'));
+      $args = $this->addSearchCriteriaHeader($args);
+
+      return parent::__call($method, $args);
+
+    }
+    catch (Exception $e) {
+      return $this->getExceptionResponse($method, $args, $e);
+    }
   }
 
   /**
@@ -458,21 +472,6 @@ class ContentHubClient extends Client {
   }
 
   /**
-   * Deletes an entity from a webhook's interest list.
-   *
-   * @param string $uuid
-   *   Interest UUID.
-   * @param string $webhook_uuid
-   *   Webhook UUID.
-   *
-   * @return \Psr\Http\Message\ResponseInterface
-   *   Response.
-   */
-  public function deleteInterest($uuid, $webhook_uuid) {
-    return $this->delete("interest/$uuid/$webhook_uuid");
-  }
-
-  /**
    * Purges all entities from the Content Hub.
    *
    * This method should be used carefully as it deletes all the entities for
@@ -588,10 +587,10 @@ class ContentHubClient extends Client {
    */
   public function listEntities(array $options = []) {
     $variables = $options + [
-      'limit' => 1000,
-      'start' => 0,
-      'filters' => [],
-    ];
+        'limit' => 1000,
+        'start' => 0,
+        'filters' => [],
+      ];
 
     foreach ($variables['filters'] as $key => $value) {
       $variables["filter:${key}"] = $value;
@@ -698,6 +697,25 @@ class ContentHubClient extends Client {
   }
 
   /**
+   * Add entities to Interest List.
+   *
+   * @param string $webhook_uuid
+   *   The UUID of the webhook.
+   * @param array $uuids
+   *   Entity UUIDs to add to Interest List.
+   *
+   * @return \Psr\Http\Message\ResponseInterface
+   *   The response.
+   *
+   * @throws \GuzzleHttp\Exception\RequestException
+   */
+  public function addEntitiesToInterestList(string $webhook_uuid, array $uuids): ResponseInterface {
+    $options['body'] = json_encode(['interests' => $uuids]);
+
+    return $this->post("interest/webhook/$webhook_uuid", $options);
+  }
+
+  /**
    * Returns interests list.
    *
    * @param string $webhook_uuid
@@ -708,22 +726,91 @@ class ContentHubClient extends Client {
    *
    * @throws \Exception
    */
-  public function getInterestsByWebhook($webhook_uuid) {
+  public function getInterestsByWebhook(string $webhook_uuid): array {
     $data = self::getResponseJson($this->get("interest/webhook/$webhook_uuid"));
 
     return $data['data']['interests'] ?? [];
   }
 
   /**
-   * Get the settings that were used to instantiate this client.
+   * Deletes an entity from a webhook's interest list.
    *
-   * @return \Acquia\ContentHubClient\Settings
-   *   Settings object.
+   * @param string $uuid
+   *   Interest UUID.
+   * @param string $webhook_uuid
+   *   Webhook UUID.
    *
-   * @codeCoverageIgnore
+   * @return \Psr\Http\Message\ResponseInterface
+   *   Response.
    */
-  public function getSettings() {
-    return $this->settings;
+  public function deleteInterest(string $uuid, string $webhook_uuid): ResponseInterface {
+    return $this->delete("interest/$uuid/$webhook_uuid");
+  }
+
+  /**
+   * Returns an extended interest list based on the site role.
+   *
+   * @param string $webhook_uuid
+   *   Identifier of the webhook.
+   * @param string $site_role
+   *   The role of the site.
+   *
+   * @return array
+   *   An associate array keyed by the entity uuid.
+   *
+   * @throws \Exception
+   */
+  public function getInterestsByWebhookAndSiteRole(string $webhook_uuid, string $site_role): array {
+    $data = self::getResponseJson($this->get("interest/webhook/$webhook_uuid/$site_role"));
+    return $data['data'] ?? [];
+  }
+
+  /**
+   * The extended interest list to add based on site role.
+   *
+   * Format:
+   * [
+   *   'fe5f27d1-6e41-4609-b65a-2cb179549d1e' => [
+   *     'status' => '',
+   *     'reason' => '',
+   *     'event_ref' => '',
+   *   ],
+   * ]
+   *
+   * @param array $interest_list
+   *   An array of interest items.
+   * @param string $webhook_uuid
+   *   The webhook uuid to register interest items for.
+   * @param string $site_role
+   *   The site role.
+   *
+   * @return \Psr\Http\Message\ResponseInterface
+   */
+  public function addEntitiesToInterestListBySiteRole(string $webhook_uuid, string $site_role, array $interest_list): ResponseInterface {
+    $options['body'] = json_encode($interest_list);
+
+    return $this->post("interest/webhook/$webhook_uuid/$site_role", $options);
+  }
+
+  /**
+   * The extended interest list to add based on site role.
+   *
+   * Format:
+   *   @see \Acquia\ContentHubClient\ContentHubClient::addEntitiesToInterestListBySiteRole
+   *
+   * @param array $interest_list
+   *   An array of interest items.
+   * @param string $webhook_uuid
+   *   The webhook uuid to register interest items for.
+   * @param string $site_role
+   *   The site role.
+   *
+   * @return \Psr\Http\Message\ResponseInterface
+   */
+  public function updateInterestListBySiteRole(string $webhook_uuid, string $site_role, array $interest_list): ResponseInterface {
+    $options['body'] = json_encode($interest_list);
+
+    return $this->put("interest/webhook/$webhook_uuid/$site_role", $options);
   }
 
   /**
@@ -830,25 +917,6 @@ class ContentHubClient extends Client {
    */
   public function unSuppressWebhook(string $webhook_uuid) {
     return self::getResponseJson($this->put("settings/webhooks/$webhook_uuid/enable"));
-  }
-
-  /**
-   * Add entities to Interest List.
-   *
-   * @param string $webhook_uuid
-   *   The UUID of the webhook.
-   * @param array $uuids
-   *   Entity UUIDs to add to Interest List.
-   *
-   * @return \Psr\Http\Message\ResponseInterface
-   *   The response.
-   *
-   * @throws \GuzzleHttp\Exception\RequestException
-   */
-  public function addEntitiesToInterestList($webhook_uuid, array $uuids) {
-    $options['body'] = json_encode(['interests' => $uuids]);
-
-    return $this->post("interest/webhook/$webhook_uuid", $options);
   }
 
   /**
@@ -1057,228 +1125,6 @@ class ContentHubClient extends Client {
     $response = $this->delete("settings/webhooks/$webhook_id/filters", $options);
 
     return self::getResponseJson($response);
-  }
-
-  /**
-   * Gets a Json Response from a request.
-   *
-   * @param \Psr\Http\Message\ResponseInterface $response
-   *   Response.
-   *
-   * @return mixed
-   *   Response array.
-   *
-   * @throws \Exception
-   */
-  public static function getResponseJson(ResponseInterface $response) {
-    try {
-      $body = (string) $response->getBody();
-    }
-    catch (Exception $exception) {
-      $message = sprintf("An exception occurred in the JSON response. Message: %s",
-        $exception->getMessage());
-      throw new Exception($message);
-    }
-
-    return json_decode($body, TRUE);
-  }
-
-  /**
-   * {@inheritdoc}
-   *
-   * @codeCoverageIgnore
-   */
-  public function __call($method, $args) {
-    try {
-      if (strpos($args[0], '?')) {
-        [$uri, $query] = explode('?', $args[0]);
-        $parts = explode('/', $uri);
-        if ($query) {
-          $last = array_pop($parts);
-          $last .= "?$query";
-          $parts[] = $last;
-        }
-      }
-      else {
-        $parts = explode('/', $args[0]);
-      }
-      $args[0] = self::makePath(...$parts);
-
-      $args = $this->addSearchCriteriaHeader($args);
-
-      return parent::__call($method, $args);
-    }
-    catch (Exception $e) {
-      return $this->getExceptionResponse($method, $args, $e);
-    }
-  }
-
-  /**
-   * Obtains the appropriate exception Response.
-   *
-   * Logging error messages according to API call.
-   *
-   * @param string $method
-   *   The Request to Plexus, as defined in the content-hub-php library.
-   * @param array $args
-   *   The Request arguments.
-   * @param \Exception $exception
-   *   The Exception object.
-   *
-   * @return \Psr\Http\Message\ResponseInterface
-   *   The response after raising an exception.
-   *
-   *  @codeCoverageIgnore
-   */
-  protected function getExceptionResponse($method, array $args, \Exception $exception) {
-    // If we reach here it is because there was an exception raised in the
-    // API call.
-    $api_call = $args[0];
-    $response = $exception->getResponse();
-    if (!$response) {
-      $response = $this->getErrorResponse($exception->getCode(), $exception->getMessage());
-    }
-    $response_body = json_decode($response->getBody(), TRUE);
-    $error_code = $response_body['error']['code'];
-    $error_message = $response_body['error']['message'];
-
-    // Customize Error messages according to API Call.
-    switch ($api_call) {
-      case'settings/webhooks':
-        $log_level = LogLevel::WARNING;
-        break;
-
-      case (preg_match('/filters\?name=*/', $api_call) ? TRUE : FALSE):
-      case (preg_match('/settings\/clients\/*/', $api_call) ? TRUE : FALSE):
-      case (preg_match('/settings\/webhooks\/.*\/filters/', $api_call) ? TRUE : FALSE):
-        $log_level = LogLevel::NOTICE;
-        break;
-
-      default:
-        // The default log level is ERROR.
-        $log_level = LogLevel::ERROR;
-        break;
-    }
-
-    $reason = sprintf("Request ID: %s, Method: %s, Path: \"%s\", Status Code: %s, Reason: %s, Error Code: %s, Error Message: \"%s\"",
-      $response_body['request_id'],
-      strtoupper($method),
-      $api_call,
-      $response->getStatusCode(),
-      $response->getReasonPhrase(),
-      $error_code,
-      $error_message
-    );
-    $this->logger->log($log_level, $reason);
-
-    // Return the response.
-    return $response;
-  }
-
-  /**
-   * Returns error response.
-   *
-   * @param int $code
-   *   Status code.
-   * @param string $reason
-   *   Reason.
-   * @param string|null $request_id
-   *   The request id from the ContentHub service if available.
-   *
-   * @return \Psr\Http\Message\ResponseInterface
-   *   Response.
-   */
-  protected function getErrorResponse(int $code, string $reason, ?string $request_id = NULL): ResponseInterface {
-    if ($code < 100 || $code >= 600) {
-      $code = 500;
-    }
-    $body = [
-      'request_id' => $request_id,
-      'error' => [
-        'code' => $code,
-        'message' => $reason,
-      ],
-    ];
-    return new Response($code, [], json_encode($body), '1.1', $reason);
-  }
-
-  /**
-   * Make a base url out of components and add a trailing slash to it.
-   *
-   * @param string[] $base_url_components
-   *   Base URL components.
-   *
-   * @return string
-   *   Processed string.
-   */
-  protected static function makeBaseURL(...$base_url_components): string { // phpcs:ignore
-    return self::makePath(...$base_url_components) . '/';
-  }
-
-  /**
-   * Make path out of its individual components.
-   *
-   * @param string[] $path_components
-   *   Path components.
-   *
-   * @return string
-   *   Processed string.
-   */
-  protected static function makePath(...$path_components): string { // phpcs:ignore
-    return self::gluePartsTogether($path_components, '/');
-  }
-
-  /**
-   * Glue all elements of an array together.
-   *
-   * @param array $parts
-   *   Parts array.
-   * @param string $glue
-   *   Glue symbol.
-   *
-   * @return string
-   *   Processed string.
-   */
-  protected static function gluePartsTogether(array $parts, string $glue): string {
-    return implode($glue, self::removeAllLeadingAndTrailingSlashes($parts));
-  }
-
-  /**
-   * Removes all leading and trailing slashes.
-   *
-   * Strip all leading and trailing slashes from all components of the given
-   * array.
-   *
-   * @param string[] $components
-   *   Array of strings.
-   *
-   * @return string[]
-   *   Processed array.
-   */
-  protected static function removeAllLeadingAndTrailingSlashes(array $components): array {
-    return array_map(function ($component) {
-      return trim($component, '/');
-    }, $components);
-  }
-
-  /**
-   * Attaches RequestResponseHandler to handlers stack.
-   *
-   * @param array $config
-   *   Client config.
-   *
-   * @codeCoverageIgnore
-   */
-  protected function addRequestResponseHandler(array $config): void {
-    if (empty($config['handler']) || empty($this->logger)) {
-      return;
-    }
-
-    if (!$config['handler'] instanceof HandlerStack) {
-      return;
-    }
-
-    $config['handler']->push(new RequestResponseHandler($this->logger));
   }
 
   /**
