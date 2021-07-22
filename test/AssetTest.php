@@ -3,8 +3,9 @@
 namespace Acquia\ContentHubClient\test;
 
 use Acquia\ContentHubClient\Asset;
+use PHPUnit\Framework\TestCase;
 
-class AssetTest extends \PHPUnit_Framework_TestCase
+class AssetTest extends TestCase
 {
     public function testCreateAsset()
     {

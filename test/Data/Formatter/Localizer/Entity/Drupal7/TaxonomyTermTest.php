@@ -3,6 +3,7 @@
 namespace Acquia\ContentHubClient\test\Data\Formatter\Localizer\Entity\Drupal7;
 
 use Acquia\ContentHubClient\Data\Formatter\Localizer\Entity\Drupal7\TaxonomyTerm as Localizer;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Taxonomy term data localizer test.
@@ -10,7 +11,7 @@ use Acquia\ContentHubClient\Data\Formatter\Localizer\Entity\Drupal7\TaxonomyTerm
  * @coversDefaultClass Acquia\ContentHubClient\Data\Formatter\Localizer\Entity\Drupal7\TaxonomyTerm
  * @group content-hub-php
  */
-class TaxonomyTermTest extends \PHPUnit_Framework_TestCase
+class TaxonomyTermTest extends TestCase
 {
     /**
      * Tests the localizeEntity() method.

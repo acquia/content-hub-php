@@ -3,6 +3,7 @@
 namespace Acquia\ContentHubClient\test\Data\Formatter\Standardizer;
 
 use Acquia\ContentHubClient\Data\Formatter\Standardizer\Drupal8 as Standardizer;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Drupal8 data standardizer test.
@@ -10,7 +11,7 @@ use Acquia\ContentHubClient\Data\Formatter\Standardizer\Drupal8 as Standardizer;
  * @coversDefaultClass Acquia\ContentHubClient\Data\Formatter\Standardizer\Drupal8
  * @group content-hub-php
  */
-class Drupal8Test extends \PHPUnit_Framework_TestCase
+class Drupal8Test extends TestCase
 {
     /**
      * Tests the standardizeEntity() method, empty data.

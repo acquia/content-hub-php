@@ -3,6 +3,7 @@
 namespace Acquia\ContentHubClient\test\Data\Formatter\Transformer;
 
 use Acquia\ContentHubClient\Data\Formatter\Transformer\General as Transformer;
+use PHPUnit\Framework\TestCase;
 
 /**
  * General data transformer test.
@@ -10,7 +11,7 @@ use Acquia\ContentHubClient\Data\Formatter\Transformer\General as Transformer;
  * @coversDefaultClass Acquia\ContentHubClient\Data\Formatter\Transformer\General
  * @group content-hub-php
  */
-class GeneralTest extends \PHPUnit_Framework_TestCase
+class GeneralTest extends TestCase
 {
     /**
      * Tests the rename() method, index does not exist.

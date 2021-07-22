@@ -3,6 +3,7 @@
 namespace Acquia\ContentHubClient\test\Data;
 
 use Acquia\ContentHubClient\Data\Adapter;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Adapter test.
@@ -10,7 +11,7 @@ use Acquia\ContentHubClient\Data\Adapter;
  * @coversDefaultClass Acquia\ContentHubClient\Data\Adapter
  * @group content-hub-php
  */
-class AdapterTest extends \PHPUnit_Framework_TestCase
+class AdapterTest extends TestCase
 {
     /**
      * Tests the constructor() method, adapter schema is unsupported.

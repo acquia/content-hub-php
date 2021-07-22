@@ -3,6 +3,7 @@
 namespace Acquia\ContentHubClient\test\Data\Formatter\Localizer\Entity\Drupal7;
 
 use Acquia\ContentHubClient\Data\Formatter\Localizer\Entity\Drupal7\File as Localizer;
+use PHPUnit\Framework\TestCase;
 
 /**
  * File data localizer test.
@@ -10,7 +11,7 @@ use Acquia\ContentHubClient\Data\Formatter\Localizer\Entity\Drupal7\File as Loca
  * @coversDefaultClass Acquia\ContentHubClient\Data\Formatter\Localizer\Entity\Drupal7\File
  * @group content-hub-php
  */
-class FileTest extends \PHPUnit_Framework_TestCase
+class FileTest extends TestCase
 {
     /**
      * Tests the localizeEntity() method.

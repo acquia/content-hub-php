@@ -3,6 +3,7 @@
 namespace Acquia\ContentHubClient\test\Data\Formatter\Localizer\Attribute\Drupal7;
 
 use Acquia\ContentHubClient\Data\Formatter\Localizer\Attribute\Drupal7\ArrayString as Localizer;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Array string data localizer test.
@@ -10,7 +11,7 @@ use Acquia\ContentHubClient\Data\Formatter\Localizer\Attribute\Drupal7\ArrayStri
  * @coversDefaultClass Acquia\ContentHubClient\Data\Formatter\Localizer\Attribute\Drupal7\ArrayString
  * @group content-hub-php
  */
-class ArrayStringTest extends \PHPUnit_Framework_TestCase
+class ArrayStringTest extends TestCase
 {
     /**
      * Tests the localizeEntity() method.
