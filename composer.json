@@ -14,10 +14,10 @@
         "issues": "https://github.com/acquia/content-hub-php/issues"
     },
     "require": {
-        "php": ">=5.6",
+        "php": ">=7.2",
         "guzzlehttp/guzzle": "~6.0",
-        "symfony/serializer": "~2.7|^3.2",
-        "symfony/http-foundation": "~2.7|^3.2"
+        "symfony/http-foundation": "^3.4 || ^4.3",
+        "symfony/serializer": "^3.4 || ^4.3"
     },
     "require-dev": {
         "fabpot/php-cs-fixer": "~1.0",
