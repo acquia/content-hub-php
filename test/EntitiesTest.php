@@ -6,8 +6,9 @@ use Acquia\ContentHubClient\Entities;
 use Acquia\ContentHubClient\Entity;
 use Acquia\ContentHubClient\Asset;
 use Acquia\ContentHubClient\Attribute;
+use PHPUnit\Framework\TestCase;
 
-class EntitiesTest extends \PHPUnit_Framework_TestCase
+class EntitiesTest extends TestCase
 {
   private function getData()
   {

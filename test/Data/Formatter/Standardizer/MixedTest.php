@@ -3,6 +3,7 @@
 namespace Acquia\ContentHubClient\test\Data\Formatter\Standardizer;
 
 use Acquia\ContentHubClient\Data\Formatter\Standardizer\Mixed as Standardizer;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Mixed data standardizer test.
@@ -10,7 +11,7 @@ use Acquia\ContentHubClient\Data\Formatter\Standardizer\Mixed as Standardizer;
  * @coversDefaultClass Acquia\ContentHubClient\Data\Formatter\Standardizer\Mixed
  * @group content-hub-php
  */
-class GeneralTest extends \PHPUnit_Framework_TestCase
+class GeneralTest extends TestCase
 {
     /**
      * Tests the standardizeListEntities() method, empty data.

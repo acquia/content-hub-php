@@ -3,8 +3,9 @@
 namespace Acquia\ContentHubClient\test;
 
 use Acquia\ContentHubClient\Attribute;
+use PHPUnit\Framework\TestCase;
 
-class AttributeTest extends \PHPUnit_Framework_TestCase
+class AttributeTest extends TestCase
 {
     private function setAttributeData()
     {

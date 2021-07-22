@@ -3,6 +3,7 @@
 namespace Acquia\ContentHubClient\test\Data\Formatter\Localizer\Entity\Drupal7;
 
 use Acquia\ContentHubClient\Data\Formatter\Localizer\Entity\Drupal7\Node as Localizer;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Node data localizer test.
@@ -10,7 +11,7 @@ use Acquia\ContentHubClient\Data\Formatter\Localizer\Entity\Drupal7\Node as Loca
  * @coversDefaultClass Acquia\ContentHubClient\Data\Formatter\Localizer\Entity\Drupal7\Node
  * @group content-hub-php
  */
-class NodeTest extends \PHPUnit_Framework_TestCase
+class NodeTest extends TestCase
 {
     /**
      * Tests the localizeEntity() method.

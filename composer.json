@@ -14,19 +14,14 @@
         "issues": "https://github.com/acquia/content-hub-php/issues"
     },
     "require": {
-        "php": ">=5.6",
+        "php": ">=7.2",
         "guzzlehttp/guzzle": "~6.0",
-        "symfony/serializer": "~2.7|^3.2",
-        "symfony/http-foundation": "~2.7|^3.2"
+        "symfony/http-foundation": "^3.4 || ^4.3",
+        "symfony/serializer": "^3.4 || ^4.3"
     },
     "require-dev": {
-        "fabpot/php-cs-fixer": "~1.0",
-        "pdepend/pdepend": "~1.0",
-        "phploc/phploc": "~2.0",
-        "phpmd/phpmd": "~1.0",
-        "phpunit/phpunit": ">=4.8.35 <5",
-        "scrutinizer/ocular": "~1.0",
-        "sebastian/phpcpd": "~2.0"
+        "phpunit/phpunit": "^8",
+        "scrutinizer/ocular": "^1.8"
     },
     "suggest": {
         "ramsey/uuid": "A PHP 5.4+ library for generating RFC 4122 version 1, 3, 4, and 5 universally unique identifiers (UUID)"

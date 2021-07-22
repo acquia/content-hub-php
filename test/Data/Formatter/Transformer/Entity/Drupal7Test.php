@@ -3,6 +3,7 @@
 namespace Acquia\ContentHubClient\test\Data\Formatter\Transformer\Entity;
 
 use Acquia\ContentHubClient\Data\Formatter\Transformer\Entity\Drupal7 as Transformer;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Drupal7 data transformer test.
@@ -10,7 +11,7 @@ use Acquia\ContentHubClient\Data\Formatter\Transformer\Entity\Drupal7 as Transfo
  * @coversDefaultClass Acquia\ContentHubClient\Data\Formatter\Transformer\Entity\Drupal7
  * @group content-hub-php
  */
-class Drupal7Test extends \PHPUnit_Framework_TestCase
+class Drupal7Test extends TestCase
 {
     /**
      * Tests the arrayStringToString() method, index does not exist.

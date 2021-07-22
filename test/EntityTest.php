@@ -5,8 +5,9 @@ namespace Acquia\ContentHubClient\test;
 use Acquia\ContentHubClient\Entity;
 use Acquia\ContentHubClient\Asset;
 use Acquia\ContentHubClient\Attribute;
+use PHPUnit\Framework\TestCase;
 
-class EntityTest extends \PHPUnit_Framework_TestCase
+class EntityTest extends TestCase
 {
     private function getData()
     {

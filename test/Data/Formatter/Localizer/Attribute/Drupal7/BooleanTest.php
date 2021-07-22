@@ -3,6 +3,7 @@
 namespace Acquia\ContentHubClient\test\Data\Formatter\Localizer\Attribute\Drupal7;
 
 use Acquia\ContentHubClient\Data\Formatter\Localizer\Attribute\Drupal7\Boolean as Localizer;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Boolean data localizer test.
@@ -10,7 +11,7 @@ use Acquia\ContentHubClient\Data\Formatter\Localizer\Attribute\Drupal7\Boolean a
  * @coversDefaultClass Acquia\ContentHubClient\Data\Formatter\Localizer\Attribute\Drupal7\Boolean
  * @group content-hub-php
  */
-class BooleanTest extends \PHPUnit_Framework_TestCase
+class BooleanTest extends TestCase
 {
     /**
      * Tests the localizeEntity() method.

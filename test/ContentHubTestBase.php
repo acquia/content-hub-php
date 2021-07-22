@@ -3,8 +3,9 @@
 namespace Acquia\ContentHubClient\test;
 
 use GuzzleHttp\Psr7\Response;
+use PHPUnit\Framework\TestCase;
 
-abstract class ContentHubTestBase extends \PHPUnit_Framework_TestCase
+abstract class ContentHubTestBase extends TestCase
 {
     /**
      * @param array $responses Responses
