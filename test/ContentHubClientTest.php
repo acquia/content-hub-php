@@ -269,6 +269,46 @@ class ContentHubClientTest extends TestCase {
   }
 
   /**
+   * @covers ::removeAllLeadingAndTrailingSlashes
+   */
+  public function testRemoveAllLeadingAndTrailingSlashes(): void {
+    $base_url_components = ['http://example.com/', 'example/', 'path'];
+    $expected = ['http://example.com', 'example', 'path'];
+    $actual = $this->ch_client->removeAllLeadingAndTrailingSlashes($base_url_components);
+    $this->assertTrue($expected === $actual);
+  }
+
+  /**
+   * @covers ::gluePartsTogether
+   */
+  public function testGluePartsTogetherWithColons(): void {
+    $parts = ['http://example.com/', 'example/', 'path'];
+    $expected = 'http://example.com:example:path';
+    $actual = $this->ch_client->gluePartsTogether($parts, ':');
+    $this->assertTrue($expected === $actual);
+  }
+
+  /**
+   * @covers ::makePath
+   */
+  public function testMakePath(): void {
+    $parts = ['http://example.com/', 'example/', 'path'];
+    $expected = 'http://example.com/example/path';
+    $actual = $this->ch_client->makePath(...$parts);
+    $this->assertTrue($expected === $actual);
+  }
+
+  /**
+   * @covers ::makeBaseURL
+   */
+  public function testMakeBaseURL(): void {
+    $parts = ['http://example.com/', 'example/', 'path'];
+    $expected = 'http://example.com/example/path/';
+    $actual = $this->ch_client->makeBaseURL(...$parts);
+    $this->assertTrue($expected === $actual);
+  }
+
+  /**
    * @covers \Acquia\ContentHubClient\ContentHubClient::ping
    * @throws \Exception
    */
