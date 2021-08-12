@@ -12,6 +12,7 @@ use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Response;
+use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -791,16 +792,34 @@ class ContentHubClient extends Client {
    *   ],
    * ]
    *
-   * @param array $interest_list
+   * @param array|\JsonSerializable $interest_list
    * @param string $webhook_uuid
    * @param string $site_role
    *
    * @return \Psr\Http\Message\ResponseInterface
    */
-  public function addEntitiesToInterestListBySiteRole(string $webhook_uuid, string $site_role, array $interest_list): ResponseInterface {
+  public function addEntitiesToInterestListBySiteRole(string $webhook_uuid, string $site_role, $interest_list): ResponseInterface {
     $options['body'] = json_encode($interest_list);
 
     return $this->post("interest/webhook/$webhook_uuid/$site_role", $options);
+  }
+
+  /**
+   * The extended interest list to add based on site role.
+   *
+   * Format:
+   *   @see \Acquia\ContentHubClient\ContentHubClient::addEntitiesToInterestListBySiteRole
+   *
+   * @param array|\JsonSerializable $interest_list
+   * @param string $webhook_uuid
+   * @param string $site_role
+   *
+   * @return \Psr\Http\Message\ResponseInterface
+   */
+  public function updateInterestListBySiteRole(string $webhook_uuid, string $site_role, $interest_list): ResponseInterface {
+    $options['body'] = json_encode($interest_list);
+
+    return $this->put("interest/webhook/$webhook_uuid/$site_role", $options);
   }
 
   /**
