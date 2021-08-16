@@ -793,8 +793,11 @@ class ContentHubClient extends Client {
    * ]
    *
    * @param array $interest_list
+   *   An array of interest items.
    * @param string $webhook_uuid
+   *   The webhook uuid to register interest items for.
    * @param string $site_role
+   *   The site role.
    *
    * @return \Psr\Http\Message\ResponseInterface
    */
@@ -811,8 +814,11 @@ class ContentHubClient extends Client {
    *   @see \Acquia\ContentHubClient\ContentHubClient::addEntitiesToInterestListBySiteRole
    *
    * @param array $interest_list
+   *   An array of interest items.
    * @param string $webhook_uuid
+   *   The webhook uuid to register interest items for.
    * @param string $site_role
+   *   The site role.
    *
    * @return \Psr\Http\Message\ResponseInterface
    */
