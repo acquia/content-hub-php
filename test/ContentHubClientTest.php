@@ -1101,7 +1101,7 @@ class ContentHubClientTest extends TestCase {
   /**
    * @covers ::getInterestByWebhookAndSiteRole
    */
-  public function testGetInterestByWebhookAndSiteRoleIfAny() {
+  public function testGetInterestByWebhookAndSiteRoleIfAny(): void {
     $response = [
       'success' => TRUE,
       'data' => [
@@ -1126,7 +1126,7 @@ class ContentHubClientTest extends TestCase {
   /**
    * @covers ::getInterestByWebhookAndSiteRole
    */
-  public function testGetInterestByWebhookAndSiteRoleIfNone() {
+  public function testGetInterestByWebhookAndSiteRoleIfNone(): void {
     $response = [
       'success' => FALSE,
       'error' => [
@@ -1149,7 +1149,7 @@ class ContentHubClientTest extends TestCase {
   /**
    * @covers ::addEntitiesToInterestListBySiteRole
    */
-  public function testAddEntitiesToInterestListBySiteRoleReturnsSuccess() {
+  public function testAddEntitiesToInterestListBySiteRoleReturnsSuccess(): void {
     $webhook_uuid = 'some-webhook-uuid';
     $site_role = 'subscriber';
     $response = json_encode([
@@ -1176,6 +1176,37 @@ class ContentHubClientTest extends TestCase {
       ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], $response));
 
     $api_response = $this->ch_client->addEntitiesToInterestListBySiteRole($webhook_uuid, $site_role, $interest_list);
+
+    $this->assertSame($api_response->getStatusCode(), SymfonyResponse::HTTP_OK);
+    $this->assertSame($api_response->getBody()->getContents(), $response);
+  }
+
+  /**
+   * @covers ::updateInterestListBySiteRole
+   */
+  public function testUpdateInterestListBySiteRoleReturnsSuccess(): void {
+    $webhook_uuid = 'some-webhook-uuid';
+    $site_role = 'subscriber';
+    $response = json_encode([
+      'success' => TRUE,
+      'request_id' => 'some-request-uuid',
+    ]);
+
+    $interest_list = [
+      'entity_uuid_1' => [
+        'status' => SyndicationStatus::IMPORT_SUCCESSFUL,
+        'reason' => 'lorem',
+        'event_ref' => 'event_ref_uuid_1',
+      ],
+    ];
+
+    $this->ch_client
+      ->shouldReceive('put')
+      ->once()
+      ->with("interest/webhook/$webhook_uuid/$site_role", ['body' => json_encode($interest_list)])
+      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], $response));
+
+    $api_response = $this->ch_client->updateInterestListBySiteRole($webhook_uuid, $site_role, $interest_list);
 
     $this->assertSame($api_response->getStatusCode(), SymfonyResponse::HTTP_OK);
     $this->assertSame($api_response->getBody()->getContents(), $response);
