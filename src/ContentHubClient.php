@@ -724,7 +724,7 @@ class ContentHubClient extends Client {
    *
    * @throws \GuzzleHttp\Exception\RequestException
    */
-  public function addEntitiesToInterestList($webhook_uuid, array $uuids) {
+  public function addEntitiesToInterestList(string $webhook_uuid, array $uuids): ResponseInterface {
     $options['body'] = json_encode(['interests' => $uuids]);
 
     return $this->post("interest/webhook/$webhook_uuid", $options);
@@ -741,7 +741,7 @@ class ContentHubClient extends Client {
    *
    * @throws \Exception
    */
-  public function getInterestsByWebhook($webhook_uuid) {
+  public function getInterestsByWebhook(string $webhook_uuid): array {
     $data = self::getResponseJson($this->get("interest/webhook/$webhook_uuid"));
 
     return $data['data']['interests'] ?? [];
@@ -758,7 +758,7 @@ class ContentHubClient extends Client {
    * @return \Psr\Http\Message\ResponseInterface
    *   Response.
    */
-  public function deleteInterest($uuid, $webhook_uuid) {
+  public function deleteInterest(string $uuid, string $webhook_uuid): ResponseInterface {
     return $this->delete("interest/$uuid/$webhook_uuid");
   }
 
@@ -836,7 +836,7 @@ class ContentHubClient extends Client {
    *
    * @codeCoverageIgnore
    */
-  public function getSettings() {
+  public function getSettings(): Settings {
     return $this->settings;
   }
 
