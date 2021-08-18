@@ -775,7 +775,7 @@ class ContentHubClient extends Client {
    *
    * @throws \Exception
    */
-  public function getInterestByWebhookAndSiteRole(string $webhook_uuid, string $site_role): array {
+  public function getInterestsByWebhookAndSiteRole(string $webhook_uuid, string $site_role): array {
     $data = self::getResponseJson($this->get("interest/webhook/$webhook_uuid/$site_role"));
     return $data['data'] ?? [];
   }

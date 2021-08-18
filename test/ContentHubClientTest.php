@@ -1099,9 +1099,9 @@ class ContentHubClientTest extends TestCase {
   }
 
   /**
-   * @covers ::getInterestByWebhookAndSiteRole
+   * @covers ::getInterestsByWebhookAndSiteRole
    */
-  public function testGetInterestByWebhookAndSiteRoleIfAny(): void {
+  public function testGetInterestsByWebhookAndSiteRoleIfAny(): void {
     $response = [
       'success' => TRUE,
       'data' => [
@@ -1120,13 +1120,13 @@ class ContentHubClientTest extends TestCase {
       ->with("interest/webhook/$webhook_uuid/$site_role")
       ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response)));
 
-    $this->assertSame($this->ch_client->getInterestByWebhookAndSiteRole($webhook_uuid, $site_role), $response['data']);
+    $this->assertSame($this->ch_client->getInterestsByWebhookAndSiteRole($webhook_uuid, $site_role), $response['data']);
   }
 
   /**
-   * @covers ::getInterestByWebhookAndSiteRole
+   * @covers ::getInterestsByWebhookAndSiteRole
    */
-  public function testGetInterestByWebhookAndSiteRoleIfNone(): void {
+  public function testGetInterestsByWebhookAndSiteRoleIfNone(): void {
     $response = [
       'success' => FALSE,
       'error' => [
@@ -1143,7 +1143,7 @@ class ContentHubClientTest extends TestCase {
       ->with("interest/webhook/$webhook_uuid/$site_role")
       ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response)));
 
-    $this->assertSame($this->ch_client->getInterestByWebhookAndSiteRole($webhook_uuid, $site_role), []);
+    $this->assertSame($this->ch_client->getInterestsByWebhookAndSiteRole($webhook_uuid, $site_role), []);
   }
 
   /**
