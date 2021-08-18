@@ -12,6 +12,7 @@ use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Response;
+use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -467,21 +468,6 @@ class ContentHubClient extends Client {
   }
 
   /**
-   * Deletes an entity from a webhook's interest list.
-   *
-   * @param string $uuid
-   *   Interest UUID.
-   * @param string $webhook_uuid
-   *   Webhook UUID.
-   *
-   * @return \Psr\Http\Message\ResponseInterface
-   *   Response.
-   */
-  public function deleteInterest($uuid, $webhook_uuid) {
-    return $this->delete("interest/$uuid/$webhook_uuid");
-  }
-
-  /**
    * Purges all entities from the Content Hub.
    *
    * This method should be used carefully as it deletes all the entities for
@@ -726,6 +712,25 @@ class ContentHubClient extends Client {
   }
 
   /**
+   * Add entities to Interest List.
+   *
+   * @param string $webhook_uuid
+   *   The UUID of the webhook.
+   * @param array $uuids
+   *   Entity UUIDs to add to Interest List.
+   *
+   * @return \Psr\Http\Message\ResponseInterface
+   *   The response.
+   *
+   * @throws \GuzzleHttp\Exception\RequestException
+   */
+  public function addEntitiesToInterestList(string $webhook_uuid, array $uuids): ResponseInterface {
+    $options['body'] = json_encode(['interests' => $uuids]);
+
+    return $this->post("interest/webhook/$webhook_uuid", $options);
+  }
+
+  /**
    * Returns interests list.
    *
    * @param string $webhook_uuid
@@ -736,13 +741,104 @@ class ContentHubClient extends Client {
    *
    * @throws \Exception
    */
-  public function getInterestsByWebhook($webhook_uuid) {
+  public function getInterestsByWebhook(string $webhook_uuid): array {
     $data = self::getResponseJson($this->get("interest/webhook/$webhook_uuid"));
 
     return $data['data']['interests'] ?? [];
   }
 
+  /**
+   * Deletes an entity from a webhook's interest list.
+   *
+   * @param string $uuid
+   *   Interest UUID.
+   * @param string $webhook_uuid
+   *   Webhook UUID.
+   *
+   * @return \Psr\Http\Message\ResponseInterface
+   *   Response.
+   */
+  public function deleteInterest(string $uuid, string $webhook_uuid): ResponseInterface {
+    return $this->delete("interest/$uuid/$webhook_uuid");
+  }
 
+  /**
+   * Returns an extended interest list based on the site role.
+   *
+   * @param string $webhook_uuid
+   *   Identifier of the webhook.
+   * @param string $site_role
+   *   The role of the site.
+   *
+   * @return array
+   *   An associate array keyed by the entity uuid.
+   *
+   * @throws \Exception
+   */
+  public function getInterestsByWebhookAndSiteRole(string $webhook_uuid, string $site_role): array {
+    $data = self::getResponseJson($this->get("interest/webhook/$webhook_uuid/$site_role"));
+    return $data['data'] ?? [];
+  }
+
+  /**
+   * The extended interest list to add based on site role.
+   *
+   * Format:
+   * [
+   *   'fe5f27d1-6e41-4609-b65a-2cb179549d1e' => [
+   *     'status' => '',
+   *     'reason' => '',
+   *     'event_ref' => '',
+   *   ],
+   * ]
+   *
+   * @param array $interest_list
+   *   An array of interest items.
+   * @param string $webhook_uuid
+   *   The webhook uuid to register interest items for.
+   * @param string $site_role
+   *   The site role.
+   *
+   * @return \Psr\Http\Message\ResponseInterface
+   */
+  public function addEntitiesToInterestListBySiteRole(string $webhook_uuid, string $site_role, array $interest_list): ResponseInterface {
+    $options['body'] = json_encode($interest_list);
+
+    return $this->post("interest/webhook/$webhook_uuid/$site_role", $options);
+  }
+
+  /**
+   * The extended interest list to add based on site role.
+   *
+   * Format:
+   *   @see \Acquia\ContentHubClient\ContentHubClient::addEntitiesToInterestListBySiteRole
+   *
+   * @param array $interest_list
+   *   An array of interest items.
+   * @param string $webhook_uuid
+   *   The webhook uuid to register interest items for.
+   * @param string $site_role
+   *   The site role.
+   *
+   * @return \Psr\Http\Message\ResponseInterface
+   */
+  public function updateInterestListBySiteRole(string $webhook_uuid, string $site_role, array $interest_list): ResponseInterface {
+    $options['body'] = json_encode($interest_list);
+
+    return $this->put("interest/webhook/$webhook_uuid/$site_role", $options);
+  }
+
+  /**
+   * Get the settings that were used to instantiate this client.
+   *
+   * @return \Acquia\ContentHubClient\Settings
+   *   Settings object.
+   *
+   * @codeCoverageIgnore
+   */
+  public function getSettings(): Settings {
+    return $this->settings;
+  }
 
   /**
    * Obtains the Settings for the active subscription.
@@ -847,25 +943,6 @@ class ContentHubClient extends Client {
    */
   public function unSuppressWebhook(string $webhook_uuid) {
     return self::getResponseJson($this->put("settings/webhooks/$webhook_uuid/enable"));
-  }
-
-  /**
-   * Add entities to Interest List.
-   *
-   * @param string $webhook_uuid
-   *   The UUID of the webhook.
-   * @param array $uuids
-   *   Entity UUIDs to add to Interest List.
-   *
-   * @return \Psr\Http\Message\ResponseInterface
-   *   The response.
-   *
-   * @throws \GuzzleHttp\Exception\RequestException
-   */
-  public function addEntitiesToInterestList($webhook_uuid, array $uuids) {
-    $options['body'] = json_encode(['interests' => $uuids]);
-
-    return $this->post("interest/webhook/$webhook_uuid", $options);
   }
 
   /**

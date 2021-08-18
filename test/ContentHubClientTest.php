@@ -7,6 +7,7 @@ use Acquia\ContentHubClient\CDFDocument;
 use Acquia\ContentHubClient\ContentHubClient;
 use Acquia\ContentHubClient\ContentHubLibraryEvents;
 use Acquia\ContentHubClient\Event\GetCDFTypeEvent;
+use Acquia\ContentHubClient\InterestList\SyndicationStatus;
 use Acquia\ContentHubClient\ObjectFactory;
 use Acquia\ContentHubClient\SearchCriteria\SearchCriteria;
 use Acquia\ContentHubClient\Settings;
@@ -30,7 +31,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 /**
- * @covers \Acquia\ContentHubClient\ContentHubClient
+ * @coversDefaultClass \Acquia\ContentHubClient\ContentHubClient
  *
  * @runTestsInSeparateProcesses
  * @preserveGlobalState disabled
@@ -265,6 +266,46 @@ class ContentHubClientTest extends TestCase {
 
     unset($this->ch_client);
     \Mockery::close();
+  }
+
+  /**
+   * @covers ::removeAllLeadingAndTrailingSlashes
+   */
+  public function testRemoveAllLeadingAndTrailingSlashes(): void {
+    $base_url_components = ['http://example.com/', 'example/', 'path'];
+    $expected = ['http://example.com', 'example', 'path'];
+    $actual = $this->ch_client->removeAllLeadingAndTrailingSlashes($base_url_components);
+    $this->assertTrue($expected === $actual);
+  }
+
+  /**
+   * @covers ::gluePartsTogether
+   */
+  public function testGluePartsTogetherWithColons(): void {
+    $parts = ['http://example.com/', 'example/', 'path'];
+    $expected = 'http://example.com:example:path';
+    $actual = $this->ch_client->gluePartsTogether($parts, ':');
+    $this->assertTrue($expected === $actual);
+  }
+
+  /**
+   * @covers ::makePath
+   */
+  public function testMakePath(): void {
+    $parts = ['http://example.com/', 'example/', 'path'];
+    $expected = 'http://example.com/example/path';
+    $actual = $this->ch_client->makePath(...$parts);
+    $this->assertTrue($expected === $actual);
+  }
+
+  /**
+   * @covers ::makeBaseURL
+   */
+  public function testMakeBaseURL(): void {
+    $parts = ['http://example.com/', 'example/', 'path'];
+    $expected = 'http://example.com/example/path/';
+    $actual = $this->ch_client->makeBaseURL(...$parts);
+    $this->assertTrue($expected === $actual);
   }
 
   /**
@@ -1055,6 +1096,120 @@ class ContentHubClientTest extends TestCase {
       ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response)));
 
     $this->assertSame($this->ch_client->getInterestsByWebhook($webhook_uuid), $response['data']['interests']);
+  }
+
+  /**
+   * @covers ::getInterestsByWebhookAndSiteRole
+   */
+  public function testGetInterestsByWebhookAndSiteRoleIfAny(): void {
+    $response = [
+      'success' => TRUE,
+      'data' => [
+        '0e714009-72f9-4016-8f26-5fae32e6abb8' => [
+          'status' => SyndicationStatus::IMPORT_SUCCESSFUL,
+          'reason' => 'ipsum',
+          'event_ref' => '0e714009-72f9-4016-8f26-5fae32e6abb9',
+        ],
+      ],
+    ];
+    $webhook_uuid = 'some-webhook-uuid';
+    $site_role = 'subscriber';
+    $this->ch_client
+      ->shouldReceive('get')
+      ->once()
+      ->with("interest/webhook/$webhook_uuid/$site_role")
+      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response)));
+
+    $this->assertSame($this->ch_client->getInterestsByWebhookAndSiteRole($webhook_uuid, $site_role), $response['data']);
+  }
+
+  /**
+   * @covers ::getInterestsByWebhookAndSiteRole
+   */
+  public function testGetInterestsByWebhookAndSiteRoleIfNone(): void {
+    $response = [
+      'success' => FALSE,
+      'error' => [
+        'code' => 404,
+        'message' => 'interests list is empty.',
+        'request_id' => 'some-request-uuid',
+      ],
+    ];
+    $webhook_uuid = 'some-webhook-uuid';
+    $site_role = 'subscriber';
+    $this->ch_client
+      ->shouldReceive('get')
+      ->once()
+      ->with("interest/webhook/$webhook_uuid/$site_role")
+      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response)));
+
+    $this->assertSame($this->ch_client->getInterestsByWebhookAndSiteRole($webhook_uuid, $site_role), []);
+  }
+
+  /**
+   * @covers ::addEntitiesToInterestListBySiteRole
+   */
+  public function testAddEntitiesToInterestListBySiteRoleReturnsSuccess(): void {
+    $webhook_uuid = 'some-webhook-uuid';
+    $site_role = 'subscriber';
+    $response = json_encode([
+      'success' => TRUE,
+      'request_id' => 'some-request-uuid',
+    ]);
+
+    $interest_list = [
+      'entity_uuid_1' => [
+        'status' => SyndicationStatus::IMPORT_SUCCESSFUL,
+        'reason' => 'lorem',
+        'event_ref' => 'event_ref_uuid_1',
+      ],
+      'entity_uuid_2' => [
+        'status' => SyndicationStatus::IMPORT_FAILED,
+        'reason' => 'ipsum',
+        'event_ref' => 'event_ref_uuid_2',
+      ],
+    ];
+    $this->ch_client
+      ->shouldReceive('post')
+      ->once()
+      ->with("interest/webhook/$webhook_uuid/$site_role", ['body' => json_encode($interest_list)])
+      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], $response));
+
+    $api_response = $this->ch_client->addEntitiesToInterestListBySiteRole($webhook_uuid, $site_role, $interest_list);
+
+    $this->assertSame($api_response->getStatusCode(), SymfonyResponse::HTTP_OK);
+    $this->assertSame($api_response->getBody()->getContents(), $response);
+  }
+
+  /**
+   * @covers ::updateInterestListBySiteRole
+   */
+  public function testUpdateInterestListBySiteRoleReturnsSuccess(): void {
+    $webhook_uuid = 'some-webhook-uuid';
+    $site_role = 'subscriber';
+    $response = json_encode([
+      'success' => TRUE,
+      'request_id' => 'some-request-uuid',
+    ]);
+
+    $interest_list = [
+      'entity_uuid_1' => [
+        'status' => SyndicationStatus::IMPORT_SUCCESSFUL,
+        'reason' => 'lorem',
+        'event_ref' => 'event_ref_uuid_1',
+      ],
+    ];
+
+    $this->ch_client
+      ->shouldReceive('put')
+      ->once()
+      ->with("interest/webhook/$webhook_uuid/$site_role", ['body' => json_encode($interest_list)])
+      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], $response));
+
+    $api_response = $this->ch_client->updateInterestListBySiteRole($webhook_uuid, $site_role, $interest_list);
+
+    $this->assertSame($api_response->getStatusCode(), SymfonyResponse::HTTP_OK);
+    $this->assertSame($api_response->getBody()->getContents(), $response);
   }
 
   /**
