@@ -2358,7 +2358,7 @@ class ContentHubClientTest extends TestCase {
       'success' => TRUE,
       'data' => [
         'some-data',
-      ]
+      ],
     ];
 
     $this->ch_client
@@ -2410,6 +2410,94 @@ class ContentHubClientTest extends TestCase {
       ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response)));
 
     $this->assertSame($this->ch_client->restoreSnapshot($snapshot), $response);
+  }
+
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::startScrollByFilter
+   *
+   * @throws \Exception
+   */
+  public function testStartScrollByFilterIfSucceeds(): void {
+    $size = 100;
+    $scroll_time_window = '10m';
+    $filter_uuid = 'some-filter-uuid';
+
+    $request_parameters = [
+      'query' => [
+        'scroll' => $scroll_time_window,
+        'size' => $size,
+      ],
+    ];
+
+    $response = [
+      'uuid' => 'some-uuid',
+      'request_id' => 'some-request-id',
+      'success' => TRUE,
+    ];
+
+    $this->ch_client
+      ->shouldReceive('post')
+      ->once()
+      ->with("filters/$filter_uuid/scroll", $request_parameters)
+      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response)));
+
+    $this->assertSame($this->ch_client->startScrollByFilter($filter_uuid, $scroll_time_window, $size), $response);
+  }
+
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::continueScroll
+   *
+   * @throws \Exception
+   */
+  public function testContinueScrollIfSucceeds(): void {
+    $scroll_id = 'some-scroll-id';
+    $scroll_time_window = '10m';
+
+    $request_parameters = [
+      'scroll_id' => $scroll_id,
+      'scroll' => '10m',
+    ];
+
+    $response = [
+      'uuid' => 'some-uuid',
+      'request_id' => 'some-request-id',
+      'success' => TRUE,
+    ];
+
+    $this->ch_client
+      ->shouldReceive('post')
+      ->once()
+      ->with("scroll/continue", ['body' => json_encode($request_parameters)])
+      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response)));
+
+    $this->assertSame($this->ch_client->continueScroll($scroll_id, $scroll_time_window), $response);
+  }
+
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::cancelScroll
+   *
+   * @throws \Exception
+   */
+  public function testCancelScrollIfSucceeds(): void {
+    $scroll_id = 'some-scroll-id';
+
+    $request_parameters = [
+      'scroll_id' => [$scroll_id],
+    ];
+
+    $response = [
+      'uuid' => 'some-uuid',
+      'request_id' => 'some-request-id',
+      'success' => TRUE,
+    ];
+
+    $this->ch_client
+      ->shouldReceive('delete')
+      ->once()
+      ->with("scroll", ['body' => json_encode($request_parameters)])
+      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response)));
+
+    $this->assertSame($this->ch_client->cancelScroll($scroll_id), $response);
   }
 
 }
