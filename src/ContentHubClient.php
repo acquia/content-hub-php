@@ -598,26 +598,6 @@ class ContentHubClient extends Client {
   }
 
   /**
-   * Pings the service to ensure that it is available.
-   *
-   * @return \Psr\Http\Message\ResponseInterface
-   *   Response.
-   *
-   * @throws \GuzzleHttp\Exception\RequestException
-   * @throws \Exception
-   *
-   * @since 0.2.0
-   */
-  public function ping() {
-    $makeBaseURL = self::makeBaseURL($this->getConfig()['base_url']);
-    $client = ObjectFactory::getGuzzleClient([
-      'base_uri' => $makeBaseURL,
-    ]);
-
-    return self::getResponseJson($client->get('ping'));
-  }
-
-  /**
    * Searches for entities.
    *
    * @param mixed $query
