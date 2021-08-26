@@ -2455,7 +2455,7 @@ class ContentHubClientTest extends TestCase {
 
     $request_parameters = [
       'scroll_id' => $scroll_id,
-      'scroll' => '10m',
+      'scroll' => $scroll_time_window,
     ];
 
     $response = [
@@ -2494,7 +2494,7 @@ class ContentHubClientTest extends TestCase {
     $this->ch_client
       ->shouldReceive('delete')
       ->once()
-      ->with("scroll", ['body' => json_encode($request_parameters)])
+      ->with('scroll', ['body' => json_encode($request_parameters)])
       ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response)));
 
     $this->assertSame($this->ch_client->cancelScroll($scroll_id), $response);

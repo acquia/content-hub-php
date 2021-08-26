@@ -15,11 +15,11 @@ use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use Psr\Log\LogLevel;
+use Symfony\Component\HttpFoundation\Response as HttpResponse;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpFoundation\Response as HttpResponse;
 
 use function GuzzleHttp\default_user_agent;
 
@@ -1162,13 +1162,13 @@ class ContentHubClient extends Client {
     }
 
     $reason = sprintf("Request ID: %s, Method: %s, Path: \"%s\", Status Code: %s, Reason: %s, Error Code: %s, Error Message: \"%s\"",
-        $response_body['request_id'],
-        strtoupper($method),
-        $api_call,
-        $response->getStatusCode(),
-        $response->getReasonPhrase(),
-        $error_code,
-        $error_message
+      $response_body['request_id'],
+      strtoupper($method),
+      $api_call,
+      $response->getStatusCode(),
+      $response->getReasonPhrase(),
+      $error_code,
+      $error_message
     );
     $this->logger->log($log_level, $reason);
 
@@ -1186,10 +1186,10 @@ class ContentHubClient extends Client {
    * @param string|null $request_id
    *   The request id from the ContentHub service if available.
    *
-   * @return \GuzzleHttp\Psr7\Response
+   * @return \Psr\Http\Message\ResponseInterface
    *   Response.
    */
-  protected function getErrorResponse(int $code, string $reason, ?string $request_id = NULL): Response {
+  protected function getErrorResponse(int $code, string $reason, ?string $request_id = NULL): ResponseInterface {
     if ($code < 100 || $code >= 600) {
       $code = 500;
     }
@@ -1198,7 +1198,7 @@ class ContentHubClient extends Client {
       'error' => [
         'code' => $code,
         'message' => $reason,
-      ]
+      ],
     ];
     return new Response($code, [], json_encode($body), '1.1', $reason);
   }
@@ -1380,12 +1380,12 @@ class ContentHubClient extends Client {
    * @param int $size
    *   Amount of entities to return.
    *
-   * @return mixed
+   * @return array
    *   Response from backend call.
    *
    * @throws \Exception
    */
-  public function startScrollByFilter(string $filter_uuid, string $scroll_time_window, int $size) {
+  public function startScrollByFilter(string $filter_uuid, string $scroll_time_window, int $size): array {
     return self::getResponseJson($this->post("filters/$filter_uuid/scroll", [
       'query' => [
         'scroll' => $scroll_time_window,
@@ -1404,12 +1404,12 @@ class ContentHubClient extends Client {
    * @param string $scroll_time_window
    *   How long the scroll cursor will be retained inside memory.
    *
-   * @return mixed
+   * @return array
    *   Response from backend call.
    *
    * @throws \Exception
    */
-  public function continueScroll(string $scroll_id, string $scroll_time_window) {
+  public function continueScroll(string $scroll_id, string $scroll_time_window): array {
     $options = [
       'body' => json_encode([
         'scroll_id' => $scroll_id,
@@ -1426,12 +1426,12 @@ class ContentHubClient extends Client {
    * @param string $scroll_id
    *   Scroll id.
    *
-   * @return mixed
+   * @return array
    *   Response from backend call.
    *
    * @throws \Exception
    */
-  public function cancelScroll(string $scroll_id) {
+  public function cancelScroll(string $scroll_id): array {
     $options = [
       'body' => json_encode([
         'scroll_id' => [$scroll_id],
