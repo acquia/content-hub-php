@@ -1426,12 +1426,12 @@ class ContentHubClient extends Client {
    * @param string $scroll_id
    *   Scroll id.
    *
-   * @return array
+   * @return array|null
    *   Response from backend call.
    *
    * @throws \Exception
    */
-  public function cancelScroll(string $scroll_id): array {
+  public function cancelScroll(string $scroll_id): ?array {
     $options = [
       'body' => json_encode([
         'scroll_id' => [$scroll_id],
