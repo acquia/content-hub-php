@@ -16,7 +16,6 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use Psr\Log\LogLevel;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
-use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -40,7 +39,7 @@ class ContentHubClient extends Client {
   const FEATURE_DEPRECATED_RESPONSE = [
     'success' => FALSE,
     'error' => [
-      'code' => SymfonyResponse::HTTP_GONE,
+      'code' => HttpResponse::HTTP_GONE,
       'message' => 'This feature is deprecated',
     ],
   ];
