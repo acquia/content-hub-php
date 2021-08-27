@@ -3,27 +3,22 @@
 namespace Acquia\ContentHubClient;
 
 use Acquia\ContentHubClient\CDF\CDFObject;
-use Acquia\ContentHubClient\Event\GetCDFTypeEvent;
 use Acquia\ContentHubClient\Guzzle\Middleware\RequestResponseHandler;
 use Acquia\ContentHubClient\SearchCriteria\SearchCriteria;
 use Acquia\ContentHubClient\SearchCriteria\SearchCriteriaBuilder;
 use Acquia\Hmac\Guzzle\HmacAuthMiddleware;
-use Acquia\Hmac\Key;
 use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\ClientException;
-use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use Psr\Log\LogLevel;
-use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
+use Symfony\Component\HttpFoundation\Response as HttpResponse;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpFoundation\Response as HttpResponse;
 
 use function GuzzleHttp\default_user_agent;
 
@@ -42,11 +37,11 @@ class ContentHubClient extends Client {
   const OPTION_NAME_LANGUAGES = 'client-languages';
 
   const FEATURE_DEPRECATED_RESPONSE = [
-      'success' => FALSE,
-      'error' => [
-        'code' => SymfonyResponse::HTTP_GONE,
-        'message' => 'This feature is deprecated',
-      ],
+    'success' => FALSE,
+    'error' => [
+      'code' => HttpResponse::HTTP_GONE,
+      'message' => 'This feature is deprecated',
+    ],
   ];
 
   /**
@@ -152,6 +147,7 @@ class ContentHubClient extends Client {
    *   Response.
    *
    * @throws \Exception
+   *
    * @codeCoverageIgnore
    */
   public function definition($endpoint = '') {
@@ -679,6 +675,7 @@ class ContentHubClient extends Client {
    *   Webhook.
    *
    * @throws \Exception
+   *
    * @codeCoverageIgnore
    */
   public function getWebHook($url) {
@@ -736,6 +733,7 @@ class ContentHubClient extends Client {
    *   Response.
    *
    * @throws \Exception
+   *
    * @codeCoverageIgnore
    */
   public function getRemoteSettings() {
@@ -1116,7 +1114,9 @@ class ContentHubClient extends Client {
   }
 
   /**
-   * Obtains the appropriate exception Response, logging error messages according to API call.
+   * Obtains the appropriate exception Response.
+   *
+   * Logging error messages according to API call.
    *
    * @param string $method
    *   The Request to Plexus, as defined in the content-hub-php library.
@@ -1125,14 +1125,14 @@ class ContentHubClient extends Client {
    * @param \Exception $exception
    *   The Exception object.
    *
-   * @return ResponseInterface The response after raising an exception.
-   *   The response object.
+   * @return \Psr\Http\Message\ResponseInterface
+   *   The response after raising an exception.
    *
    *  @codeCoverageIgnore
    */
-  protected function getExceptionResponse($method, array $args, \Exception $exception)
-  {
-    // If we reach here it is because there was an exception raised in the API call.
+  protected function getExceptionResponse($method, array $args, \Exception $exception) {
+    // If we reach here it is because there was an exception raised in the
+    // API call.
     $api_call = $args[0];
     $response = $exception->getResponse();
     if (!$response) {
@@ -1148,9 +1148,9 @@ class ContentHubClient extends Client {
         $log_level = LogLevel::WARNING;
         break;
 
-      case (preg_match('/filters\?name=*/', $api_call) ? true : false) :
-      case (preg_match('/settings\/clients\/*/', $api_call) ? true : false) :
-      case (preg_match('/settings\/webhooks\/.*\/filters/', $api_call) ? true : false) :
+      case (preg_match('/filters\?name=*/', $api_call) ? TRUE : FALSE):
+      case (preg_match('/settings\/clients\/*/', $api_call) ? TRUE : FALSE):
+      case (preg_match('/settings\/webhooks\/.*\/filters/', $api_call) ? TRUE : FALSE):
         $log_level = LogLevel::NOTICE;
         break;
 
@@ -1161,13 +1161,13 @@ class ContentHubClient extends Client {
     }
 
     $reason = sprintf("Request ID: %s, Method: %s, Path: \"%s\", Status Code: %s, Reason: %s, Error Code: %s, Error Message: \"%s\"",
-        $response_body['request_id'],
-        strtoupper($method),
-        $api_call,
-        $response->getStatusCode(),
-        $response->getReasonPhrase(),
-        $error_code,
-        $error_message
+      $response_body['request_id'],
+      strtoupper($method),
+      $api_call,
+      $response->getStatusCode(),
+      $response->getReasonPhrase(),
+      $error_code,
+      $error_message
     );
     $this->logger->log($log_level, $reason);
 
@@ -1182,13 +1182,13 @@ class ContentHubClient extends Client {
    *   Status code.
    * @param string $reason
    *   Reason.
-   * @param null $request_id
+   * @param string|null $request_id
    *   The request id from the ContentHub service if available.
    *
-   * @return \GuzzleHttp\Psr7\Response
+   * @return \Psr\Http\Message\ResponseInterface
    *   Response.
    */
-  protected function getErrorResponse($code, $reason, $request_id = NULL) {
+  protected function getErrorResponse(int $code, string $reason, ?string $request_id = NULL): ResponseInterface {
     if ($code < 100 || $code >= 600) {
       $code = 500;
     }
@@ -1197,7 +1197,7 @@ class ContentHubClient extends Client {
       'error' => [
         'code' => $code,
         'message' => $reason,
-      ]
+      ],
     ];
     return new Response($code, [], json_encode($body), '1.1', $reason);
   }
@@ -1344,8 +1344,8 @@ class ContentHubClient extends Client {
    * @param string $name
    *   The name of the snapshot.
    *
-   * @return \Psr\Http\Message\ResponseInterface
-   *   Response.
+   * @return mixed
+   *   Response from backend call.
    *
    * @throws \GuzzleHttp\Exception\RequestException
    */
@@ -1359,13 +1359,85 @@ class ContentHubClient extends Client {
    * @param string $name
    *   The name of the snapshot.
    *
-   * @return \Psr\Http\Message\ResponseInterface
-   *   Response.
+   * @return mixed
+   *   Response from backend call.
    *
    * @throws \GuzzleHttp\Exception\RequestException
    */
-  public function restoreSnapshot($name) {
+  public function restoreSnapshot(string $name) {
     return self::getResponseJson($this->put("snapshots/$name/restore"));
+  }
+
+  /**
+   * Initiates Scroll API request chain.
+   *
+   * @param string $filter_uuid
+   *   Filter uuid to execute by.
+   * @param string $scroll_time_window
+   *   How long the scroll cursor will be retained inside memory. Must be
+   *   suffixed with duration unit (m, s, ms etc.).
+   * @param int $size
+   *   Amount of entities to return.
+   *
+   * @return array
+   *   Response from backend call.
+   *
+   * @throws \Exception
+   */
+  public function startScrollByFilter(string $filter_uuid, string $scroll_time_window, int $size): array {
+    return self::getResponseJson($this->post("filters/$filter_uuid/scroll", [
+      'query' => [
+        'scroll' => $scroll_time_window,
+        'size' => $size,
+      ],
+    ]));
+  }
+
+  /**
+   * Continue Scroll API request chain.
+   *
+   * Notice: scroll id is changing continuously once you make a call.
+   *
+   * @param string $scroll_id
+   *   Scroll id.
+   * @param string $scroll_time_window
+   *   How long the scroll cursor will be retained inside memory.
+   *
+   * @return array
+   *   Response from backend call.
+   *
+   * @throws \Exception
+   */
+  public function continueScroll(string $scroll_id, string $scroll_time_window): array {
+    $options = [
+      'body' => json_encode([
+        'scroll_id' => $scroll_id,
+        'scroll' => $scroll_time_window,
+      ]),
+    ];
+
+    return self::getResponseJson($this->post('scroll/continue', $options));
+  }
+
+  /**
+   * Cancel Scroll API request chain.
+   *
+   * @param string $scroll_id
+   *   Scroll id.
+   *
+   * @return array|null
+   *   Response from backend call.
+   *
+   * @throws \Exception
+   */
+  public function cancelScroll(string $scroll_id): ?array {
+    $options = [
+      'body' => json_encode([
+        'scroll_id' => [$scroll_id],
+      ]),
+    ];
+
+    return self::getResponseJson($this->delete("scroll", $options));
   }
 
 }
