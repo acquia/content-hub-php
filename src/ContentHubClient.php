@@ -40,7 +40,7 @@ class ContentHubClient extends Client {
     'success' => FALSE,
     'error' => [
       'code' => HttpResponse::HTTP_GONE,
-      'message' => 'This feature is deprecated',
+      'message' => 'This feature is deprecated.',
     ],
   ];
 
