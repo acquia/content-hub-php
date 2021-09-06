@@ -17,7 +17,6 @@ use GuzzleHttp\Psr7\Response;
 use Psr\Log\LogLevel;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
 use Psr\Http\Message\ResponseInterface;
-use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
