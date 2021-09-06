@@ -39,7 +39,7 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 class ContentHubClientTest extends TestCase {
 
   /**
-   * CH client.
+   * Content Hub client.
    *
    * @var \Acquia\ContentHubClient\ContentHubClient
    */
