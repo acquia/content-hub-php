@@ -164,7 +164,7 @@ class ContentHubLoggingClient extends Client {
     if (isset(
       $context['object_id'],
       $context['event_name'],
-      $context['object_type'],
+      $context['object_type']
     )) {
       $context['severity'] = $severity;
       $context['content'] = $message;
