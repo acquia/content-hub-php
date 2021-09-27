@@ -162,7 +162,7 @@ class ContentHubLoggingClientTest extends TestCase {
     ];
 
     $this->expectExceptionMessage('Object Id(UUID) / Event Name/ Object Type missing from event log attributes');
-    $this->ch_client->getContextArray($status, $message, $context);
+    $this->ch_client->getContextArray($severity, $message, $context);
   }
 
   /**
