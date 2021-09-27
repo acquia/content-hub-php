@@ -139,7 +139,7 @@ class ContentHubLoggingClientTest extends TestCase {
     $actual_outcome = $this->ch_client->getContextArray($severity, $message, $context);
 
     $expected_outcome = $context + [
-      'status' => $severity,
+      'severity' => $severity,
       'content' => $message,
     ];
 
