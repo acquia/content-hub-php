@@ -110,9 +110,8 @@ class ContentHubLoggingClientTest extends TestCase {
       'object_id' => 'object_id',
       'event_name' => 'event_name',
       'object_type' => 'object_type',
-      'relevant_score' => 5,
-      'status' => 'Error',
-      'content' => json_encode(['message' => 'some message']),
+      'severity' => 'ERROR',
+      'content' => 'some message',
     ];
     $context['origin'] = $this->ch_client->getSettings()->getUuid();
 
@@ -130,19 +129,18 @@ class ContentHubLoggingClientTest extends TestCase {
    * @covers \Acquia\ContentHubClient\ContentHubLoggingClient::getContextArray
    */
   public function testGetContextArray(): void {
-    $status = 'status';
+    $severity = 'severity';
     $message = 'message';
     $context = [
       'object_id' => 'object_id',
       'event_name' => 'event_name',
       'object_type' => 'object_type',
-      'relevant_score' => 5,
     ];
-    $actual_outcome = $this->ch_client->getContextArray($status, $message, $context);
+    $actual_outcome = $this->ch_client->getContextArray($severity, $message, $context);
 
     $expected_outcome = $context + [
-      'status' => $status,
-      'content' => json_encode(['message' => $message]),
+      'status' => $severity,
+      'content' => $message,
     ];
 
     $this->assertSame($expected_outcome, $actual_outcome);
@@ -156,15 +154,14 @@ class ContentHubLoggingClientTest extends TestCase {
    * @throws \Exception
    */
   public function testGetContextArrayException(): void {
-    $status = 'status';
+    $severity = 'severity';
     $message = 'message';
     $context = [
       'object_id' => 'object_id',
       'event_name' => 'event_name',
-      'object_type' => 'object_type',
     ];
 
-    $this->expectExceptionMessage('Object Id(UUID) / Event Name/ Object Type/ Relevant score missing from event log attributes');
+    $this->expectExceptionMessage('Object Id(UUID) / Event Name/ Object Type missing from event log attributes');
     $this->ch_client->getContextArray($status, $message, $context);
   }
 
