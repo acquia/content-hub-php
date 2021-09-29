@@ -126,7 +126,7 @@ class ContentHubLoggingClient extends Client {
    * Sends event log to events micro service.
    *
    * @param string $severity
-   *   Status/Severity for the event: error, warning etc.
+   *   Severity for the event: ERROR, INFO, WARN etc.
    * @param string $message
    *   Error message to display.
    * @param array $context
