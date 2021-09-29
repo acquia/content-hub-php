@@ -125,20 +125,20 @@ class ContentHubLoggingClient extends Client {
   /**
    * Sends event log to events micro service.
    *
-   * @param string $status
-   *   Status for the event: error, warning etc.
+   * @param string $severity
+   *   Severity for the event: ERROR, INFO, WARN etc.
    * @param string $message
    *   Error message to display.
    * @param array $context
-   *   Context array containing uuid, relevant score etc.
+   *   Context array containing uuid, object type etc.
    *
    * @return mixed
    *   Response from logging service.
    *
    * @throws Exception
    */
-  public function sendLog(string $status, string $message, array $context) {
-    $log_details = $this->getContextArray($status, $message, $context);
+  public function sendLog(string $severity, string $message, array $context) {
+    $log_details = $this->getContextArray($severity, $message, $context);
     $log_details['origin'] = $this->getSettings()->getUuid();
     $options['body'] = json_encode($log_details);
 
@@ -148,30 +148,29 @@ class ContentHubLoggingClient extends Client {
   /**
    * Sets the array for event logging.
    *
-   * @param string $status
-   *   Status for the event: error, warning etc.
+   * @param string $severity
+   *   Severity for the event: ERROR, INFO, WARN etc.
    * @param string $message
    *   Error message to display.
    * @param array $context
-   *   Context array containing uuid, relevant score etc.
+   *   Context array containing uuid, object type etc.
    *
    * @return array
    *   Final context array having all the required attributes.
    *
    * @throws Exception
    */
-  public function getContextArray(string $status, string $message, array $context): array {
+  public function getContextArray(string $severity, string $message, array $context): array {
     if (isset(
       $context['object_id'],
       $context['event_name'],
-      $context['object_type'],
-      $context['relevant_score']
+      $context['object_type']
     )) {
-      $context['status'] = $status;
-      $context['content'] = json_encode(['message' => $message]);
+      $context['severity'] = $severity;
+      $context['content'] = $message;
     }
     else {
-      throw new \Exception('Object Id(UUID) / Event Name/ Object Type/ Relevant score missing from event log attributes');
+      throw new \Exception('Object Id(UUID) / Event Name/ Object Type missing from event log attributes');
     }
     return $context;
   }
