@@ -1,11 +1,11 @@
 <?php
 
-namespace Acquia\ContentHubClient\InterestList;
+namespace Acquia\ContentHubClient\Syndication;
 
 /**
  * Represents possible syndication statuses.
  *
- * @package Acquia\ContentHubClient\InterestList
+ * @package Acquia\ContentHubClient\Syndication
  */
 final class SyndicationStatus {
 
