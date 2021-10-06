@@ -1160,14 +1160,15 @@ class ContentHubClient extends Client {
         break;
     }
 
-    $reason = sprintf("Request ID: %s, Method: %s, Path: \"%s\", Status Code: %s, Reason: %s, Error Code: %s, Error Message: \"%s\"",
+    $reason = sprintf("Request ID: %s, Method: %s, Path: \"%s\", Status Code: %s, Reason: %s, Error Code: %s, Error Message: \"%s\". Error data: \"%s\"",
       $response_body['request_id'],
       strtoupper($method),
       $api_call,
       $response->getStatusCode(),
       $response->getReasonPhrase(),
       $error_code,
-      $error_message
+      $error_message,
+      print_r($response_body['error']['data'], TRUE)
     );
     $this->logger->log($log_level, $reason);
 
