@@ -1168,7 +1168,7 @@ class ContentHubClient extends Client {
       $response->getReasonPhrase(),
       $error_code,
       $error_message,
-      print_r($response_body['error']['data'], TRUE)
+      print_r($response_body['error']['data'] ?? $response_body['error'], TRUE)
     );
     $this->logger->log($log_level, $reason);
 
