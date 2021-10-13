@@ -10,8 +10,8 @@ namespace Acquia\ContentHubClient\Syndication;
 final class SyndicationEvents {
 
   public const SEVERITY_ERROR = 'ERROR';
-
   public const SEVERITY_INFO = 'INFO';
+  public const SEVERITY_WARN = 'WARN';
 
   public const EXPORT_FAILURE = [
     'name' => 'Entity Export failure',
@@ -25,7 +25,7 @@ final class SyndicationEvents {
 
   public const IMPORT_SUCCESS = [
     'name' => 'Entity Import success',
-    'severity' => self::SEVERITY_INFO
+    'severity' => self::SEVERITY_INFO,
   ];
 
 }
