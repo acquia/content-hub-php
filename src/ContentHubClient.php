@@ -14,6 +14,7 @@ use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
+use GuzzleHttp\RequestOptions;
 use Psr\Log\LogLevel;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
 use Psr\Http\Message\ResponseInterface;
@@ -1283,6 +1284,21 @@ class ContentHubClient extends Client {
     ];
 
     return self::getResponseJson($this->delete("scroll", $options));
+  }
+  
+  /**
+   * Fetch entities via query params.
+   *
+   * @param array $params
+   *   Query params.
+   *
+   * @return array|null
+   *   Response from backend call.
+   *
+   * @throws \Exception
+   */
+  public function queryEntities(array $params): ?array {
+    return self::getResponseJson($this->get("entities", [RequestOptions::QUERY => $params]));
   }
 
 }
