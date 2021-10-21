@@ -52,11 +52,11 @@ class ContentHubLoggingClient extends Client {
    * @codeCoverageIgnore
    */
   public function __construct(
-    array $config = [],
     LoggerInterface $logger,
     Settings $settings,
     HmacAuthMiddleware $middleware,
-    EventDispatcherInterface $dispatcher
+    EventDispatcherInterface $dispatcher,
+    array $config = []
   ) {
     $this->logger = $logger;
     $this->settings = $settings;
