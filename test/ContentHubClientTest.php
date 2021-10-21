@@ -302,7 +302,7 @@ class ContentHubClientTest extends TestCase {
   /**
    * @covers ::makeBaseURL
    */
-  public function testMakeBaseURL(): void {
+  public function testMakeBaseUrl(): void {
     $parts = ['http://example.com/', 'example/', 'path'];
     $expected = 'http://example.com/example/path/';
     $actual = $this->ch_client->makeBaseURL(...$parts);
@@ -2655,18 +2655,14 @@ class ContentHubClientTest extends TestCase {
 
     $this->assertSame($this->ch_client->cancelScroll($scroll_id), $response);
   }
-  
+
   /**
    * @covers \Acquia\ContentHubClient\ContentHubClient::queryEntities
    *
    * @throws \Exception
    */
   public function testQueryEntitiesIfSucceeds(): void {
-    $request_parameters = [
-      RequestOptions::QUERY => [
-        'type' => 'client',
-      ],
-    ];
+    $request_parameters = ['type' => 'client'];
 
     $response = [
       'uuid' => 'some-uuid',
@@ -2677,10 +2673,10 @@ class ContentHubClientTest extends TestCase {
     $this->ch_client
       ->shouldReceive('get')
       ->once()
-      ->with('entities', $request_parameters)
+      ->with('entities', [RequestOptions::QUERY => $request_parameters])
       ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response)));
 
-    $this->assertSame($this->ch_client->queryEntities(['type' => 'client']), $response);
+    $this->assertSame($this->ch_client->queryEntities($request_parameters), $response);
   }
 
 }
