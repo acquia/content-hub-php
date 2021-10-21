@@ -21,6 +21,7 @@ use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use GuzzleHttp\RequestOptions;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
@@ -2653,6 +2654,33 @@ class ContentHubClientTest extends TestCase {
       ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response)));
 
     $this->assertSame($this->ch_client->cancelScroll($scroll_id), $response);
+  }
+  
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::queryEntities
+   *
+   * @throws \Exception
+   */
+  public function testQueryEntitiesIfSucceeds(): void {
+    $request_parameters = [
+      RequestOptions::QUERY => [
+        'type' => 'client',
+      ],
+    ];
+
+    $response = [
+      'uuid' => 'some-uuid',
+      'request_id' => 'some-request-id',
+      'success' => TRUE,
+    ];
+
+    $this->ch_client
+      ->shouldReceive('get')
+      ->once()
+      ->with('entities', $request_parameters)
+      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response)));
+
+    $this->assertSame($this->ch_client->queryEntities(['type' => 'client']), $response);
   }
 
 }
