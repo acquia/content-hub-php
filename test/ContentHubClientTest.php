@@ -2661,7 +2661,7 @@ class ContentHubClientTest extends TestCase {
    *
    * @throws \Exception
    */
-  public function testQueryEntitiesIfSucceeds(): void {
+  public function testQueryEntitiesIfSucceedsWithParams(): void {
     $request_parameters = ['type' => 'client'];
 
     $response = [
@@ -2677,6 +2677,28 @@ class ContentHubClientTest extends TestCase {
       ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response)));
 
     $this->assertSame($this->ch_client->queryEntities($request_parameters), $response);
+  }
+
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::queryEntities
+   *
+   * @throws \Exception
+   */
+  public function testQueryEntitiesIfSucceedsWithoutParams(): void {
+
+    $response = [
+      'uuid' => 'some-uuid',
+      'request_id' => 'some-request-id',
+      'success' => TRUE,
+    ];
+
+    $this->ch_client
+      ->shouldReceive('get')
+      ->once()
+      ->with('entities', [])
+      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response)));
+
+    $this->assertSame($this->ch_client->queryEntities(), $response);
   }
 
 }

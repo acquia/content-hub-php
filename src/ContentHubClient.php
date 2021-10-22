@@ -3,19 +3,15 @@
 namespace Acquia\ContentHubClient;
 
 use Acquia\ContentHubClient\CDF\CDFObject;
-use Acquia\ContentHubClient\Guzzle\Middleware\RequestResponseHandler;
 use Acquia\ContentHubClient\SearchCriteria\SearchCriteria;
 use Acquia\ContentHubClient\SearchCriteria\SearchCriteriaBuilder;
 use Acquia\Hmac\Guzzle\HmacAuthMiddleware;
-use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\RequestOptions;
-use Psr\Log\LogLevel;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
@@ -146,7 +142,7 @@ class ContentHubClient extends Client {
       return parent::__call($method, $args);
 
     }
-    catch (Exception $e) {
+    catch (\Exception $e) {
       return $this->getExceptionResponse($method, $args, $e);
     }
   }
@@ -226,8 +222,8 @@ class ContentHubClient extends Client {
       $config = [
         'base_url' => $settings->getUrl(),
       ];
-      $client = ObjectFactory::getCHClient($config, $logger, $settings,
-        $settings->getMiddleware(), $dispatcher);
+      $client = ObjectFactory::getCHClient($logger, $settings,
+        $settings->getMiddleware(), $dispatcher, $config);
       // @todo remove this once shared secret is returned on the register
       // endpoint.
       // We need the shared secret to be fully functional, so an additional
@@ -238,10 +234,10 @@ class ContentHubClient extends Client {
       $settings = ObjectFactory::instantiateSettings($settings->getName(),
         $settings->getUuid(), $settings->getApiKey(), $settings->getSecretKey(),
         $settings->getUrl(), $remote['shared_secret']);
-      return ObjectFactory::getCHClient($config, $logger, $settings,
-        $settings->getMiddleware(), $dispatcher);
+      return ObjectFactory::getCHClient($logger, $settings,
+        $settings->getMiddleware(), $dispatcher, $config);
     }
-    catch (Exception $exception) {
+    catch (\Exception $exception) {
       if ($exception instanceof BadResponseException) {
         $message = sprintf('Error registering client with name="%s" (Error Code = %d: %s)',
           $name, $exception->getResponse()->getStatusCode(),
@@ -260,7 +256,7 @@ class ContentHubClient extends Client {
       $message = sprintf("An unknown exception was caught. Message: %s",
         $exception->getMessage());
       $logger->error($message);
-      throw new Exception($message);
+      throw new \Exception($message);
     }
   }
 
@@ -587,10 +583,10 @@ class ContentHubClient extends Client {
    */
   public function listEntities(array $options = []) {
     $variables = $options + [
-        'limit' => 1000,
-        'start' => 0,
-        'filters' => [],
-      ];
+      'limit' => 1000,
+      'start' => 0,
+      'filters' => [],
+    ];
 
     foreach ($variables['filters'] as $key => $value) {
       $variables["filter:${key}"] = $value;
@@ -796,6 +792,7 @@ class ContentHubClient extends Client {
    * The extended interest list to add based on site role.
    *
    * Format:
+   *
    *   @see \Acquia\ContentHubClient\ContentHubClient::addEntitiesToInterestListBySiteRole
    *
    * @param array $interest_list
@@ -935,7 +932,7 @@ class ContentHubClient extends Client {
     $uuid = $client_uuid ?? $settings->getUuid();
     $response = $this->deleteEntity($uuid);
     if (!$response) {
-      throw new Exception(sprintf("Entity with UUID = %s cannot be deleted.", $uuid));
+      throw new \Exception(sprintf("Entity with UUID = %s cannot be deleted.", $uuid));
     }
     return $this->delete("settings/client/uuid/$uuid");
   }
@@ -1285,9 +1282,9 @@ class ContentHubClient extends Client {
 
     return self::getResponseJson($this->delete("scroll", $options));
   }
-  
+
   /**
-   * Fetch entities via query params.
+   * Fetches entities via query params.
    *
    * @param array $params
    *   Query params.
@@ -1297,8 +1294,9 @@ class ContentHubClient extends Client {
    *
    * @throws \Exception
    */
-  public function queryEntities(array $params): ?array {
-    return self::getResponseJson($this->get("entities", [RequestOptions::QUERY => $params]));
+  public function queryEntities(array $params = []): ?array {
+    $args = $params ? [RequestOptions::QUERY => $params] : [];
+    return self::getResponseJson($this->get('entities', $args));
   }
 
 }

@@ -116,15 +116,15 @@ class ObjectFactory {
    *   ContentHubClient instance.
    */
   public static function getCHClient( // phpcs:ignore
-    array $config,
     LoggerInterface $logger,
     Settings $settings,
     HmacAuthMiddleware $middleware,
     EventDispatcherInterface $dispatcher,
+    array $config,
     string $api_version = 'v2'
   ): ContentHubClient {
-    return new ContentHubClient($config, $logger, $settings, $middleware,
-      $dispatcher, $api_version);
+    return new ContentHubClient($logger, $settings, $middleware,
+      $dispatcher, $config, $api_version);
   }
 
   /**
