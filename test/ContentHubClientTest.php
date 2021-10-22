@@ -21,6 +21,7 @@ use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use GuzzleHttp\RequestOptions;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
@@ -179,14 +180,6 @@ class ContentHubClientTest extends TestCase {
     $this->dispatcher = $this->getMockDispatcher();
 
     $this->ch_client = $this->makeMockCHClient(
-      [
-        'base_url' => $this->test_data['url'],
-        'client-languages' => [
-          'en',
-          'es',
-          'und',
-        ],
-      ],
       new NullLogger(),
       $this->makeMockSettings(
         $this->test_data['name'],
@@ -199,6 +192,14 @@ class ContentHubClientTest extends TestCase {
       ),
       \Mockery::mock(HmacAuthMiddleware::class),
       $this->dispatcher,
+      [
+        'base_url' => $this->test_data['url'],
+        'client-languages' => [
+          'en',
+          'es',
+          'und',
+        ],
+      ],
       'v2'
     );
 
@@ -231,15 +232,15 @@ class ContentHubClientTest extends TestCase {
       });
     $this->object_factory->shouldReceive('getCHClient')
       ->andReturnUsing(function (
-        array $config,
         LoggerInterface $logger,
         Settings $settings,
         HmacAuthMiddleware $middleware,
         EventDispatcherInterface $dispatcher,
+        array $config,
         string $api_version = 'v2'
       ) {
-        return $this->makeMockCHClient($config, $logger, $settings, $middleware,
-          $dispatcher, $api_version);
+        return $this->makeMockCHClient($logger, $settings, $middleware,
+          $dispatcher, $config, $api_version);
       });
     $this->object_factory->shouldReceive('getCDFDocument')
       ->andReturnUsing(function (...$entities) {
@@ -301,7 +302,7 @@ class ContentHubClientTest extends TestCase {
   /**
    * @covers ::makeBaseURL
    */
-  public function testMakeBaseURL(): void {
+  public function testMakeBaseUrl(): void {
     $parts = ['http://example.com/', 'example/', 'path'];
     $expected = 'http://example.com/example/path/';
     $actual = $this->ch_client->makeBaseURL(...$parts);
@@ -2256,11 +2257,11 @@ class ContentHubClientTest extends TestCase {
    * @throws \ReflectionException
    */
   public function makeMockCHClient( // phpcs:ignore
-    array $config,
     LoggerInterface $logger,
     Settings $settings,
     HmacAuthMiddleware $middleware,
     EventDispatcherInterface $dispatcher,
+    array $config,
     string $api_version = 'v2'
   ): ContentHubClient {
     $client = \Mockery::mock(ContentHubClient::class)
@@ -2653,6 +2654,51 @@ class ContentHubClientTest extends TestCase {
       ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response)));
 
     $this->assertSame($this->ch_client->cancelScroll($scroll_id), $response);
+  }
+
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::queryEntities
+   *
+   * @throws \Exception
+   */
+  public function testQueryEntitiesIfSucceedsWithParams(): void {
+    $request_parameters = ['type' => 'client'];
+
+    $response = [
+      'uuid' => 'some-uuid',
+      'request_id' => 'some-request-id',
+      'success' => TRUE,
+    ];
+
+    $this->ch_client
+      ->shouldReceive('get')
+      ->once()
+      ->with('entities', [RequestOptions::QUERY => $request_parameters])
+      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response)));
+
+    $this->assertSame($this->ch_client->queryEntities($request_parameters), $response);
+  }
+
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::queryEntities
+   *
+   * @throws \Exception
+   */
+  public function testQueryEntitiesIfSucceedsWithoutParams(): void {
+
+    $response = [
+      'uuid' => 'some-uuid',
+      'request_id' => 'some-request-id',
+      'success' => TRUE,
+    ];
+
+    $this->ch_client
+      ->shouldReceive('get')
+      ->once()
+      ->with('entities', [])
+      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response)));
+
+    $this->assertSame($this->ch_client->queryEntities(), $response);
   }
 
 }
