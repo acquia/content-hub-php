@@ -180,14 +180,6 @@ class ContentHubClientTest extends TestCase {
     $this->dispatcher = $this->getMockDispatcher();
 
     $this->ch_client = $this->makeMockCHClient(
-      [
-        'base_url' => $this->test_data['url'],
-        'client-languages' => [
-          'en',
-          'es',
-          'und',
-        ],
-      ],
       new NullLogger(),
       $this->makeMockSettings(
         $this->test_data['name'],
@@ -200,6 +192,14 @@ class ContentHubClientTest extends TestCase {
       ),
       \Mockery::mock(HmacAuthMiddleware::class),
       $this->dispatcher,
+      [
+        'base_url' => $this->test_data['url'],
+        'client-languages' => [
+          'en',
+          'es',
+          'und',
+        ],
+      ],
       'v2'
     );
 
@@ -232,15 +232,15 @@ class ContentHubClientTest extends TestCase {
       });
     $this->object_factory->shouldReceive('getCHClient')
       ->andReturnUsing(function (
-        array $config,
         LoggerInterface $logger,
         Settings $settings,
         HmacAuthMiddleware $middleware,
         EventDispatcherInterface $dispatcher,
+        array $config,
         string $api_version = 'v2'
       ) {
-        return $this->makeMockCHClient($config, $logger, $settings, $middleware,
-          $dispatcher, $api_version);
+        return $this->makeMockCHClient($logger, $settings, $middleware,
+          $dispatcher, $config, $api_version);
       });
     $this->object_factory->shouldReceive('getCDFDocument')
       ->andReturnUsing(function (...$entities) {
@@ -2257,11 +2257,11 @@ class ContentHubClientTest extends TestCase {
    * @throws \ReflectionException
    */
   public function makeMockCHClient( // phpcs:ignore
-    array $config,
     LoggerInterface $logger,
     Settings $settings,
     HmacAuthMiddleware $middleware,
     EventDispatcherInterface $dispatcher,
+    array $config,
     string $api_version = 'v2'
   ): ContentHubClient {
     $client = \Mockery::mock(ContentHubClient::class)
