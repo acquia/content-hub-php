@@ -147,6 +147,7 @@ class Webhook {
   public function isEnabled() {
     $enabled = [
       'ENABLED',
+      'enabled',
       '',
     ];
     return in_array($this->getStatus(), $enabled, TRUE);
