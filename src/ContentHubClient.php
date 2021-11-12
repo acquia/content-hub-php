@@ -1443,6 +1443,11 @@ class ContentHubClient extends Client {
 
   /**
    * Checks whether the given account is featured.
+   *
+   * @return bool
+   *   True if the account is featured.
+   *
+   * @throws \Exception
    */
   public function isFeatured(): bool {
     $remote = $this->getRemoteSettings();

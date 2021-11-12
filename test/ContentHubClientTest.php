@@ -2501,6 +2501,15 @@ class ContentHubClientTest extends TestCase {
   }
 
   /**
+   * @dataProvider isFeaturedDataProvider
+   */
+  public function testIsFeatured(array $remote_settings, bool $expectation): void {
+    $this->ch_client->shouldReceive('getRemoteSettings')
+      ->andReturn($remote_settings);
+    $this->assertTrue($this->ch_client->isFeatured() === $expectation);
+  }
+
+  /**
    * Data provider for isFeatured test cases.
    *
    * @return array[]
