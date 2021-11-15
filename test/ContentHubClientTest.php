@@ -2148,7 +2148,7 @@ class ContentHubClientTest extends TestCase {
           'suppressed_until' => 'some-timestamp',
         ],
       ],
-    ]);
+    ])->byDefault();
 
     return $client;
   }
@@ -2498,6 +2498,51 @@ class ContentHubClientTest extends TestCase {
       ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response)));
 
     $this->assertSame($this->ch_client->cancelScroll($scroll_id), $response);
+  }
+
+  /**
+   * @dataProvider isFeaturedDataProvider
+   */
+  public function testIsFeatured(array $remote_settings, bool $expectation): void {
+    $this->ch_client->shouldReceive('getRemoteSettings')
+      ->andReturn($remote_settings);
+    $this->assertTrue($this->ch_client->isFeatured() === $expectation);
+  }
+
+  /**
+   * Data provider for isFeatured test cases.
+   *
+   * @return array[]
+   *   Remote settings response and the expectation.
+   */
+  public function isFeaturedDataProvider(): array {
+    // A truncated response of /settings endpoint.
+    $response = [
+      'hostname' => $this->test_data['host-name'],
+      'api_key' => $this->test_data['api-key'],
+      'secret_key' => $this->test_data['secret-key'],
+      'shared_secret' => $this->test_data['shared-secret'],
+      'client_name' => 'client_name',
+    ];
+
+    return [
+      [
+        $response + ['featured' => TRUE],
+        TRUE,
+      ],
+      [
+        $response + ['featured' => FALSE],
+        FALSE,
+      ],
+      [
+        $response,
+        FALSE,
+      ],
+      [
+        [],
+        FALSE,
+      ],
+    ];
   }
 
 }
