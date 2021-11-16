@@ -7,7 +7,6 @@ use Acquia\ContentHubClient\Guzzle\Middleware\RequestResponseHandler;
 use Acquia\ContentHubClient\SearchCriteria\SearchCriteria;
 use Acquia\ContentHubClient\SearchCriteria\SearchCriteriaBuilder;
 use Acquia\Hmac\Guzzle\HmacAuthMiddleware;
-use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\ClientException;
@@ -128,13 +127,13 @@ class ContentHubClient extends Client {
    *
    * @since 0.2.0
    */
-  public function ping() {
+  public function ping(): ResponseInterface {
     $makeBaseURL = self::makeBaseURL($this->getConfig()['base_url']);
     $client = ObjectFactory::getGuzzleClient([
       'base_uri' => $makeBaseURL,
     ]);
 
-    return self::getResponseJson($client->get('ping'));
+    return $client->get('ping');
   }
 
   /**
@@ -227,7 +226,7 @@ class ContentHubClient extends Client {
       return ObjectFactory::getCHClient($config, $logger, $settings,
         $settings->getMiddleware(), $dispatcher);
     }
-    catch (Exception $exception) {
+    catch (\Exception $exception) {
       if ($exception instanceof BadResponseException) {
         $message = sprintf('Error registering client with name="%s" (Error Code = %d: %s)',
           $name, $exception->getResponse()->getStatusCode(),
@@ -246,7 +245,7 @@ class ContentHubClient extends Client {
       $message = sprintf("An unknown exception was caught. Message: %s",
         $exception->getMessage());
       $logger->error($message);
-      throw new Exception($message);
+      throw new \Exception($message);
     }
   }
 
@@ -867,7 +866,7 @@ class ContentHubClient extends Client {
     $uuid = $client_uuid ?? $settings->getUuid();
     $response = $this->deleteEntity($uuid);
     if (!$response) {
-      throw new Exception(sprintf("Entity with UUID = %s cannot be deleted.", $uuid));
+      throw new \Exception(sprintf("Entity with UUID = %s cannot be deleted.", $uuid));
     }
     return $this->delete("settings/client/uuid/$uuid");
   }
@@ -1074,10 +1073,10 @@ class ContentHubClient extends Client {
     try {
       $body = (string) $response->getBody();
     }
-    catch (Exception $exception) {
+    catch (\Exception $exception) {
       $message = sprintf("An exception occurred in the JSON response. Message: %s",
         $exception->getMessage());
-      throw new Exception($message);
+      throw new \Exception($message);
     }
 
     return json_decode($body, TRUE);
@@ -1108,7 +1107,7 @@ class ContentHubClient extends Client {
 
       return parent::__call($method, $args);
     }
-    catch (Exception $e) {
+    catch (\Exception $e) {
       return $this->getExceptionResponse($method, $args, $e);
     }
   }
