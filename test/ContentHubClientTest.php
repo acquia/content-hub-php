@@ -280,13 +280,16 @@ class ContentHubClientTest extends TestCase {
       'base_uri' => $this->test_data['url'],
     ];
 
+    $response_code = SymfonyResponse::HTTP_ACCEPTED;
     $this->guzzle_client
       ->shouldReceive('get')
       ->once()
       ->with('ping')
-      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response_body)));
+      ->andReturn($this->makeMockResponse($response_code, [], json_encode($response_body)));
 
-    $this->assertSame($this->ch_client->ping(), $response_body);
+    $response = $this->ch_client->ping();
+    $this->assertSame($response->getStatusCode(), $response_code);
+    $this->assertSame($response_body, $this->ch_client::getResponseJson($response));
     $this->assertSame($this->guzzle_client->getConfig(), $config);
   }
 
