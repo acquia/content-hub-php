@@ -35,6 +35,3 @@ jobs:
 
       - name: Run Coveralls
         run: ./vendor/bin/php-coveralls -v
-
-      - name: Run Ocular
-        run: ./vendor/bin/ocular code-coverage:upload --format=php-clover build/logs/clover.xml
