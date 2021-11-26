@@ -1,0 +1,38 @@
+name: Content Hub PHP
+on: [push, pull_request]
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    env:
+      COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    strategy:
+      matrix:
+        os: [ ubuntu-latest ]
+        php-version: [ '7.4' ]
+    steps:
+      # This step checks out a copy of your repository.
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          coverage: xdebug
+
+      - name: Install composer dependencies
+        run: |
+          composer require --dev php-coveralls/php-coveralls
+          composer install
+      - name: Run phpcs
+        run: |
+          ./vendor/bin/phpcs --config-set installed_paths vendor/drupal/coder/coder_sniffer
+          ./vendor/bin/phpcs -n --standard=Drupal,DrupalPractice src/ tests/
+      - name: Run PHPUnit
+        run: ./vendor/bin/phpunit
+
+      - name: Run Coveralls
+        run: ./vendor/bin/php-coveralls -v
+
+      - name: Run Ocular
+        run: ./vendor/bin/ocular code-coverage:upload --format=php-clover build/logs/clover.xml
