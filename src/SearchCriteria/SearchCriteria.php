@@ -2,8 +2,6 @@
 
 namespace Acquia\ContentHubClient\SearchCriteria;
 
-use DateTimeInterface;
-
 /**
  * Class SearchCriteria.
  *
@@ -139,8 +137,8 @@ class SearchCriteria implements \JsonSerializable {
     array $bundle,
     array $tags,
     string $label,
-    ?DateTimeInterface $startDate,
-    ?DateTimeInterface $endDate,
+    ?\DateTimeInterface $startDate,
+    ?\DateTimeInterface $endDate,
     int $from,
     int $size,
     string $sorting,
@@ -237,7 +235,7 @@ class SearchCriteria implements \JsonSerializable {
    * @return \DateTimeInterface|null
    *   Search start date.
    */
-  public function getStartDate(): ?DateTimeInterface {
+  public function getStartDate(): ?\DateTimeInterface {
     return $this->startDate;
   }
 
@@ -247,7 +245,7 @@ class SearchCriteria implements \JsonSerializable {
    * @return \DateTimeInterface|null
    *   Search end date.
    */
-  public function getEndDate(): ?DateTimeInterface {
+  public function getEndDate(): ?\DateTimeInterface {
     return $this->endDate;
   }
 

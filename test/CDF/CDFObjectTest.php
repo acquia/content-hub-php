@@ -5,7 +5,6 @@ namespace Acquia\ContentHubClient\test\CDF;
 use Acquia\ContentHubClient\CDF\CDFObject;
 use Acquia\ContentHubClient\CDFAttribute;
 use Acquia\ContentHubClient\assets\CDFAttributeChild;
-use phpDocumentor\Reflection\Types\Self_;
 use PHPUnit\Framework\TestCase;
 
 /**

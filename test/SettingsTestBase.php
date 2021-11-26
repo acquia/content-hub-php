@@ -2,7 +2,6 @@
 
 namespace Acquia\ContentHubClient\test;
 
-use Acquia\ContentHubClient\User;
 use GuzzleHttp\Psr7\Response;
 
 /**
