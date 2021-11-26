@@ -3,7 +3,6 @@
 namespace Acquia\ContentHubClient;
 
 use Acquia\ContentHubClient\CDF\CDFObject;
-use ReflectionClass;
 
 /**
  * Class CDFAttribute.
@@ -78,7 +77,7 @@ class CDFAttribute {
    *   Unsupported data type exception.
    */
   public function __construct($id, $type, $value = NULL, $language = CDFObject::LANGUAGE_UNDETERMINED) {
-    $r = new ReflectionClass(__CLASS__);
+    $r = new \ReflectionClass(__CLASS__);
     if (!in_array($type, $r->getConstants())) {
       // @todo validate value against data type?
       throw new \Exception(sprintf("Unsupported CDF Attribute data type \"%s\".", $type));

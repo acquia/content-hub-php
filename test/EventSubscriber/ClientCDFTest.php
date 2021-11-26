@@ -3,7 +3,6 @@
 namespace Acquia\ContentHubClient\test\EventSubscriber;
 
 use Acquia\ContentHubClient\CDF\CDFObject;
-use Acquia\ContentHubClient\CDF\CDFObjectInterface;
 use Acquia\ContentHubClient\CDF\ClientCDFObject;
 use Acquia\ContentHubClient\ContentHubLibraryEvents;
 use Acquia\ContentHubClient\Event\GetCDFTypeEvent;

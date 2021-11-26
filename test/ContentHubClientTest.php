@@ -30,7 +30,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 /**
- * @covers \Acquia\ContentHubClient\ContentHubClient
+ * @coversDefaultClass  \Acquia\ContentHubClient\ContentHubClient
  *
  * @runTestsInSeparateProcesses
  * @preserveGlobalState disabled
@@ -2504,6 +2504,8 @@ class ContentHubClientTest extends TestCase {
   }
 
   /**
+   * @covers ::getRemoteSettings
+   *
    * @dataProvider isFeaturedDataProvider
    */
   public function testIsFeatured(array $remote_settings, bool $expectation): void {
