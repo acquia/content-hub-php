@@ -3,7 +3,6 @@
 namespace Acquia\ContentHubClient\test\EventSubscriber;
 
 use Acquia\ContentHubClient\CDF\CDFObject;
-use Acquia\ContentHubClient\CDF\CDFObjectInterface;
 use Acquia\ContentHubClient\CDF\ClientCDFObject;
 use Acquia\ContentHubClient\ContentHubLibraryEvents;
 use Acquia\ContentHubClient\Event\GetCDFTypeEvent;
@@ -70,7 +69,8 @@ class ClientCDFTest extends TestCase {
       ->willReturn('client');
 
     $event->expects($this->once())
-      ->method('getData');
+      ->method('getData')
+      ->willReturn(['metadata' => 'Metadata']);
 
     $event->expects($this->once())
       ->method('setObject');

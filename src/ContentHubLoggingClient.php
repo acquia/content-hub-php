@@ -3,7 +3,6 @@
 namespace Acquia\ContentHubClient;
 
 use Acquia\Hmac\Guzzle\HmacAuthMiddleware;
-use Exception;
 use GuzzleHttp\Client;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -117,7 +116,7 @@ class ContentHubLoggingClient extends Client {
       return parent::__call($method, $args);
 
     }
-    catch (Exception $e) {
+    catch (\Exception $e) {
       return $this->getExceptionResponse($method, $args, $e);
     }
   }
