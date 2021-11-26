@@ -69,7 +69,8 @@ class ClientCDFTest extends TestCase {
       ->willReturn('client');
 
     $event->expects($this->once())
-      ->method('getData');
+      ->method('getData')
+      ->willReturn(['metadata' => 'Client Metadata']);
 
     $event->expects($this->once())
       ->method('setObject');
