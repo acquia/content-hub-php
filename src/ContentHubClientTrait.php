@@ -8,6 +8,9 @@ use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LogLevel;
 
+/**
+ * Common trait for CH Client and CH Logging Client.
+ */
 trait ContentHubClientTrait {
 
   /**
@@ -96,7 +99,7 @@ trait ContentHubClientTrait {
    *   Status code.
    * @param string $reason
    *   Reason.
-   * @param null $request_id
+   * @param string|null $request_id
    *   The request id from the ContentHub service if available.
    *
    * @return \GuzzleHttp\Psr7\Response
@@ -111,7 +114,7 @@ trait ContentHubClientTrait {
       'error' => [
         'code' => $code,
         'message' => $reason,
-      ]
+      ],
     ];
     return new Response($code, [], json_encode($body), '1.1', $reason);
   }
@@ -126,8 +129,8 @@ trait ContentHubClientTrait {
    * @param \Exception $exception
    *   The Exception object.
    *
-   * @return ResponseInterface The response after raising an exception.
-   *   The response object.
+   * @return \GuzzleHttp\Psr7\ResponseInterface
+   *   The response after raising an exception.
    *
    *  @codeCoverageIgnore
    */
@@ -148,9 +151,9 @@ trait ContentHubClientTrait {
         $log_level = LogLevel::WARNING;
         break;
 
-      case (preg_match('/filters\?name=*/', $api_call) ? true : false) :
-      case (preg_match('/settings\/clients\/*/', $api_call) ? true : false) :
-      case (preg_match('/settings\/webhooks\/.*\/filters/', $api_call) ? true : false) :
+      case (preg_match('/filters\?name=*/', $api_call) ? TRUE : FALSE):
+      case (preg_match('/settings\/clients\/*/', $api_call) ? TRUE : FALSE):
+      case (preg_match('/settings\/webhooks\/.*\/filters/', $api_call) ? TRUE : FALSE):
         $log_level = LogLevel::NOTICE;
         break;
 
@@ -232,4 +235,3 @@ trait ContentHubClientTrait {
   }
 
 }
-

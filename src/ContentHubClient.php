@@ -773,14 +773,15 @@ class ContentHubClient extends Client {
    *   ],
    * ]
    *
-   * @param array $interest_list
-   *   An array of interest items.
    * @param string $webhook_uuid
    *   The webhook uuid to register interest items for.
    * @param string $site_role
    *   The site role.
+   * @param array $interest_list
+   *   An array of interest items.
    *
    * @return \Psr\Http\Message\ResponseInterface
+   *   Response object.
    */
   public function addEntitiesToInterestListBySiteRole(string $webhook_uuid, string $site_role, array $interest_list): ResponseInterface {
     $options['body'] = json_encode($interest_list);
@@ -795,14 +796,15 @@ class ContentHubClient extends Client {
    *
    *   @see \Acquia\ContentHubClient\ContentHubClient::addEntitiesToInterestListBySiteRole
    *
-   * @param array $interest_list
-   *   An array of interest items.
    * @param string $webhook_uuid
    *   The webhook uuid to register interest items for.
    * @param string $site_role
    *   The site role.
+   * @param array $interest_list
+   *   An array of interest items.
    *
    * @return \Psr\Http\Message\ResponseInterface
+   *   Response object.
    */
   public function updateInterestListBySiteRole(string $webhook_uuid, string $site_role, array $interest_list): ResponseInterface {
     $options['body'] = json_encode($interest_list);

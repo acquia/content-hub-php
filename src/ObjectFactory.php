@@ -99,8 +99,6 @@ class ObjectFactory {
   /**
    * Creates ContentHubClient instance.
    *
-   * @param array $config
-   *   Config.
    * @param \Psr\Log\LoggerInterface $logger
    *   Logger instance.
    * @param \Acquia\ContentHubClient\Settings $settings
@@ -109,6 +107,8 @@ class ObjectFactory {
    *   HmacAuthMiddleware instance.
    * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
    *   Event dispatcher instance.
+   * @param array $config
+   *   Config.
    * @param string $api_version
    *   API version.
    *

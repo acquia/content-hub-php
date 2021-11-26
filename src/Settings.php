@@ -169,6 +169,7 @@ class Settings {
    * Returns middleware.
    *
    * @codeCoverageIgnore
+   *
    * @return \Acquia\Hmac\Guzzle\HmacAuthMiddleware
    *   Auth middleware.
    */
