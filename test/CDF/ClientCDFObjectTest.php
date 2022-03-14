@@ -26,10 +26,10 @@ class ClientCDFObjectTest extends TestCase {
     'settings' => [
       'uuid' => 'some-uuid',
       'name' => 'some-name',
-      'apiKey' => 'some-api-key',
-      'secretKey' => 'some-secret-key',
+      'apiKey' => '',
+      'secretKey' => '',
       'url' => 'some-url',
-      'sharedSecret' => NULL,
+      'sharedSecret' => '',
       'webhook' => [
         'webhook1' => 'w1-uuid',
         'webhook2' => 'w2-uuid',
