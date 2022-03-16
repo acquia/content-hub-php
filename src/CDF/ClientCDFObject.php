@@ -61,10 +61,10 @@ class ClientCDFObject extends CDFObject {
       $this->settings = new Settings(
         $metadata['settings']['name'],
         $metadata['settings']['uuid'],
-        '',
-        '',
+        $metadata['settings']['apiKey'],
+        '********',
         $metadata['settings']['url'],
-        '',
+        $metadata['settings']['sharedSecret'],
         $metadata['settings']['webhook']
       );
     }

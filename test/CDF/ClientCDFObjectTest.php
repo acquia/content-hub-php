@@ -26,10 +26,10 @@ class ClientCDFObjectTest extends TestCase {
     'settings' => [
       'uuid' => 'some-uuid',
       'name' => 'some-name',
-      'apiKey' => '',
-      'secretKey' => '',
+      'apiKey' => 'some-api-key',
+      'secretKey' => 'some-secret-key',
       'url' => 'some-url',
-      'sharedSecret' => '',
+      'sharedSecret' => NULL,
       'webhook' => [
         'webhook1' => 'w1-uuid',
         'webhook2' => 'w2-uuid',
@@ -77,7 +77,9 @@ class ClientCDFObjectTest extends TestCase {
    * @covers \Acquia\ContentHubClient\CDF\ClientCDFObject::getSettings
    */
   public function testGetSettings(): void {
-    $this->assertEquals(self::METADATA['settings'], $this->clientCdfObject->getSettings()->toArray());
+    $settings = self::METADATA['settings'];
+    $settings['secretKey'] = '********';
+    $this->assertEquals($settings, $this->clientCdfObject->getSettings()->toArray());
   }
 
   /**
