@@ -24,7 +24,7 @@
         "symfony/serializer": "^3.4 || ^4.3"
     },
     "require-dev": {
-        "drupal/coder": "^8.3",
+        "drupal/coder": "dev-8.x-3.x",
         "mockery/mockery": "^1.2",
         "pdepend/pdepend": "~1.0",
         "phploc/phploc": "~2.0",

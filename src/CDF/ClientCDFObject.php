@@ -33,6 +33,7 @@ class ClientCDFObject extends CDFObject {
    * @throws \Exception
    */
   public static function create($uuid, array $metadata) {
+    $metadata['settings']['secretKey'] = '********';
     $cdf = new static('client', $uuid, date('c'), date('c'), $uuid, $metadata);
     $cdf->addAttribute('clientname', CDFAttribute::TYPE_STRING, $metadata['settings']['name']);
     return $cdf;
