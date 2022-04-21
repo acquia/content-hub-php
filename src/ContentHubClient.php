@@ -630,7 +630,22 @@ class ContentHubClient extends Client {
    * @throws \Exception
    */
   public function getClientByName($name) {
-    return self::getResponseJson($this->get("settings/clients/$name"));
+    return self::getResponseJson($this->get("settings/client/name/$name"));
+  }
+
+  /**
+   * Returns the Client, given its uuid.
+   *
+   * @param string $uuid
+   *   Client uuid.
+   *
+   * @return mixed
+   *   Response.
+   *
+   * @throws \Exception
+   */
+  public function getClientByUuid(string $uuid) {
+    return self::getResponseJson($this->get("settings/client/uuid/$uuid"));
   }
 
   /**
