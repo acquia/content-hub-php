@@ -2573,14 +2573,19 @@ class ContentHubClientTest extends TestCase {
     ];
   }
 
-  public function testCacheRemoteSettings() {
+  /**
+   * Tests cachable remote settings.
+   *
+   * @throws \Exception
+   */
+  public function testCacheRemoteSettings(): void {
     $response1 = [
       'remote' => 'data',
-      'settings' => 'test'
+      'settings' => 'test',
     ];
     $response2 = [
       'remote' => 'different data',
-      'settings' => 'another test'
+      'settings' => 'another test',
     ];
 
     $resp1 = new Response(SymfonyResponse::HTTP_OK, [], json_encode($response1));
