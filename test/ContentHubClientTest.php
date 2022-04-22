@@ -1002,16 +1002,10 @@ class ContentHubClientTest extends TestCase {
    */
   public function testGetClientByUuidReturnsClientInfoIfSuccessful(): void {
     $response = [
-      'name' => $this->test_data['name'],
-      'uuid' => $this->test_data['client-uuid'],
+      'name' => 'client-2',
+      'uuid' => 'client-2-uuid',
     ];
-    $this->ch_client
-      ->shouldReceive('get')
-      ->once()
-      ->with('settings/client/uuid/' . $this->test_data['client-uuid'])
-      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response)));
-
-    $api_response = $this->ch_client->getClientByUuid($this->test_data['client-uuid']);
+    $api_response = $this->ch_client->getClientByUuid('client-2-uuid');
     $this->assertSame($api_response, $response);
   }
 
@@ -1020,22 +1014,9 @@ class ContentHubClientTest extends TestCase {
    * @throws \Exception
    */
   public function testGetClientByUuidReturnsUnsuccessfulIfClientIsNotFound(): void {
-    $response = [
-      'success' => FALSE,
-      'error' => [
-        'code' => 4005,
-        'message' => 'The requested client name was not found.',
-      ],
-      'request_id' => 'some-request-uuid',
-    ];
-
-    $this->ch_client
-      ->shouldReceive('get')
-      ->once()
-      ->with('settings/client/uuid/' . $this->test_data['client-uuid'])
-      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_NOT_FOUND, [], json_encode($response)));
-
-    $this->assertSame($this->ch_client->getClientByUuid($this->test_data['client-uuid']), $response);
+    $response = [];
+    $api_response = $this->ch_client->getClientByUuid('client-3-uuid');
+    $this->assertSame($api_response, $response);
   }
 
   /**

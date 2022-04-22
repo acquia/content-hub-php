@@ -64,6 +64,13 @@ class ContentHubClient extends Client {
    */
   protected $dispatcher;
 
+  /**
+   * Cached remote settings.
+   *
+   * @var array
+   */
+  protected $remoteSettings = [];
+
   // phpcs:disable
   /**
    * {@inheritdoc}
@@ -644,8 +651,14 @@ class ContentHubClient extends Client {
    *
    * @throws \Exception
    */
-  public function getClientByUuid(string $uuid) {
-    return self::getResponseJson($this->get("settings/client/uuid/$uuid"));
+  public function getClientByUuid(string $uuid): array {
+    $settings = $this->getRemoteSettings(TRUE);
+    foreach ($settings['clients'] as $client) {
+      if ($client['uuid'] === $uuid) {
+        return $client;
+      }
+    }
+    return [];
   }
 
   /**
@@ -743,15 +756,22 @@ class ContentHubClient extends Client {
   /**
    * Obtains the Settings for the active subscription.
    *
-   * @return Settings
+   * @param bool $cached
+   *  Return cached remote settings.
+   *
+   * @return array
    *   Response.
    *
    * @throws \Exception
    *
    * @codeCoverageIgnore
    */
-  public function getRemoteSettings() {
-    return self::getResponseJson($this->get('settings'));
+  public function getRemoteSettings(bool $cached = FALSE): array {
+    if ($cached && !empty($this->remoteSettings)) {
+      return $this->remoteSettings;
+    }
+    $this->remoteSettings = self::getResponseJson($this->get('settings'));
+    return !is_array($this->remoteSettings) ? [] : $this->remoteSettings;
   }
 
   /**
