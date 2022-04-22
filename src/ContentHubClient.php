@@ -660,7 +660,7 @@ class ContentHubClient extends Client {
    * @throws \Exception
    */
   public function getClientByUuid(string $uuid): array {
-    $settings = $this->getRemoteSettings(TRUE);
+    $settings = $this->getRemoteSettings();
     foreach ($settings['clients'] as $client) {
       if ($client['uuid'] === $uuid) {
         return $client;
