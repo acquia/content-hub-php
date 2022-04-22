@@ -2573,4 +2573,32 @@ class ContentHubClientTest extends TestCase {
     ];
   }
 
+  public function testCacheRemoteSettings() {
+    $response1 = [
+      'remote' => 'data',
+      'settings' => 'test'
+    ];
+    $response2 = [
+      'remote' => 'different data',
+      'settings' => 'another test'
+    ];
+
+    $resp1 = new Response(SymfonyResponse::HTTP_OK, [], json_encode($response1));
+    $resp2 = new Response(SymfonyResponse::HTTP_OK, [], json_encode($response2));
+    $this->ch_client->shouldReceive('get')->andReturn($resp1, $resp2, $resp1);
+    $this->ch_client->shouldReceive('getRemoteSettings')->passthru();
+
+    $this->ch_client->cacheRemoteSettings(FALSE);
+    $actual = $this->ch_client->getRemoteSettings();
+    $this->assertSame($response1, $actual);
+    $actual = $this->ch_client->getRemoteSettings();
+    $this->assertSame($response2, $actual);
+
+    $actual = $this->ch_client->getRemoteSettings();
+    $this->ch_client->cacheRemoteSettings(TRUE);
+    $this->assertSame($response1, $actual);
+    $actual = $this->ch_client->getRemoteSettings();
+    $this->assertSame($response1, $actual);
+  }
+
 }

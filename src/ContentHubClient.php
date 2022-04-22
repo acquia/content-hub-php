@@ -71,6 +71,14 @@ class ContentHubClient extends Client {
    */
   protected $remoteSettings = [];
 
+  /**
+   * Whether to return cached remote settings.
+   *
+   * @var bool
+   *   True if it should return cached.
+   */
+  protected $shouldReturnCachedRemoteSettings = FALSE;
+
   // phpcs:disable
   /**
    * {@inheritdoc}
@@ -756,9 +764,6 @@ class ContentHubClient extends Client {
   /**
    * Obtains the Settings for the active subscription.
    *
-   * @param bool $cached
-   *  Return cached remote settings.
-   *
    * @return array
    *   Response.
    *
@@ -766,12 +771,22 @@ class ContentHubClient extends Client {
    *
    * @codeCoverageIgnore
    */
-  public function getRemoteSettings(bool $cached = FALSE): array {
-    if ($cached && !empty($this->remoteSettings)) {
+  public function getRemoteSettings(): array {
+    if ($this->shouldReturnCachedRemoteSettings && !empty($this->remoteSettings)) {
       return $this->remoteSettings;
     }
     $this->remoteSettings = self::getResponseJson($this->get('settings'));
     return !is_array($this->remoteSettings) ? [] : $this->remoteSettings;
+  }
+
+  /**
+   * Sets cachable remote settings.
+   *
+   * @param bool $should_cache
+   *   If set to true, returns cached remote settings.
+   */
+  public function cacheRemoteSettings(bool $should_cache): void {
+    $this->shouldReturnCachedRemoteSettings = $should_cache;
   }
 
   /**
