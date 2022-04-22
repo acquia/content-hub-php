@@ -654,8 +654,8 @@ class ContentHubClient extends Client {
    * @param string $uuid
    *   Client uuid.
    *
-   * @return mixed
-   *   Response.
+   * @return array
+   *   The client array (uuid, name).
    *
    * @throws \Exception
    */
