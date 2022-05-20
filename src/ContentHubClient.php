@@ -28,8 +28,7 @@ use function GuzzleHttp\default_user_agent;
  */
 class ContentHubClient extends Client {
 
-  // Override VERSION inherited from GuzzleHttp::ClientInterface.
-  const VERSION = '2.0.0';
+  const LIB_VERSION = '2.2.0';
 
   const LIBRARYNAME = 'AcquiaContentHubPHPLib';
 
