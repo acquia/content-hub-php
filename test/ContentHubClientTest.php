@@ -2547,10 +2547,10 @@ class ContentHubClientTest extends TestCase {
   public function isFeaturedDataProvider(): array {
     // A truncated response of /settings endpoint.
     $response = [
-      'hostname' => $this->test_data['host-name'],
-      'api_key' => $this->test_data['api-key'],
-      'secret_key' => $this->test_data['secret-key'],
-      'shared_secret' => $this->test_data['shared-secret'],
+      'hostname' => 'some-host-name',
+      'api_key' => 'some-api-key',
+      'secret_key' => 'some-secret-key',
+      'shared_secret' => 'some-shared-secret',
       'client_name' => 'client_name',
     ];
 
