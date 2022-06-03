@@ -408,7 +408,7 @@ class ContentHubClient extends Client {
    */
   protected function getCDFObject($data) { // phpcs:ignore
     $event = ObjectFactory::getCDFTypeEvent($data);
-    $this->dispatcher->dispatch(ContentHubLibraryEvents::GET_CDF_CLASS, $event);
+    $this->dispatcher->dispatch($event, ContentHubLibraryEvents::GET_CDF_CLASS);
 
     return $event->getObject();
   }
