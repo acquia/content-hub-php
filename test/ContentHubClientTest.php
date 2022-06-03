@@ -611,7 +611,7 @@ class ContentHubClientTest extends TestCase {
     $this->dispatcher
       ->shouldReceive('dispatch')
       ->once()
-      ->withArgs(static function (string $event_name, Event $event) {
+      ->withArgs(static function (Event $event, string $event_name) {
         return $event_name === ContentHubLibraryEvents::GET_CDF_CLASS;
       });
 
