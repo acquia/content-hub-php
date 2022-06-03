@@ -3,7 +3,7 @@
 namespace Acquia\ContentHubClient\Event;
 
 use Acquia\ContentHubClient\CDF\CDFObjectInterface;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Class GetCDFTypeEvent.

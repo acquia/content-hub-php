@@ -20,11 +20,12 @@ use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use GuzzleHttp\Psr7\Utils;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
@@ -610,7 +611,7 @@ class ContentHubClientTest extends TestCase {
     $this->dispatcher
       ->shouldReceive('dispatch')
       ->once()
-      ->withArgs(static function (string $event_name, Event $event) {
+      ->withArgs(static function (Event $event, string $event_name) {
         return $event_name === ContentHubLibraryEvents::GET_CDF_CLASS;
       });
 
@@ -2056,7 +2057,7 @@ class ContentHubClientTest extends TestCase {
     $response->shouldReceive('getStatusCode')->andReturn($status);
     $response->shouldReceive('getHeaders')->andReturn($headers);
     $response->shouldReceive('getBody')
-      ->andReturn(\GuzzleHttp\Psr7\stream_for($body));
+      ->andReturn(Utils::streamFor($body));
 
     return $response;
   }
@@ -2546,10 +2547,10 @@ class ContentHubClientTest extends TestCase {
   public function isFeaturedDataProvider(): array {
     // A truncated response of /settings endpoint.
     $response = [
-      'hostname' => $this->test_data['host-name'],
-      'api_key' => $this->test_data['api-key'],
-      'secret_key' => $this->test_data['secret-key'],
-      'shared_secret' => $this->test_data['shared-secret'],
+      'hostname' => 'some-host-name',
+      'api_key' => 'some-api-key',
+      'secret_key' => 'some-secret-key',
+      'shared_secret' => 'some-shared-secret',
       'client_name' => 'client_name',
     ];
 
