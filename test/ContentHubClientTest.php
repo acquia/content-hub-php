@@ -20,11 +20,12 @@ use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use GuzzleHttp\Psr7\Utils;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
@@ -2056,7 +2057,7 @@ class ContentHubClientTest extends TestCase {
     $response->shouldReceive('getStatusCode')->andReturn($status);
     $response->shouldReceive('getHeaders')->andReturn($headers);
     $response->shouldReceive('getBody')
-      ->andReturn(\GuzzleHttp\Psr7\stream_for($body));
+      ->andReturn(Utils::streamFor($body));
 
     return $response;
   }
