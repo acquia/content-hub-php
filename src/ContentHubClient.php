@@ -85,11 +85,11 @@ class ContentHubClient extends Client {
    * @codeCoverageIgnore
    */
   public function __construct(
-    array $config = [],
     LoggerInterface $logger,
     Settings $settings,
     HmacAuthMiddleware $middleware,
     EventDispatcherInterface $dispatcher,
+    array $config = [],
     $api_version = 'v2'
   ) {
     $this->logger = $logger;
