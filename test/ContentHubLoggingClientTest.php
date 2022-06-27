@@ -96,11 +96,11 @@ class ContentHubLoggingClientTest extends TestCase {
   /**
    * Tests sends event log to events micro service.
    *
-   * @covers \Acquia\ContentHubClient\ContentHubLoggingClient::sendLog
+   * @covers \Acquia\ContentHubClient\ContentHubLoggingClient::sendLogs
    *
    * @throws \Exception
    */
-  public function testSendLong(): void {
+  public function testSendLogs(): void {
     $response_body = [
       'success' => TRUE,
       'request_id' => 'some-uuid',
@@ -112,57 +112,15 @@ class ContentHubLoggingClientTest extends TestCase {
       'object_type' => 'object_type',
       'severity' => 'ERROR',
       'content' => 'some message',
+      'origin' => 'some-origin',
     ];
-    $context['origin'] = $this->ch_client->getSettings()->getUuid();
 
     $this->ch_client
       ->shouldReceive('post')
       ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response_body)));
 
-    $send_log = $this->ch_client->sendLog('Error', 'Message', $context);
+    $send_log = $this->ch_client->sendLogs($context);
     $this->assertSame($send_log, $response_body);
-  }
-
-  /**
-   * Tests get context array method.
-   *
-   * @covers \Acquia\ContentHubClient\ContentHubLoggingClient::getContextArray
-   */
-  public function testGetContextArray(): void {
-    $severity = 'severity';
-    $message = 'message';
-    $context = [
-      'object_id' => 'object_id',
-      'event_name' => 'event_name',
-      'object_type' => 'object_type',
-    ];
-    $actual_outcome = $this->ch_client->getContextArray($severity, $message, $context);
-
-    $expected_outcome = $context + [
-      'severity' => $severity,
-      'content' => $message,
-    ];
-
-    $this->assertSame($expected_outcome, $actual_outcome);
-  }
-
-  /**
-   * Tests get context array exception.
-   *
-   * @covers \Acquia\ContentHubClient\ContentHubLoggingClient::getContextArray
-   *
-   * @throws \Exception
-   */
-  public function testGetContextArrayException(): void {
-    $severity = 'severity';
-    $message = 'message';
-    $context = [
-      'object_id' => 'object_id',
-      'event_name' => 'event_name',
-    ];
-
-    $this->expectExceptionMessage('Object Id(UUID) / Event Name/ Object Type missing from event log attributes');
-    $this->ch_client->getContextArray($severity, $message, $context);
   }
 
   /**
