@@ -16,11 +16,6 @@ class ContentHubLoggingClient extends Client {
 
   use ContentHubClientTrait;
 
-  // Override VERSION inherited from GuzzleHttp::ClientInterface.
-  const LIB_VERSION = '2.0.0';
-
-  const LIBRARYNAME = 'AcquiaContentHubPHPLib';
-
   /**
    * The settings.
    *
