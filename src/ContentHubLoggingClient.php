@@ -7,8 +7,6 @@ use GuzzleHttp\Client;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-use function GuzzleHttp\default_user_agent;
-
 /**
  * Class ContentHubClient.
  *
@@ -17,11 +15,6 @@ use function GuzzleHttp\default_user_agent;
 class ContentHubLoggingClient extends Client {
 
   use ContentHubClientTrait;
-
-  // Override VERSION inherited from GuzzleHttp::ClientInterface.
-  const VERSION = '2.0.0';
-
-  const LIBRARYNAME = 'AcquiaContentHubPHPLib';
 
   /**
    * The settings.
@@ -71,7 +64,7 @@ class ContentHubLoggingClient extends Client {
     }
 
     // Setting up the User Header string.
-    $user_agent_string = self::LIBRARYNAME . '/' . self::VERSION . ' ' . default_user_agent();
+    $user_agent_string = ContentHubDescriptor::userAgent();
     if (isset($config['client-user-agent'])) {
       $user_agent_string = $config['client-user-agent'] . ' ' . $user_agent_string;
     }
@@ -122,56 +115,19 @@ class ContentHubLoggingClient extends Client {
   }
 
   /**
-   * Sends event log to events micro service.
+   * Sends event logs to events microservice.
    *
-   * @param string $severity
-   *   Severity for the event: ERROR, INFO, WARN etc.
-   * @param string $message
-   *   Error message to display.
-   * @param array $context
-   *   Context array containing uuid, object type etc.
+   * @param array $logs
+   *   Array of logs.
    *
    * @return mixed
    *   Response from logging service.
    *
-   * @throws Exception
+   * @throws \Exception
    */
-  public function sendLog(string $severity, string $message, array $context) {
-    $log_details = $this->getContextArray($severity, $message, $context);
-    $log_details['origin'] = $this->getSettings()->getUuid();
-    $options['body'] = json_encode($log_details);
-
+  public function sendLogs(array $logs) {
+    $options['body'] = json_encode($logs, JSON_THROW_ON_ERROR);
     return self::getResponseJson($this->post('events', $options));
-  }
-
-  /**
-   * Sets the array for event logging.
-   *
-   * @param string $severity
-   *   Severity for the event: ERROR, INFO, WARN etc.
-   * @param string $message
-   *   Error message to display.
-   * @param array $context
-   *   Context array containing uuid, object type etc.
-   *
-   * @return array
-   *   Final context array having all the required attributes.
-   *
-   * @throws Exception
-   */
-  public function getContextArray(string $severity, string $message, array $context): array {
-    if (isset(
-      $context['object_id'],
-      $context['event_name'],
-      $context['object_type']
-    )) {
-      $context['severity'] = $severity;
-      $context['content'] = $message;
-    }
-    else {
-      throw new \Exception('Object Id(UUID) / Event Name/ Object Type missing from event log attributes');
-    }
-    return $context;
   }
 
 }
