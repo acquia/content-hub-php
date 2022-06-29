@@ -17,8 +17,6 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-use function GuzzleHttp\default_user_agent;
-
 /**
  * Class ContentHubClient.
  *
@@ -27,11 +25,6 @@ use function GuzzleHttp\default_user_agent;
 class ContentHubClient extends Client {
 
   use ContentHubClientTrait;
-
-  // Override VERSION inherited from GuzzleHttp::ClientInterface.
-  const VERSION = '2.0.0';
-
-  const LIBRARYNAME = 'AcquiaContentHubPHPLib';
 
   const OPTION_NAME_LANGUAGES = 'client-languages';
 
@@ -94,7 +87,7 @@ class ContentHubClient extends Client {
     }
 
     // Setting up the User Header string.
-    $user_agent_string = self::LIBRARYNAME . '/' . self::VERSION . ' ' . default_user_agent();
+    $user_agent_string = ContentHubDescriptor::userAgent();;
     if (isset($config['client-user-agent'])) {
       $user_agent_string = $config['client-user-agent'] . ' ' . $user_agent_string;
     }
@@ -202,7 +195,7 @@ class ContentHubClient extends Client {
       'base_uri' => self::makeBaseURL($url, $api_version),
       'headers' => [
         'Content-Type' => 'application/json',
-        'User-Agent' => self::LIBRARYNAME . '/' . self::VERSION . ' ' . default_user_agent(),
+        'User-Agent' => ContentHubDescriptor::userAgent(),
       ],
       'handler' => ObjectFactory::getHandlerStack(),
     ];
@@ -288,7 +281,7 @@ class ContentHubClient extends Client {
       'base_uri' => self::makeBaseURL($url, $api_version),
       'headers' => [
         'Content-Type' => 'application/json',
-        'User-Agent' => self::LIBRARYNAME . '/' . self::VERSION . ' ' . default_user_agent(),
+        'User-Agent' => ContentHubDescriptor::userAgent(),
       ],
       'handler' => ObjectFactory::getHandlerStack(),
     ];

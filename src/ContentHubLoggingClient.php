@@ -7,8 +7,6 @@ use GuzzleHttp\Client;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-use function GuzzleHttp\default_user_agent;
-
 /**
  * Class ContentHubClient.
  *
@@ -71,7 +69,7 @@ class ContentHubLoggingClient extends Client {
     }
 
     // Setting up the User Header string.
-    $user_agent_string = self::LIBRARYNAME . '/' . self::LIB_VERSION . ' ' . default_user_agent();
+    $user_agent_string = ContentHubDescriptor::userAgent();
     if (isset($config['client-user-agent'])) {
       $user_agent_string = $config['client-user-agent'] . ' ' . $user_agent_string;
     }
