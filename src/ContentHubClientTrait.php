@@ -231,7 +231,7 @@ trait ContentHubClientTrait {
       'base_uri' => $makeBaseURL,
     ]);
 
-    return self::getResponseJson($client->get('ping'));
+    return $client->get('ping');
   }
 
 }

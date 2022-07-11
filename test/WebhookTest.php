@@ -32,7 +32,7 @@ class WebhookTest extends TestCase {
   /**
    * {@inheritDoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     $this->definition = [
@@ -57,7 +57,7 @@ class WebhookTest extends TestCase {
   /**
    * {@inheritDoc}
    */
-  protected function tearDown() {
+  protected function tearDown(): void {
     parent::tearDown();
 
     unset($this->webhook, $this->definition);

@@ -77,7 +77,9 @@ class ClientCDFObjectTest extends TestCase {
    * @covers \Acquia\ContentHubClient\CDF\ClientCDFObject::getSettings
    */
   public function testGetSettings(): void {
-    $this->assertEquals(self::METADATA['settings'], $this->clientCdfObject->getSettings()->toArray());
+    $settings = self::METADATA['settings'];
+    $settings['secretKey'] = '********';
+    $this->assertEquals($settings, $this->clientCdfObject->getSettings()->toArray());
   }
 
   /**

@@ -240,11 +240,11 @@ class CDFDocumentTest extends TestCase {
   public function providerEntityOperations() {
     $cdfObjectMockFirst = $this->getMockBuilder(CDFObject::class)
       ->disableOriginalConstructor()
-      ->setMethods(['getUuid'])
+      ->onlyMethods(['getUuid'])
       ->getMock();
     $cdfObjectMockSecond = $this->getMockBuilder(CDFObject::class)
       ->disableOriginalConstructor()
-      ->setMethods(['getUuid'])
+      ->onlyMethods(['getUuid'])
       ->getMock();
 
     $cdfObjectMockFirst->expects($this->any())
@@ -272,11 +272,11 @@ class CDFDocumentTest extends TestCase {
   public function providerMergeDocuments() {
     $cdfObjectMockFirst = $this->getMockBuilder(CDFObject::class)
       ->disableOriginalConstructor()
-      ->setMethods(['getUuid'])
+      ->onlyMethods(['getUuid'])
       ->getMock();
     $cdfObjectMockSecond = $this->getMockBuilder(CDFObject::class)
       ->disableOriginalConstructor()
-      ->setMethods(['getUuid'])
+      ->onlyMethods(['getUuid'])
       ->getMock();
 
     $cdfObjectMockFirst->expects($this->any())
@@ -307,11 +307,11 @@ class CDFDocumentTest extends TestCase {
     // First set of objects.
     $setOneFirst = $this->getMockBuilder(CDFObject::class)
       ->disableOriginalConstructor()
-      ->setMethods(['getUuid'])
+      ->onlyMethods(['getUuid'])
       ->getMock();
     $setOneSecond = $this->getMockBuilder(CDFObject::class)
       ->disableOriginalConstructor()
-      ->setMethods(['getUuid'])
+      ->onlyMethods(['getUuid'])
       ->getMock();
 
     $setOneFirst->expects($this->any())
@@ -325,11 +325,11 @@ class CDFDocumentTest extends TestCase {
     // Second set of objects.
     $setTwoFirst = $this->getMockBuilder(CDFObject::class)
       ->disableOriginalConstructor()
-      ->setMethods(['getUuid'])
+      ->onlyMethods(['getUuid'])
       ->getMock();
     $setTwoSecond = $this->getMockBuilder(CDFObject::class)
       ->disableOriginalConstructor()
-      ->setMethods(['getUuid'])
+      ->onlyMethods(['getUuid'])
       ->getMock();
 
     $setTwoFirst->expects($this->any())
@@ -376,11 +376,11 @@ class CDFDocumentTest extends TestCase {
     // First set of objects.
     $setOneFirst = $this->getMockBuilder(CDFObject::class)
       ->disableOriginalConstructor()
-      ->setMethods(['getUuid'])
+      ->onlyMethods(['getUuid'])
       ->getMock();
     $setOneSecond = $this->getMockBuilder(CDFObject::class)
       ->disableOriginalConstructor()
-      ->setMethods(['getUuid'])
+      ->onlyMethods(['getUuid'])
       ->getMock();
 
     $setOneFirst->expects($this->any())
@@ -394,11 +394,11 @@ class CDFDocumentTest extends TestCase {
     // Second set of objects.
     $setTwoFirst = $this->getMockBuilder(CDFObject::class)
       ->disableOriginalConstructor()
-      ->setMethods(['getUuid'])
+      ->onlyMethods(['getUuid'])
       ->getMock();
     $setTwoSecond = $this->getMockBuilder(CDFObject::class)
       ->disableOriginalConstructor()
-      ->setMethods(['getUuid'])
+      ->onlyMethods(['getUuid'])
       ->getMock();
 
     $setTwoFirst->expects($this->any())
@@ -444,11 +444,11 @@ class CDFDocumentTest extends TestCase {
   public function providerToString() {
     $cdfObjectMockFirst = $this->getMockBuilder(CDFObject::class)
       ->disableOriginalConstructor()
-      ->setMethods(['getUuid', 'toArray'])
+      ->onlyMethods(['getUuid', 'toArray'])
       ->getMock();
     $cdfObjectMockSecond = $this->getMockBuilder(CDFObject::class)
       ->disableOriginalConstructor()
-      ->setMethods(['getUuid', 'toArray'])
+      ->onlyMethods(['getUuid', 'toArray'])
       ->getMock();
 
     $cdfObjectMockFirst->expects($this->any())

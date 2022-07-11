@@ -118,7 +118,7 @@ class ClientCDFTest extends TestCase {
 
     return $this->getMockBuilder(GetCDFTypeEvent::class)
       ->disableOriginalConstructor()
-      ->setMethods([
+      ->onlyMethods([
         'getType',
         'setObject',
         'stopPropagation',

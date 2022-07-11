@@ -22,11 +22,12 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\RequestOptions;
+use GuzzleHttp\Psr7\Utils;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
@@ -322,13 +323,16 @@ class ContentHubClientTest extends TestCase {
       'base_uri' => $this->test_data['url'],
     ];
 
+    $response_code = SymfonyResponse::HTTP_ACCEPTED;
     $this->guzzle_client
       ->shouldReceive('get')
       ->once()
       ->with('ping')
-      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response_body)));
+      ->andReturn($this->makeMockResponse($response_code, [], json_encode($response_body)));
 
-    $this->assertSame($this->ch_client->ping(), $response_body);
+    $response = $this->ch_client->ping();
+    $this->assertSame($response->getStatusCode(), $response_code);
+    $this->assertSame($response_body, $this->ch_client::getResponseJson($response));
     $this->assertSame($this->guzzle_client->getConfig(), $config);
   }
 
@@ -649,7 +653,7 @@ class ContentHubClientTest extends TestCase {
     $this->dispatcher
       ->shouldReceive('dispatch')
       ->once()
-      ->withArgs(static function (string $event_name, Event $event) {
+      ->withArgs(static function (Event $event, string $event_name) {
         return $event_name === ContentHubLibraryEvents::GET_CDF_CLASS;
       });
 
@@ -1005,7 +1009,7 @@ class ContentHubClientTest extends TestCase {
     $this->ch_client
       ->shouldReceive('get')
       ->once()
-      ->with('settings/clients/' . $this->test_data['name'])
+      ->with('settings/client/name/' . $this->test_data['name'])
       ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response)));
 
     $api_response = $this->ch_client->getClientByName($this->test_data['name']);
@@ -1029,10 +1033,33 @@ class ContentHubClientTest extends TestCase {
     $this->ch_client
       ->shouldReceive('get')
       ->once()
-      ->with('settings/clients/' . $this->test_data['name'])
+      ->with('settings/client/name/' . $this->test_data['name'])
       ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_NOT_FOUND, [], json_encode($response)));
 
     $this->assertSame($this->ch_client->getClientByName($this->test_data['name']), $response);
+  }
+
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::getClientByUuid
+   * @throws \Exception
+   */
+  public function testGetClientByUuidReturnsClientInfoIfSuccessful(): void {
+    $response = [
+      'name' => 'client-2',
+      'uuid' => 'client-2-uuid',
+    ];
+    $api_response = $this->ch_client->getClientByUuid('client-2-uuid');
+    $this->assertSame($api_response, $response);
+  }
+
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::getClientByUuid
+   * @throws \Exception
+   */
+  public function testGetClientByUuidReturnsUnsuccessfulIfClientIsNotFound(): void {
+    $response = [];
+    $api_response = $this->ch_client->getClientByUuid('client-3-uuid');
+    $this->assertSame($api_response, $response);
   }
 
   /**
@@ -2186,7 +2213,7 @@ class ContentHubClientTest extends TestCase {
     $response->shouldReceive('getStatusCode')->andReturn($status);
     $response->shouldReceive('getHeaders')->andReturn($headers);
     $response->shouldReceive('getBody')
-      ->andReturn(\GuzzleHttp\Psr7\stream_for($body));
+      ->andReturn(Utils::streamFor($body));
 
     return $response;
   }
@@ -2304,7 +2331,7 @@ class ContentHubClientTest extends TestCase {
           'suppressed_until' => 'some-timestamp',
         ],
       ],
-    ]);
+    ])->byDefault();
 
     return $client;
   }
@@ -2699,6 +2726,86 @@ class ContentHubClientTest extends TestCase {
       ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response)));
 
     $this->assertSame($this->ch_client->queryEntities(), $response);
+  }
+
+  /**
+   * @covers ::getRemoteSettings
+   *
+   * @dataProvider isFeaturedDataProvider
+   */
+  public function testIsFeatured(array $remote_settings, bool $expectation): void {
+    $this->ch_client->shouldReceive('getRemoteSettings')
+      ->andReturn($remote_settings);
+    $this->assertTrue($this->ch_client->isFeatured() === $expectation);
+  }
+
+  /**
+   * Data provider for isFeatured test cases.
+   *
+   * @return array[]
+   *   Remote settings response and the expectation.
+   */
+  public function isFeaturedDataProvider(): array {
+    // A truncated response of /settings endpoint.
+    $response = [
+      'hostname' => 'some-host-name',
+      'api_key' => 'some-api-key',
+      'secret_key' => 'some-secret-key',
+      'shared_secret' => 'some-shared-secret',
+      'client_name' => 'client_name',
+    ];
+
+    return [
+      [
+        $response + ['featured' => TRUE],
+        TRUE,
+      ],
+      [
+        $response + ['featured' => FALSE],
+        FALSE,
+      ],
+      [
+        $response,
+        FALSE,
+      ],
+      [
+        [],
+        FALSE,
+      ],
+    ];
+  }
+
+  /**
+   * Tests cachable remote settings.
+   *
+   * @throws \Exception
+   */
+  public function testCacheRemoteSettings(): void {
+    $response1 = [
+      'remote' => 'data',
+      'settings' => 'test',
+    ];
+    $response2 = [
+      'remote' => 'different data',
+      'settings' => 'another test',
+    ];
+
+    $resp1 = new Response(SymfonyResponse::HTTP_OK, [], json_encode($response1));
+    $resp2 = new Response(SymfonyResponse::HTTP_OK, [], json_encode($response2));
+    $this->ch_client->shouldReceive('get')->andReturn($resp1, $resp2, $resp1);
+    $this->ch_client->shouldReceive('getRemoteSettings')->passthru();
+
+    $this->ch_client->cacheRemoteSettings(FALSE);
+    $actual = $this->ch_client->getRemoteSettings();
+    $this->assertSame($response1, $actual);
+    $actual = $this->ch_client->getRemoteSettings();
+    $this->assertSame($response2, $actual);
+
+    $actual = $this->ch_client->getRemoteSettings();
+    $this->ch_client->cacheRemoteSettings(TRUE);
+    $this->assertSame($response1, $actual);
+    $actual = $this->ch_client->getRemoteSettings();
+    $this->assertSame($response1, $actual);
   }
 
 }

@@ -70,7 +70,7 @@ class DefaultCDFTest extends TestCase {
 
     $getCDFTypeEventMock = $this->getMockBuilder(GetCDFTypeEvent::class)
       ->disableOriginalConstructor()
-      ->setMethods(['setObject', 'stopPropagation', 'getData'])
+      ->onlyMethods(['setObject', 'stopPropagation', 'getData'])
       ->getMock();
 
     $getCDFTypeEventMock->expects($this->once())
