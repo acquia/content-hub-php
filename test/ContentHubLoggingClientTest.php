@@ -6,6 +6,7 @@ use Acquia\ContentHubClient\ContentHubLoggingClient;
 use Acquia\ContentHubClient\Settings;
 use Acquia\Hmac\Guzzle\HmacAuthMiddleware;
 use GuzzleHttp\Psr7\Response;
+use GuzzleHttp\Psr7\Utils;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
@@ -224,7 +225,7 @@ class ContentHubLoggingClientTest extends TestCase {
 
     $response->getStatusCode()->willReturn($status);
     $response->getHeaders()->willReturn($headers);
-    $response->getBody()->willReturn(\GuzzleHttp\Psr7\stream_for($body));
+    $response->getBody()->willReturn(Utils::streamFor($body));
 
     return $response->reveal();
   }
