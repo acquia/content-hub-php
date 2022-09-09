@@ -1187,8 +1187,8 @@ class ContentHubClient extends Client {
       $response = $this->getErrorResponse($exception->getCode(), $exception->getMessage());
     }
     $response_body = json_decode($response->getBody(), TRUE);
-    $error_code = $response_body['error']['code'];
-    $error_message = $response_body['error']['message'];
+    $error_code = $response_body['error']['code'] ?? '';
+    $error_message = $response_body['error']['message'] ?? '';
 
     // Customize Error messages according to API Call.
     switch ($api_call) {
@@ -1209,14 +1209,14 @@ class ContentHubClient extends Client {
     }
 
     $reason = sprintf("Request ID: %s, Method: %s, Path: \"%s\", Status Code: %s, Reason: %s, Error Code: %s, Error Message: \"%s\". Error data: \"%s\"",
-      $response_body['request_id'],
+      $response_body['request_id'] ?? '',
       strtoupper($method),
       $api_call,
       $response->getStatusCode(),
       $response->getReasonPhrase(),
       $error_code,
       $error_message,
-      print_r($response_body['error']['data'] ?? $response_body['error'], TRUE)
+      print_r($response_body['error']['data'] ?? $response_body['error'] ?? '', TRUE)
     );
     $this->logger->log($log_level, $reason);
 
