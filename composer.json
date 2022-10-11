@@ -20,6 +20,8 @@
         "symfony/serializer": "^3.4 || ^4.3"
     },
     "require-dev": {
+        "drupal/coder": "dev-8.x-3.x",
+        "squizlabs/php_codesniffer": "^3.5",
         "phpunit/phpunit": "^8",
         "scrutinizer/ocular": "^1.8"
     },
