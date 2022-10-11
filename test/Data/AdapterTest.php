@@ -18,9 +18,9 @@ class AdapterTest extends TestCase
      *
      * @covers ::__construct
      *
-     * @expectedException \Acquia\ContentHubClient\Data\Exception\UnsupportedFormatException
-     * @expectedExceptionCode 0
-     * @expectedExceptionMessage The localized data schema is not yet supported: NonExistentSchema
+     * @expectException \Acquia\ContentHubClient\Data\Exception\UnsupportedFormatException
+     * @expectExceptionCode 0
+     * @expectExceptionMessage The localized data schema is not yet supported: NonExistentSchema
      */
     public function testTranslateAdapterSchemaUnsupported()
     {
@@ -50,9 +50,9 @@ class AdapterTest extends TestCase
      *
      * @covers ::translate
      *
-     * @expectedException \Acquia\ContentHubClient\Data\Exception\UnsupportedFormatException
-     * @expectedExceptionCode 0
-     * @expectedExceptionMessage This data formatting action is not yet supported: Standardizer\NonExistentSchema
+     * @expectException \Acquia\ContentHubClient\Data\Exception\UnsupportedFormatException
+     * @expectExceptionCode 0
+     * @expectExceptionMessage This data formatting action is not yet supported: Standardizer\NonExistentSchema
      */
     public function testTranslateDataSchemaUnsupported()
     {
