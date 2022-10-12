@@ -102,7 +102,7 @@ class Adapter
 
         // Detect Mixed.
         if (isset($config['dataType']) && $config['dataType'] === 'ListEntities') {
-            return 'Mixed';
+            return 'MixedStandardizer';
         }
 
         // Could not detect schema, "guess" current localized schema.

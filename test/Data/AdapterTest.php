@@ -17,16 +17,15 @@ class AdapterTest extends TestCase
      * Tests the constructor() method, adapter schema is unsupported.
      *
      * @covers ::__construct
-     *
-     * @expectedException \Acquia\ContentHubClient\Data\Exception\UnsupportedFormatException
-     * @expectedExceptionCode 0
-     * @expectedExceptionMessage The localized data schema is not yet supported: NonExistentSchema
      */
     public function testTranslateAdapterSchemaUnsupported()
     {
         $adapterConfig = [
             'schemaId' => 'NonExistentSchema',
         ];
+        $this->expectException('\Acquia\ContentHubClient\Data\Exception\UnsupportedFormatException');
+        $this->expectExceptionCode(0);
+        $this->expectExceptionMessage('The localized data schema is not yet supported: NonExistentSchema');
         new Adapter($adapterConfig);
     }
 
@@ -49,10 +48,6 @@ class AdapterTest extends TestCase
      * Tests translate() method, adapter schema is unsupported.
      *
      * @covers ::translate
-     *
-     * @expectedException \Acquia\ContentHubClient\Data\Exception\UnsupportedFormatException
-     * @expectedExceptionCode 0
-     * @expectedExceptionMessage This data formatting action is not yet supported: Standardizer\NonExistentSchema
      */
     public function testTranslateDataSchemaUnsupported()
     {
@@ -65,6 +60,9 @@ class AdapterTest extends TestCase
                 'schema' => 'NonExistentSchema',
             ],
         ];
+        $this->expectException('\Acquia\ContentHubClient\Data\Exception\UnsupportedFormatException');
+        $this->expectExceptionCode(0);
+        $this->expectExceptionMessage('This data formatting action is not yet supported: Standardizer\NonExistentSchema');
         $translatedData = $adapter->translate($data, []);
 
         $expected = ['should not reach here'];

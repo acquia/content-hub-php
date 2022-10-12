@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 class ContentHub extends Client
 {
     // Override VERSION inherited from GuzzleHttp::ClientInterface
-    const VERSION = '1.3.3';
+    const LIB_VERSION = '1.3.3';
     const LIBRARYNAME = 'AcquiaContentHubPHPLib';
     const FEATURE_DEPRECATED_RESPONSE = [
       'success' => FALSE,
@@ -49,7 +49,7 @@ class ContentHub extends Client
         }
 
         // Setting up the User Header string
-        $user_agent_string = $this::LIBRARYNAME . '/' . $this::VERSION . ' ' . \GuzzleHttp\default_user_agent();
+        $user_agent_string = $this::LIBRARYNAME . '/' . $this::LIB_VERSION . ' ' . \GuzzleHttp\default_user_agent();
         if (isset($config['client-user-agent'])) {
             $user_agent_string = $config['client-user-agent'] . ' ' . $user_agent_string;
         }
@@ -539,7 +539,7 @@ class ContentHub extends Client
 
   /**
    * Returns status information for all webhooks.
-   * 
+   *
    * @return array
    */
     public function getWebhookStatus()

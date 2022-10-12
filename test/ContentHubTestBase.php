@@ -310,7 +310,7 @@ abstract class ContentHubTestBase extends TestCase
         $client = $this->getClient($responses);
 
         // Create an Entity
-        $response = $client->createEntity($resource);
+        $response = $client->createEntities($resource);
         $body = json_decode((string) $response->getBody(), TRUE);
         $this->assertEquals($data, $body);
         $this->assertEquals($responses[0], $response);
