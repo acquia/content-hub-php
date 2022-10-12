@@ -7,7 +7,7 @@ use Acquia\ContentHubClient\Attribute;
 /**
  * Mixed data standardizer class.
  */
-class Mixed extends AbstractStandardizer
+class MixedStandardizer extends AbstractStandardizer
 {
     /**
      * Standardize "ListEntities".

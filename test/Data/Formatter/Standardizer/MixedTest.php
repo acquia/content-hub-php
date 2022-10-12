@@ -2,13 +2,13 @@
 
 namespace Acquia\ContentHubClient\test\Data\Formatter\Standardizer;
 
-use Acquia\ContentHubClient\Data\Formatter\Standardizer\Mixed as Standardizer;
+use Acquia\ContentHubClient\Data\Formatter\Standardizer\MixedStandardizer as Standardizer;
 use PHPUnit\Framework\TestCase;
 
 /**
  * Mixed data standardizer test.
  *
- * @coversDefaultClass Acquia\ContentHubClient\Data\Formatter\Standardizer\Mixed
+ * @coversDefaultClass \Acquia\ContentHubClient\Data\Formatter\Standardizer\MixedStandardizer
  * @group content-hub-php
  */
 class GeneralTest extends TestCase
