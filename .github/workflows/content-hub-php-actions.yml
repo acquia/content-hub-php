@@ -31,7 +31,7 @@ jobs:
           ./vendor/bin/phpcs -n --standard=Drupal,DrupalPractice src/ test/
 
       - name: Run PHPUnit
-        run: ./vendor/bin/phpunit
+        run: ./vendor/bin/phpunit test/
 
       - name: Run Coveralls
         run: ./vendor/bin/php-coveralls -v
