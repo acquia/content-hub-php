@@ -35,3 +35,6 @@ jobs:
 
       - name: Run Coveralls
         run: ./vendor/bin/php-coveralls -v
+
+      - name: Run phpstan
+        run: ./vendor/bin/phpstan analyse ./src ./test
