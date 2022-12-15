@@ -3,7 +3,11 @@ parameters:
   paths:
     - ./src
     - ./test
-  scanDirectories:
-    - vendor
+  featureToggles:
+    disableRuntimeReflectionProvider: true
   bootstrapFiles:
     - vendor/autoload.php
+  scanDirectories:
+    - ./vendor
+    - ./src
+    - ./test
