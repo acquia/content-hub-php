@@ -1,8 +1,9 @@
 parameters:
   level: 1
-  scanFiles:
-    - ./vendor/autoload.php
+  paths:
+    - ./src
+    - ./test
   scanDirectories:
-    - ./
+    - vendor
   bootstrapFiles:
-    - ./vendor/autoload.php
+    - vendor/autoload.php

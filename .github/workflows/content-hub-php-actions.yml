@@ -40,4 +40,5 @@ jobs:
         run: |
           pwd
           ls -ln
-          ./vendor/bin/phpstan analyse ./src ./test -c ./phpstan.neon
+          ./vendor/bin/phpstan -v
+          ./vendor/bin/phpstan analyse -c ./phpstan.neon
