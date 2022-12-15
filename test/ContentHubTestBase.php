@@ -8,8 +8,6 @@ use GuzzleHttp\Psr7\Response;
  * Class ContentHubTestBase.
  *
  * @package Acquia\ContentHubClient\test
- *
- * @phpstan-ignore-next-line
  */
 abstract class ContentHubTestBase extends \PHPUnit_Framework_TestCase {
 
