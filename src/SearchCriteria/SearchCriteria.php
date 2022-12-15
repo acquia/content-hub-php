@@ -161,6 +161,9 @@ class SearchCriteria implements \JsonSerializable {
 
   /**
    * {@inheritDoc}
+   *
+   * @return array
+   *   The serialized array.
    */
   public function jsonSerialize() {
     return [
