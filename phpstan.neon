@@ -1,4 +1,10 @@
 parameters:
   level: 1
+  scanFiles:
+    - ./vendor/autoload.php
   scanDirectories:
     - ./
+  autoload_files:
+    - ./vendor/autoload.php
+  autoload_directories:
+    - ./vendor
