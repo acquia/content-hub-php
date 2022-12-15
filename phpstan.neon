@@ -3,11 +3,8 @@ parameters:
   paths:
     - ./src
     - ./test
-  featureToggles:
-    disableRuntimeReflectionProvider: true
-  bootstrapFiles:
-    - vendor/autoload.php
-  scanDirectories:
-    - ./vendor
-    - ./src
-    - ./test
+  ignoreErrors:
+    - '#Call to an undefined method [a-zA-Z0-9\\_:\(\).]*#'
+    - '#Instantiated class [a-zA-Z0-9\\_:\(\).]* not found.#'
+    - '#Class [a-zA-Z0-9\\_:\(\).]* extends [a-zA-Z0-9\\_:@\(\).]*#'
+    - '#Unsafe usage of new static\(\).#'
