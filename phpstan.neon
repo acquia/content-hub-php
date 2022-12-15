@@ -8,7 +8,3 @@ parameters:
     - '#Instantiated class [a-zA-Z0-9\\_:\(\).]* not found.#'
     - '#Class [a-zA-Z0-9\\_:\(\).]* extends [a-zA-Z0-9\\_:@\(\).]*#'
     - '#Unsafe usage of new static\(\).#'
-  scanDirectories:
-    - vendor/**/
-  scanFiles:
-    - vendor/composer/ClassLoader.php
