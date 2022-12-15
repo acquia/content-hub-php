@@ -4,7 +4,5 @@ parameters:
     - ./vendor/autoload.php
   scanDirectories:
     - ./
-  autoload_files:
+  bootstrapFiles:
     - ./vendor/autoload.php
-  autoload_directories:
-    - ./vendor
