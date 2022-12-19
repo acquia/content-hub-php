@@ -236,13 +236,14 @@ class CDFObject implements CDFObjectInterface {
   /**
    * {@inheritdoc}
    *
-   * @return \Acquia\ContentHubClient\CDFAttribute|void
+   * @return null|\Acquia\ContentHubClient\CDFAttribute
    *   Attribute object.
    */
-  public function getAttribute($id) {
+  public function getAttribute($id): ?CDFAttribute {
     if (!empty($this->attributes[$id])) {
       return $this->attributes[$id];
     }
+    return NULL;
   }
 
   /**
