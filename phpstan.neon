@@ -1,0 +1,9 @@
+parameters:
+  level: 1
+  paths:
+    - ./src
+  ignoreErrors:
+    - '#Class [a-zA-Z0-9\\_:\(\).]* extends [a-zA-Z0-9\\_:@\(\).]*#'
+    - '#Unsafe usage of new static\(\).#'
+  excludePaths:
+  	- test/
