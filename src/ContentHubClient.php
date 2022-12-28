@@ -1257,7 +1257,7 @@ class ContentHubClient extends Client {
   }
 
   /**
-   * Initiates Scroll API request chain.
+   * Initiates Scroll API request chain for a particular filter.
    *
    * @param string $filter_uuid
    *   Filter uuid to execute by.
@@ -1274,6 +1274,29 @@ class ContentHubClient extends Client {
    */
   public function startScrollByFilter(string $filter_uuid, string $scroll_time_window, int $size): array {
     return self::getResponseJson($this->post("filters/$filter_uuid/scroll", [
+      'query' => [
+        'scroll' => $scroll_time_window,
+        'size' => $size,
+      ],
+    ]));
+  }
+
+  /**
+   * Initiates Scroll API request chain.
+   *
+   * @param string $scroll_time_window
+   *   How long the scroll cursor will be retained inside memory. Must be
+   *   suffixed with duration unit (m, s, ms etc.).
+   * @param int $size
+   *   Amount of entities to return.
+   *
+   * @return array
+   *   Response from scroll API.
+   *
+   * @throws \Exception
+   */
+  public function startScroll(string $scroll_time_window = '30m', int $size = 100): array {
+    return self::getResponseJson($this->post('scroll', [
       'query' => [
         'scroll' => $scroll_time_window,
         'size' => $size,
