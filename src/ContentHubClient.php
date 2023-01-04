@@ -956,12 +956,15 @@ class ContentHubClient extends Client {
    *
    * @param string $webhook_uuid
    *   Webhook uuid.
+   * @param string $suppress_duration
+   *   Duration for which webhook should be suppressed. e.g. 24h.
    *
    * @return mixed
    *   Response body of backend call.
    */
-  public function suppressWebhook(string $webhook_uuid) {
-    return self::getResponseJson($this->put("webhook/$webhook_uuid/suppress"));
+  public function suppressWebhook(string $webhook_uuid, string $suppress_duration = '') {
+    $options['body'] = json_encode(['suppress_by' => $suppress_duration]);
+    return self::getResponseJson($this->put("webhook/$webhook_uuid/suppress", $options));
   }
 
   /**
@@ -974,7 +977,7 @@ class ContentHubClient extends Client {
    *   Response body of backend call.
    */
   public function unSuppressWebhook(string $webhook_uuid) {
-    return self::getResponseJson($this->put("settings/webhooks/$webhook_uuid/enable"));
+    return self::getResponseJson($this->delete("webhook/$webhook_uuid/suppress"));
   }
 
   /**
@@ -1183,24 +1186,6 @@ class ContentHubClient extends Client {
     $response = $this->delete("settings/webhooks/$webhook_id/filters", $options);
 
     return self::getResponseJson($response);
-  }
-
-  /**
-   * Reoriginates entity uuid with new target origin.
-   *
-   * @param string $entity_uuid
-   *   Entity uuid.
-   * @param string $target
-   *   Origin of target site.
-   *
-   * @return mixed
-   *   API response.
-   *
-   * @throws \Exception
-   */
-  public function reoriginateEntity(string $entity_uuid, string $target) {
-    $options['body'] = json_encode(['target' => $target]);
-    return self::getResponseJson($this->post("entities/$entity_uuid/reoriginate", $options));
   }
 
   /**

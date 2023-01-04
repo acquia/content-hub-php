@@ -1509,7 +1509,7 @@ class ContentHubClientTest extends TestCase {
     ];
 
     $this->ch_client
-      ->shouldReceive('put')
+      ->shouldReceive('delete')
       ->once()
       ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response)));
 
