@@ -2635,12 +2635,14 @@ class ContentHubClientTest extends TestCase {
   public function testStartScroll(): void {
     $size = 100;
     $scroll_time_window = '10m';
+    $query = [];
 
     $request_parameters = [
       'query' => [
         'scroll' => $scroll_time_window,
         'size' => $size,
       ],
+      'body' => json_encode($query),
     ];
 
     $response = [

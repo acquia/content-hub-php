@@ -476,6 +476,22 @@ class ContentHubClient extends Client {
   }
 
   /**
+   * Deletes multiple entity uuids.
+   *
+   * @param array $uuids
+   *   Uuids to delete.
+   *
+   * @return mixed
+   *   Response.
+   *
+   * @throws \Exception
+   */
+  public function deleteEntities(array $uuids) {
+    $options['body'] = json_encode($uuids);
+    return self::getResponseJson($this->delete("entities", $options));
+  }
+
+  /**
    * Purges all entities from the Content Hub.
    *
    * This method should be used carefully as it deletes all the entities for
@@ -1170,6 +1186,24 @@ class ContentHubClient extends Client {
   }
 
   /**
+   * Reoriginates entity uuid with new target origin.
+   *
+   * @param string $entity_uuid
+   *   Entity uuid.
+   * @param string $target
+   *   Origin of target site.
+   *
+   * @return mixed
+   *   API response.
+   *
+   * @throws \Exception
+   */
+  public function reoriginateEntity(string $entity_uuid, string $target) {
+    $options['body'] = json_encode(['target' => $target]);
+    return self::getResponseJson($this->post("entities/$entity_uuid/reoriginate", $options));
+  }
+
+  /**
    * Appends search criteria header.
    *
    * @param array $args
@@ -1289,19 +1323,21 @@ class ContentHubClient extends Client {
    *   suffixed with duration unit (m, s, ms etc.).
    * @param int $size
    *   Amount of entities to return.
+   * @param array $query
+   *   Search query.
    *
    * @return array
    *   Response from scroll API.
    *
    * @throws \Exception
    */
-  public function startScroll(string $scroll_time_window = '30m', int $size = 100): array {
-    return self::getResponseJson($this->post('scroll', [
-      'query' => [
-        'scroll' => $scroll_time_window,
-        'size' => $size,
-      ],
-    ]));
+  public function startScroll(string $scroll_time_window = '30m', int $size = 100, array $query = []): array {
+    $options['body'] = json_encode($query);
+    $options['query'] = [
+      'scroll' => $scroll_time_window,
+      'size' => $size,
+    ];
+    return self::getResponseJson($this->post('scroll', $options));
   }
 
   /**
