@@ -476,6 +476,22 @@ class ContentHubClient extends Client {
   }
 
   /**
+   * Deletes multiple entity uuids.
+   *
+   * @param array $uuids
+   *   Uuids to delete.
+   *
+   * @return mixed
+   *   Response.
+   *
+   * @throws \Exception
+   */
+  public function deleteEntities(array $uuids) {
+    $options['body'] = json_encode($uuids);
+    return self::getResponseJson($this->delete("entities", $options));
+  }
+
+  /**
    * Purges all entities from the Content Hub.
    *
    * This method should be used carefully as it deletes all the entities for
@@ -940,12 +956,15 @@ class ContentHubClient extends Client {
    *
    * @param string $webhook_uuid
    *   Webhook uuid.
+   * @param string $suppress_duration
+   *   Duration for which webhook should be suppressed. e.g. 24h.
    *
    * @return mixed
    *   Response body of backend call.
    */
-  public function suppressWebhook(string $webhook_uuid) {
-    return self::getResponseJson($this->put("webhook/$webhook_uuid/suppress"));
+  public function suppressWebhook(string $webhook_uuid, string $suppress_duration = '') {
+    $options['body'] = json_encode(['suppress_by' => $suppress_duration]);
+    return self::getResponseJson($this->put("webhook/$webhook_uuid/suppress", $options));
   }
 
   /**
@@ -958,7 +977,7 @@ class ContentHubClient extends Client {
    *   Response body of backend call.
    */
   public function unSuppressWebhook(string $webhook_uuid) {
-    return self::getResponseJson($this->put("settings/webhooks/$webhook_uuid/enable"));
+    return self::getResponseJson($this->delete("webhook/$webhook_uuid/suppress"));
   }
 
   /**
@@ -1257,7 +1276,7 @@ class ContentHubClient extends Client {
   }
 
   /**
-   * Initiates Scroll API request chain.
+   * Initiates Scroll API request chain for a particular filter.
    *
    * @param string $filter_uuid
    *   Filter uuid to execute by.
@@ -1279,6 +1298,31 @@ class ContentHubClient extends Client {
         'size' => $size,
       ],
     ]));
+  }
+
+  /**
+   * Initiates Scroll API request chain.
+   *
+   * @param string $scroll_time_window
+   *   How long the scroll cursor will be retained inside memory. Must be
+   *   suffixed with duration unit (m, s, ms etc.).
+   * @param int $size
+   *   Amount of entities to return.
+   * @param array $query
+   *   Search query.
+   *
+   * @return array
+   *   Response from scroll API.
+   *
+   * @throws \Exception
+   */
+  public function startScroll(string $scroll_time_window = '30m', int $size = 100, array $query = []): array {
+    $options['body'] = json_encode($query);
+    $options['query'] = [
+      'scroll' => $scroll_time_window,
+      'size' => $size,
+    ];
+    return self::getResponseJson($this->post('scroll', $options));
   }
 
   /**
