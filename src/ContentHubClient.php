@@ -1419,21 +1419,21 @@ class ContentHubClient implements ClientInterface {
   /**
    * {@inheritdoc}
    */
-  public function send(RequestInterface $request, array $options = []) {
+  public function send(RequestInterface $request, array $options = []): ResponseInterface {
     return $this->httpClient->send($request, $options);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function sendAsync(RequestInterface $request, array $options = []) {
+  public function sendAsync(RequestInterface $request, array $options = []): PromiseInterface {
     return $this->httpClient->sendAsync($request, $options);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function request($method, $uri, array $options = []) {
+  public function request($method, $uri, array $options = []): ResponseInterface {
     return $this->httpClient->request($method, $uri, $options);
   }
 
