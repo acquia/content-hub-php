@@ -4,14 +4,29 @@ namespace Acquia\ContentHubClient;
 
 use Acquia\ContentHubClient\Guzzle\Middleware\RequestResponseHandler;
 use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Response;
+use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\UriInterface;
 use Psr\Log\LogLevel;
 
 /**
  * Common trait for CH Client and CH Logging Client.
+ *
+ * @method ResponseInterface get(string|UriInterface $uri, array $options = [])
+ * @method ResponseInterface put(string|UriInterface $uri, array $options = [])
+ * @method ResponseInterface post(string|UriInterface $uri, array $options = [])
+ * @method ResponseInterface delete(string|UriInterface $uri, array $options = [])
  */
 trait ContentHubClientTrait {
+
+  /**
+   * GuzzleHttp client.
+   *
+   * @var \GuzzleHttp\ClientInterface
+   */
+  protected $httpClient;
 
   /**
    * Attaches RequestResponseHandler to handlers stack.
@@ -233,6 +248,41 @@ trait ContentHubClientTrait {
     ]);
 
     return $client->get('ping');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function send(RequestInterface $request, array $options = []): ResponseInterface {
+    return $this->httpClient->send($request, $options);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function sendAsync(RequestInterface $request, array $options = []): PromiseInterface {
+    return $this->httpClient->sendAsync($request, $options);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function request($method, $uri, array $options = []): ResponseInterface {
+    return $this->httpClient->request($method, $uri, $options);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function requestAsync($method, $uri, array $options = []): PromiseInterface {
+    return $this->httpClient->requestAsync($method, $uri, $options);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getConfig($option = NULL) {
+    return $this->httpClient->getConfig($option);
   }
 
 }

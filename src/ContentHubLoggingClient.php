@@ -3,7 +3,7 @@
 namespace Acquia\ContentHubClient;
 
 use Acquia\Hmac\Guzzle\HmacAuthMiddleware;
-use GuzzleHttp\Client;
+use GuzzleHttp\ClientInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -12,7 +12,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  *
  * @package Acquia\ContentHubClient
  */
-class ContentHubLoggingClient extends Client {
+class ContentHubLoggingClient implements ClientInterface {
 
   use ContentHubClientTrait;
 
@@ -82,7 +82,7 @@ class ContentHubLoggingClient extends Client {
     $config['handler']->push($middleware);
     $this->addRequestResponseHandler($config);
 
-    parent::__construct($config);
+    $this->httpClient = ObjectFactory::getGuzzleClient($config);
   }
 
   /**
@@ -106,7 +106,7 @@ class ContentHubLoggingClient extends Client {
       }
       $args[0] = self::makePath(...$parts);
 
-      return parent::__call($method, $args);
+      return $this->httpClient->__call($method, $args);
 
     }
     catch (\Exception $e) {

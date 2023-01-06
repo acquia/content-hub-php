@@ -8,6 +8,7 @@ use Acquia\Hmac\Guzzle\HmacAuthMiddleware;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\Utils;
 use PHPUnit\Framework\TestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -22,6 +23,8 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
  * @preserveGlobalState disabled
  */
 class ContentHubLoggingClientTest extends TestCase {
+
+  use ProphecyTrait;
 
   /**
    * CH client.

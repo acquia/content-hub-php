@@ -10,11 +10,8 @@ use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\RequestOptions;
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\UriInterface;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
@@ -22,11 +19,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Class ContentHubClient.
- *
- * @method ResponseInterface get(string|UriInterface $uri, array $options = [])
- * @method ResponseInterface put(string|UriInterface $uri, array $options = [])
- * @method ResponseInterface post(string|UriInterface $uri, array $options = [])
- * @method ResponseInterface delete(string|UriInterface $uri, array $options = [])
  *
  * @package Acquia\ContentHubClient
  */
@@ -79,13 +71,6 @@ class ContentHubClient implements ClientInterface {
    *   True if it should return cached.
    */
   protected $shouldReturnCachedRemoteSettings = FALSE;
-
-  /**
-   * GuzzleHttp client.
-   *
-   * @var \GuzzleHttp\Client
-   */
-  protected $httpClient;
 
   // phpcs:disable
   /**
@@ -1414,41 +1399,6 @@ class ContentHubClient implements ClientInterface {
   public function isFeatured(): bool {
     $remote = $this->getRemoteSettings();
     return $remote['featured'] ?? FALSE;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function send(RequestInterface $request, array $options = []): ResponseInterface {
-    return $this->httpClient->send($request, $options);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function sendAsync(RequestInterface $request, array $options = []): PromiseInterface {
-    return $this->httpClient->sendAsync($request, $options);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function request($method, $uri, array $options = []): ResponseInterface {
-    return $this->httpClient->request($method, $uri, $options);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function requestAsync($method, $uri, array $options = []): PromiseInterface {
-    return $this->httpClient->requestAsync($method, $uri, $options);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getConfig($option = NULL) {
-    return $this->httpClient->getConfig($option);
   }
 
 }
