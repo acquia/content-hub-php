@@ -1295,7 +1295,7 @@ class ContentHubClient implements ClientInterface {
    *
    * @param string $filter_uuid
    *   Filter uuid to execute by.
-   * @param string $scroll_time_window
+   * @param string|int $scroll_time_window
    *   How long the scroll cursor will be retained inside memory. Must be
    *   suffixed with duration unit (m, s, ms etc.).
    * @param int $size
@@ -1306,7 +1306,7 @@ class ContentHubClient implements ClientInterface {
    *
    * @throws \Exception
    */
-  public function startScrollByFilter(string $filter_uuid, string $scroll_time_window, int $size): array {
+  public function startScrollByFilter(string $filter_uuid, $scroll_time_window, int $size): array {
     return self::getResponseJson($this->post("filters/$filter_uuid/scroll", [
       'query' => [
         'scroll' => $scroll_time_window,
@@ -1347,7 +1347,7 @@ class ContentHubClient implements ClientInterface {
    *
    * @param string $scroll_id
    *   Scroll id.
-   * @param string $scroll_time_window
+   * @param string|int $scroll_time_window
    *   How long the scroll cursor will be retained inside memory.
    *
    * @return array
@@ -1355,7 +1355,7 @@ class ContentHubClient implements ClientInterface {
    *
    * @throws \Exception
    */
-  public function continueScroll(string $scroll_id, string $scroll_time_window): array {
+  public function continueScroll(string $scroll_id, $scroll_time_window): array {
     $options = [
       'body' => json_encode([
         'scroll_id' => $scroll_id,
