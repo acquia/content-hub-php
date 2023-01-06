@@ -7,6 +7,7 @@ use Acquia\ContentHubClient\Event\GetCDFTypeEvent;
 use Acquia\Hmac\Guzzle\HmacAuthMiddleware;
 use Acquia\Hmac\Key;
 use GuzzleHttp\Client;
+use GuzzleHttp\ClientInterface;
 use GuzzleHttp\HandlerStack;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -25,10 +26,10 @@ class ObjectFactory {
    * @param array $config
    *   Initial data.
    *
-   * @return \GuzzleHttp\Client
+   * @return \GuzzleHttp\ClientInterface
    *   GuzzleClient instance.
    */
-  public static function getGuzzleClient(array $config): Client {
+  public static function getGuzzleClient(array $config): ClientInterface {
     return new Client($config);
   }
 

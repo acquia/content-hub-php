@@ -6,12 +6,15 @@ use Acquia\ContentHubClient\CDF\CDFObject;
 use Acquia\ContentHubClient\SearchCriteria\SearchCriteria;
 use Acquia\ContentHubClient\SearchCriteria\SearchCriteriaBuilder;
 use Acquia\Hmac\Guzzle\HmacAuthMiddleware;
-use GuzzleHttp\Client;
+use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\RequestOptions;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\UriInterface;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
@@ -20,9 +23,14 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 /**
  * Class ContentHubClient.
  *
+ * @method ResponseInterface get(string|UriInterface $uri, array $options = [])
+ * @method ResponseInterface put(string|UriInterface $uri, array $options = [])
+ * @method ResponseInterface post(string|UriInterface $uri, array $options = [])
+ * @method ResponseInterface delete(string|UriInterface $uri, array $options = [])
+ *
  * @package Acquia\ContentHubClient
  */
-class ContentHubClient extends Client {
+class ContentHubClient implements ClientInterface {
 
   use ContentHubClientTrait;
 
@@ -72,6 +80,13 @@ class ContentHubClient extends Client {
    */
   protected $shouldReturnCachedRemoteSettings = FALSE;
 
+  /**
+   * GuzzleHttp client.
+   *
+   * @var \GuzzleHttp\Client
+   */
+  protected $httpClient;
+
   // phpcs:disable
   /**
    * {@inheritdoc}
@@ -120,7 +135,7 @@ class ContentHubClient extends Client {
     $config['handler']->push($middleware);
     $this->addRequestResponseHandler($config);
 
-    parent::__construct($config);
+    $this->httpClient = ObjectFactory::getGuzzleClient($config);
   }
   // phpcs:enable
 
@@ -147,7 +162,7 @@ class ContentHubClient extends Client {
 
       $args = $this->addSearchCriteriaHeader($args);
 
-      return parent::__call($method, $args);
+      return $this->httpClient->__call($method, $args);
 
     }
     catch (\Exception $e) {
@@ -1399,6 +1414,41 @@ class ContentHubClient extends Client {
   public function isFeatured(): bool {
     $remote = $this->getRemoteSettings();
     return $remote['featured'] ?? FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function send(RequestInterface $request, array $options = []) {
+    return $this->httpClient->send($request, $options);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function sendAsync(RequestInterface $request, array $options = []) {
+    return $this->httpClient->sendAsync($request, $options);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function request($method, $uri, array $options = []) {
+    return $this->httpClient->request($method, $uri, $options);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function requestAsync($method, $uri, array $options = []): PromiseInterface {
+    return $this->httpClient->requestAsync($method, $uri, $options);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getConfig($option = NULL) {
+    return $this->httpClient->getConfig($option);
   }
 
 }
