@@ -739,6 +739,25 @@ class ContentHubClientTest extends TestCase {
   }
 
   /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::deleteEntities
+   */
+  public function testDeleteEntities(): void {
+    $uuids = [$this->test_data['uuid']];
+    $response_body = [
+      'success' => TRUE,
+      'request_id' => 'some-uuid',
+    ];
+
+    $this->ch_client
+      ->shouldReceive('delete')
+      ->once()
+      ->with('entities', ['body' => json_encode($uuids)])
+      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_ACCEPTED, [], json_encode($response_body)));
+
+    $this->assertSame($response_body, $this->ch_client->deleteEntities($uuids));
+  }
+
+  /**
    * @covers \Acquia\ContentHubClient\ContentHubClient::deleteInterest
    */
   public function testDeleteInterestReturnsHTTPAcceptedIfAllGoesWell(): void { // phpcs:ignore

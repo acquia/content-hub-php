@@ -958,6 +958,7 @@ class ContentHubClient extends Client {
    *   Webhook uuid.
    * @param string $suppress_duration
    *   Duration for which webhook should be suppressed. e.g. 24h.
+   *   If not passed, webhook will be indefinitely suppressed.
    *
    * @return mixed
    *   Response body of backend call.
