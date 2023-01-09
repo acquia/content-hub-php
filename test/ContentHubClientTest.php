@@ -739,6 +739,46 @@ class ContentHubClientTest extends TestCase {
   }
 
   /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::reoriginateEntity
+   */
+  public function testReoriginateEntity(): void {
+    $uuid = '0e714009-72f9-4016-8f26-5fae32e6abb8';
+    $target = 'client-2-uuid';
+    $response_body = [
+      'success' => TRUE,
+      'request_id' => 'some-uuid',
+    ];
+
+    $this->ch_client
+      ->shouldReceive('post')
+      ->once()
+      ->with("entities/$uuid/reoriginate", ['body' => json_encode(['target' => $target])])
+      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_ACCEPTED, [], json_encode($response_body)));
+    $this->assertSame($response_body, $this->ch_client->reoriginateEntity($uuid, $target));
+  }
+
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::reoriginateAllEntities
+   */
+  public function testReoriginateAllEntities(): void {
+    $source = 'client-1-uuid';
+    $target = 'client-2-uuid';
+    $response_body = [
+      'success' => TRUE,
+      'request_id' => 'some-uuid',
+    ];
+
+    $this->ch_client
+      ->shouldReceive('post')
+      ->once()
+      ->with('entities/reoriginate', [
+        'body' => json_encode(['origin' => $source, 'target' => $target]),
+      ])
+      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_ACCEPTED, [], json_encode($response_body)));
+    $this->assertSame($response_body, $this->ch_client->reoriginateAllEntities($source, $target));
+  }
+
+  /**
    * @covers \Acquia\ContentHubClient\ContentHubClient::deleteInterest
    */
   public function testDeleteInterestReturnsHTTPAcceptedIfAllGoesWell(): void { // phpcs:ignore

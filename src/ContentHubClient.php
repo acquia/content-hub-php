@@ -968,6 +968,54 @@ class ContentHubClient extends Client {
   }
 
   /**
+   * Reoriginates entity uuid with new target origin.
+   *
+   * @param string $entity_uuid
+   *   Entity uuid.
+   * @param string $target
+   *   Origin of target site.
+   *
+   * @return mixed
+   *   API response.
+   *
+   * @throws \Exception
+   */
+  public function reoriginateEntity(string $entity_uuid, string $target) {
+    $client = $this->getClientByUuid($target);
+    if (empty($client)) {
+      throw new \RuntimeException(sprintf('%s target client is not registered, please check target origin uuid.', $target));
+    }
+    $options['body'] = json_encode(['target' => $target]);
+    return self::getResponseJson($this->post("entities/$entity_uuid/reoriginate", $options));
+  }
+
+  /**
+   * Reoriginate all entities from source origin to target origin.
+   *
+   * @param string $source
+   *   Source origin uuid.
+   * @param string $target
+   *   Target origin uuid.
+   *
+   * @return mixed
+   *   API response.
+   *
+   * @throws \Exception
+   */
+  public function reoriginateAllEntities(string $source, string $target) {
+    $clients = array_column($this->getClients(), 'uuid');
+    if (!in_array($source, $clients, TRUE)) {
+      throw new \RuntimeException(sprintf('%s source client is not registered, first register it and then try reorigination to target.', $source));
+    }
+
+    if (!in_array($target, $clients, TRUE)) {
+      throw new \RuntimeException(sprintf('%s target client is not registered, please check target origin uuid.', $target));
+    }
+    $options['body'] = json_encode(['origin' => $source, 'target' => $target]);
+    return self::getResponseJson($this->post('entities/reoriginate', $options));
+  }
+
+  /**
    * Remove suppression from webhook.
    *
    * @param string $webhook_uuid
