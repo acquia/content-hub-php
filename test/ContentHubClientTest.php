@@ -1484,7 +1484,29 @@ class ContentHubClientTest extends TestCase {
   /**
    * @covers \Acquia\ContentHubClient\ContentHubClient::suppressWebhook
    */
-  public function testSuppressWebhook() {
+  public function testSuppressWebhook(): void {
+    $webhook_uuid = 'some_uuid';
+    $suppress_duration = '24h';
+    $response = [
+      'success' => TRUE,
+      'request_id' => 'some-request-uuid',
+    ];
+
+    $this->ch_client
+      ->shouldReceive('put')
+      ->once()
+      ->with("webhook/$webhook_uuid/suppress", ['body' => json_encode(['suppress_by' => $suppress_duration])])
+      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response)));
+
+    $this->assertSame($this->ch_client->suppressWebhook($webhook_uuid, $suppress_duration), $response);
+  }
+
+  /**
+   * Asserts that webhook is indefinitely suppressed.
+   *
+   * @covers \Acquia\ContentHubClient\ContentHubClient::suppressWebhook
+   */
+  public function testIndefiniteWebhookSuppression(): void {
     $webhook_uuid = 'some_uuid';
     $response = [
       'success' => TRUE,
@@ -1494,6 +1516,7 @@ class ContentHubClientTest extends TestCase {
     $this->ch_client
       ->shouldReceive('put')
       ->once()
+      ->with("webhook/$webhook_uuid/suppress", ['body' => json_encode(['suppress_by' => ''])])
       ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response)));
 
     $this->assertSame($this->ch_client->suppressWebhook($webhook_uuid), $response);
