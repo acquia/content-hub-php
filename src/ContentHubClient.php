@@ -6,7 +6,7 @@ use Acquia\ContentHubClient\CDF\CDFObject;
 use Acquia\ContentHubClient\SearchCriteria\SearchCriteria;
 use Acquia\ContentHubClient\SearchCriteria\SearchCriteriaBuilder;
 use Acquia\Hmac\Guzzle\HmacAuthMiddleware;
-use GuzzleHttp\Client;
+use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\RequestException;
@@ -22,7 +22,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  *
  * @package Acquia\ContentHubClient
  */
-class ContentHubClient extends Client {
+class ContentHubClient implements ClientInterface {
 
   use ContentHubClientTrait;
 
@@ -120,7 +120,7 @@ class ContentHubClient extends Client {
     $config['handler']->push($middleware);
     $this->addRequestResponseHandler($config);
 
-    parent::__construct($config);
+    $this->httpClient = ObjectFactory::getGuzzleClient($config);
   }
   // phpcs:enable
 
@@ -147,7 +147,7 @@ class ContentHubClient extends Client {
 
       $args = $this->addSearchCriteriaHeader($args);
 
-      return parent::__call($method, $args);
+      return $this->httpClient->__call($method, $args);
 
     }
     catch (\Exception $e) {
@@ -1280,7 +1280,7 @@ class ContentHubClient extends Client {
    *
    * @param string $filter_uuid
    *   Filter uuid to execute by.
-   * @param string $scroll_time_window
+   * @param string|int $scroll_time_window
    *   How long the scroll cursor will be retained inside memory. Must be
    *   suffixed with duration unit (m, s, ms etc.).
    * @param int $size
@@ -1291,7 +1291,7 @@ class ContentHubClient extends Client {
    *
    * @throws \Exception
    */
-  public function startScrollByFilter(string $filter_uuid, string $scroll_time_window, int $size): array {
+  public function startScrollByFilter(string $filter_uuid, $scroll_time_window, int $size): array {
     return self::getResponseJson($this->post("filters/$filter_uuid/scroll", [
       'query' => [
         'scroll' => $scroll_time_window,
@@ -1332,7 +1332,7 @@ class ContentHubClient extends Client {
    *
    * @param string $scroll_id
    *   Scroll id.
-   * @param string $scroll_time_window
+   * @param string|int $scroll_time_window
    *   How long the scroll cursor will be retained inside memory.
    *
    * @return array
@@ -1340,7 +1340,7 @@ class ContentHubClient extends Client {
    *
    * @throws \Exception
    */
-  public function continueScroll(string $scroll_id, string $scroll_time_window): array {
+  public function continueScroll(string $scroll_id, $scroll_time_window): array {
     $options = [
       'body' => json_encode([
         'scroll_id' => $scroll_id,

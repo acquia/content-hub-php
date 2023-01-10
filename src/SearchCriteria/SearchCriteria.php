@@ -161,8 +161,11 @@ class SearchCriteria implements \JsonSerializable {
 
   /**
    * {@inheritDoc}
+   *
+   * @return array
+   *   The serialized array.
    */
-  public function jsonSerialize() {
+  public function jsonSerialize(): array {
     return [
       'search_term' => $this->getSearchTerm(),
       'type' => $this->getEntityType(),
