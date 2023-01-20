@@ -1420,6 +1420,31 @@ class ContentHubClient extends Client {
   /**
    * Initiates Scroll API request chain.
    *
+   * @param string $scroll_time_window
+   *   How long the scroll cursor will be retained inside memory. Must be
+   *   suffixed with duration unit (m, s, ms etc.).
+   * @param int $size
+   *   Amount of entities to return.
+   * @param array $query
+   *   Search query.
+   *
+   * @return array
+   *   Response from scroll API.
+   *
+   * @throws \Exception
+   */
+  public function startScroll(string $scroll_time_window = '30m', int $size = 100, array $query = []): array {
+    $options['body'] = json_encode($query);
+    $options['query'] = [
+      'scroll' => $scroll_time_window,
+      'size' => $size,
+    ];
+    return self::getResponseJson($this->post('scroll', $options));
+  }
+
+  /**
+   * Initiates Scroll API request chain.
+   *
    * @param string $filter_uuid
    *   Filter uuid to execute by.
    * @param string|int $scroll_time_window
