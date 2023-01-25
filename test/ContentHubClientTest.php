@@ -2472,6 +2472,39 @@ class ContentHubClientTest extends TestCase {
   }
 
   /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::startScroll
+   *
+   * @throws \Exception
+   */
+  public function testStartScroll(): void {
+    $size = 100;
+    $scroll_time_window = '10m';
+    $query = [];
+
+    $request_parameters = [
+      'query' => [
+        'scroll' => $scroll_time_window,
+        'size' => $size,
+      ],
+      'body' => json_encode($query),
+    ];
+
+    $response = [
+      'uuid' => 'some-uuid',
+      'request_id' => 'some-request-id',
+      'success' => TRUE,
+    ];
+
+    $this->ch_client
+      ->shouldReceive('post')
+      ->once()
+      ->with("scroll", $request_parameters)
+      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response)));
+
+    $this->assertSame($this->ch_client->startScroll($scroll_time_window, $size), $response);
+  }
+
+  /**
    * @covers \Acquia\ContentHubClient\ContentHubClient::continueScroll
    *
    * @throws \Exception
