@@ -12,7 +12,7 @@ final class ContentHubDescriptor {
   /**
    * Library version for client.
    */
-  public const LIB_VERSION = '2.0.0';
+  public const LIB_VERSION = '3.x-dev';
 
   /**
    * Library name for client.
