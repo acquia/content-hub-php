@@ -7,9 +7,12 @@ use Acquia\ContentHubClient\SearchCriteria\SearchCriteria;
 use Acquia\ContentHubClient\SearchCriteria\SearchCriteriaBuilder;
 use Acquia\Hmac\Guzzle\HmacAuthMiddleware;
 use GuzzleHttp\ClientInterface;
+use GuzzleHttp\ClientTrait;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\InvalidArgumentException;
 use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\RequestOptions;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
@@ -24,6 +27,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class ContentHubClient implements ClientInterface {
 
+  use ClientTrait;
   use ContentHubClientTrait;
 
   const OPTION_NAME_LANGUAGES = 'client-languages';
@@ -147,8 +151,16 @@ class ContentHubClient implements ClientInterface {
 
       $args = $this->addSearchCriteriaHeader($args);
 
-      return $this->httpClient->__call($method, $args);
+      if (\count($args) < 1) {
+        throw new InvalidArgumentException('Magic request methods require a URI and optional options array');
+      }
 
+      $uri = $args[0];
+      $opts = $args[1] ?? [];
+
+      return \substr($method, -5) === 'Async'
+        ? $this->requestAsync(\substr($method, 0, -5), $uri, $opts)
+        : $this->request($method, $uri, $opts);
     }
     catch (\Exception $e) {
       return $this->getExceptionResponse($method, $args, $e);
@@ -1448,6 +1460,39 @@ class ContentHubClient implements ClientInterface {
   public function isFeatured(): bool {
     $remote = $this->getRemoteSettings();
     return $remote['featured'] ?? FALSE;
+  }
+
+  /**
+   * Get a client configuration option.
+   *
+   * These options include default request options of the client, a "handler"
+   * (if utilized by the concrete client), and a "base_uri" if utilized by
+   * the concrete client.
+   *
+   * @param string|null $option
+   *   The config option to retrieve.
+   *
+   * @return mixed
+   *   The client configurations.
+   */
+  public function getConfig(?string $option = NULL) {
+    return $option === NULL
+      ? $this->config
+      : ($this->config[$option] ?? NULL);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function request($method, $uri, array $options = []): ResponseInterface {
+    return $this->httpClient->request($method, $uri, $options);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function requestAsync($method, $uri, array $options = []): PromiseInterface {
+    return $this->httpClient->requestAsync($method, $uri, $options);
   }
 
 }
