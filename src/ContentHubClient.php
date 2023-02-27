@@ -12,7 +12,6 @@ use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\InvalidArgumentException;
 use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\RequestOptions;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
@@ -125,6 +124,7 @@ class ContentHubClient implements ClientInterface {
     $this->addRequestResponseHandler($config);
 
     $this->httpClient = ObjectFactory::getGuzzleClient($config);
+    $this->setConfigs($config);
   }
   // phpcs:enable
 
@@ -1460,39 +1460,6 @@ class ContentHubClient implements ClientInterface {
   public function isFeatured(): bool {
     $remote = $this->getRemoteSettings();
     return $remote['featured'] ?? FALSE;
-  }
-
-  /**
-   * Get a client configuration option.
-   *
-   * These options include default request options of the client, a "handler"
-   * (if utilized by the concrete client), and a "base_uri" if utilized by
-   * the concrete client.
-   *
-   * @param string|null $option
-   *   The config option to retrieve.
-   *
-   * @return mixed
-   *   The client configurations.
-   */
-  public function getConfig(?string $option = NULL) {
-    return $option === NULL
-      ? $this->config
-      : ($this->config[$option] ?? NULL);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function request($method, $uri, array $options = []): ResponseInterface {
-    return $this->httpClient->request($method, $uri, $options);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function requestAsync($method, $uri, array $options = []): PromiseInterface {
-    return $this->httpClient->requestAsync($method, $uri, $options);
   }
 
 }

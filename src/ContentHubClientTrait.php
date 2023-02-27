@@ -8,7 +8,6 @@ use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\UriInterface;
 use Psr\Log\LogLevel;
 
 /**
@@ -22,6 +21,13 @@ trait ContentHubClientTrait {
    * @var \GuzzleHttp\ClientInterface
    */
   protected $httpClient;
+
+  /**
+   * Custom configurations.
+   *
+   * @var array
+   */
+  protected $config;
 
   /**
    * Attaches RequestResponseHandler to handlers stack.
@@ -257,6 +263,45 @@ trait ContentHubClientTrait {
    */
   public function sendAsync(RequestInterface $request, array $options = []): PromiseInterface {
     return $this->httpClient->sendAsync($request, $options);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function request($method, $uri, array $options = []): ResponseInterface {
+    return $this->httpClient->request($method, $uri, $options);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function requestAsync($method, $uri, array $options = []): PromiseInterface {
+    return $this->httpClient->requestAsync($method, $uri, $options);
+  }
+
+  /**
+   * Get a client configuration option.
+   *
+   * @param string|null $option
+   *   The config option to retrieve.
+   *
+   * @return mixed
+   *   The client configurations.
+   */
+  public function getConfig(?string $option = NULL) {
+    return $option === NULL
+      ? $this->config
+      : ($this->config[$option] ?? NULL);
+  }
+
+  /**
+   * Sets configurations.
+   *
+   * @param array $config
+   *   Array of configurations.
+   */
+  public function setConfigs(array $config): void {
+    $this->config = $config;
   }
 
 }

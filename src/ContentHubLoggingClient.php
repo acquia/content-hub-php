@@ -4,6 +4,7 @@ namespace Acquia\ContentHubClient;
 
 use Acquia\Hmac\Guzzle\HmacAuthMiddleware;
 use GuzzleHttp\ClientInterface;
+use GuzzleHttp\ClientTrait;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -14,6 +15,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class ContentHubLoggingClient implements ClientInterface {
 
+  use ClientTrait;
   use ContentHubClientTrait;
 
   /**
