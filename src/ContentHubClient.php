@@ -8,8 +8,11 @@ use Acquia\ContentHubClient\SearchCriteria\SearchCriteria;
 use Acquia\ContentHubClient\SearchCriteria\SearchCriteriaBuilder;
 use Acquia\Hmac\Guzzle\HmacAuthMiddleware;
 use GuzzleHttp\Client;
+use GuzzleHttp\ClientInterface;
+use GuzzleHttp\ClientTrait;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\InvalidArgumentException;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
@@ -26,7 +29,10 @@ use function GuzzleHttp\default_user_agent;
  *
  * @package Acquia\ContentHubClient
  */
-class ContentHubClient extends Client {
+class ContentHubClient implements ClientInterface {
+
+  use ClientTrait;
+  use ContentHubClientTrait;
 
   const LIB_VERSION = '2.x-dev';
 
@@ -126,7 +132,8 @@ class ContentHubClient extends Client {
     $config['handler']->push($middleware);
     $this->addRequestResponseHandler($config);
 
-    parent::__construct($config);
+    $this->httpClient = ObjectFactory::getGuzzleClient($config);
+    $this->setConfigs($config);
   }
   // phpcs:enable
 
@@ -1154,7 +1161,16 @@ class ContentHubClient extends Client {
 
       $args = $this->addSearchCriteriaHeader($args);
 
-      return parent::__call($method, $args);
+      if (\count($args) < 1) {
+        throw new InvalidArgumentException('Magic request methods require a URI and optional options array');
+      }
+
+      $uri = $args[0];
+      $opts = $args[1] ?? [];
+
+      return \substr($method, -5) === 'Async'
+        ? $this->requestAsync(\substr($method, 0, -5), $uri, $opts)
+        : $this->request($method, $uri, $opts);
     }
     catch (\Exception $e) {
       return $this->getExceptionResponse($method, $args, $e);
