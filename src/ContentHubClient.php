@@ -129,45 +129,6 @@ class ContentHubClient implements ClientInterface {
   // phpcs:enable
 
   /**
-   * {@inheritdoc}
-   *
-   * @codeCoverageIgnore
-   */
-  public function __call($method, $args) {
-    try {
-      if (strpos($args[0], '?')) {
-        [$uri, $query] = explode('?', $args[0]);
-        $parts = explode('/', $uri);
-        if ($query) {
-          $last = array_pop($parts);
-          $last .= "?$query";
-          $parts[] = $last;
-        }
-      }
-      else {
-        $parts = explode('/', $args[0]);
-      }
-      $args[0] = self::makePath(...$parts);
-
-      $args = $this->addSearchCriteriaHeader($args);
-
-      if (\count($args) < 1) {
-        throw new InvalidArgumentException('Magic request methods require a URI and optional options array');
-      }
-
-      $uri = $args[0];
-      $opts = $args[1] ?? [];
-
-      return \substr($method, -5) === 'Async'
-        ? $this->requestAsync(\substr($method, 0, -5), $uri, $opts)
-        : $this->request($method, $uri, $opts);
-    }
-    catch (\Exception $e) {
-      return $this->getExceptionResponse($method, $args, $e);
-    }
-  }
-
-  /**
    * Discoverability of the API.
    *
    * @param string $endpoint
