@@ -118,10 +118,10 @@ trait ContentHubClientTrait {
    * @param string|null $request_id
    *   The request id from the ContentHub service if available.
    *
-   * @return \GuzzleHttp\Psr7\Response
+   * @return \Psr\Http\Message\ResponseInterface
    *   Response.
    */
-  protected function getErrorResponse($code, $reason, $request_id = NULL) {
+  protected function getErrorResponse(int $code, string $reason, ?string $request_id = NULL): ResponseInterface {
     if ($code < 100 || $code >= 600) {
       $code = 500;
     }
@@ -140,19 +140,18 @@ trait ContentHubClientTrait {
    *
    * @param string $method
    *   The Request to Plexus, as defined in the content-hub-php library.
-   * @param array $args
-   *   The Request arguments.
+   * @param string $api_call
+   *   The api endpoint.
    * @param \Exception $exception
    *   The Exception object.
    *
-   * @return \GuzzleHttp\Psr7\ResponseInterface
+   * @return \Psr\Http\Message\ResponseInterface
    *   The response after raising an exception.
    *
    *  @codeCoverageIgnore
    */
-  protected function getExceptionResponse($method, array $args, \Exception $exception) {
+  protected function getExceptionResponse(string $method, string $api_call, \Exception $exception): ResponseInterface {
     // If we reach here it is because there was an exception raised in the API call.
-    $api_call = $args[0];
     $response = $exception->getResponse();
     if (!$response) {
       $response = $this->getErrorResponse($exception->getCode(), $exception->getMessage());
@@ -255,28 +254,97 @@ trait ContentHubClientTrait {
    * {@inheritdoc}
    */
   public function send(RequestInterface $request, array $options = []): ResponseInterface {
-    return $this->httpClient->send($request, $options);
+    try {
+      return $this->httpClient->send($request, $options);
+    }
+    catch (\Exception $e) {
+      return $this->getExceptionResponse($request->getMethod(), $request->getUri()->getPath(), $e);
+    }
   }
 
   /**
    * {@inheritdoc}
    */
   public function sendAsync(RequestInterface $request, array $options = []): PromiseInterface {
-    return $this->httpClient->sendAsync($request, $options);
+    try {
+      return $this->httpClient->sendAsync($request, $options);
+    }
+    catch (\Exception $e) {
+      return $this->getExceptionResponse($request->getMethod(), $request->getUri()->getPath(), $e);
+    }
   }
 
   /**
    * {@inheritdoc}
    */
   public function request($method, $uri, array $options = []): ResponseInterface {
-    return $this->httpClient->request($method, $uri, $options);
+    try {
+      return $this->httpClient->request($method, $uri, $options);
+    }
+    catch (\Exception $e) {
+      return $this->getExceptionResponse($method, $uri, $e);
+    }
   }
 
   /**
    * {@inheritdoc}
    */
   public function requestAsync($method, $uri, array $options = []): PromiseInterface {
-    return $this->httpClient->requestAsync($method, $uri, $options);
+    try {
+      return $this->httpClient->requestAsync($method, $uri, $options);
+    }
+    catch (\Exception $e) {
+      return $this->getExceptionResponse($method, $uri, $e);
+    }
+
+  }
+
+  /**
+   * Create and send an HTTP GET request.
+   *
+   * @param string $uri
+   *   URI object or string.
+   * @param array $options
+   *   Request options to apply.
+   */
+  public function get(string $uri, array $options = []): ResponseInterface {
+    return $this->request('GET', $uri, $options);
+  }
+
+  /**
+   * Create and send an HTTP PUT request.
+   *
+   * @param string $uri
+   *   URI object or string.
+   * @param array $options
+   *   Request options to apply.
+   */
+  public function put(string $uri, array $options = []): ResponseInterface {
+    return $this->request('PUT', $uri, $options);
+  }
+
+  /**
+   * Create and send an HTTP POST request.
+   *
+   * @param string $uri
+   *   URI object or string.
+   * @param array $options
+   *   Request options to apply.
+   */
+  public function post(string $uri, array $options = []): ResponseInterface {
+    return $this->request('POST', $uri, $options);
+  }
+
+  /**
+   * Create and send an HTTP DELETE request.
+   *
+   * @param string $uri
+   *   URI object or string.
+   * @param array $options
+   *   Request options to apply.
+   */
+  public function delete(string $uri, array $options = []): ResponseInterface {
+    return $this->request('DELETE', $uri, $options);
   }
 
   /**
@@ -288,7 +356,7 @@ trait ContentHubClientTrait {
    * @return mixed
    *   The client configurations.
    */
-  public function getConfig(?string $option = NULL) {
+  public function getConfig($option = NULL) {
     return $option === NULL
       ? $this->config
       : ($this->config[$option] ?? NULL);
