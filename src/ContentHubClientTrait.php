@@ -255,28 +255,96 @@ trait ContentHubClientTrait {
    * {@inheritdoc}
    */
   public function send(RequestInterface $request, array $options = []): ResponseInterface {
-    return $this->httpClient->send($request, $options);
+    try {
+      return $this->httpClient->send($request, $options);
+    }
+    catch (\Exception $e) {
+      return $this->getExceptionResponse($request->getMethod(), $request->getUri()->getPath(), $e);
+    }
   }
 
   /**
    * {@inheritdoc}
    */
   public function sendAsync(RequestInterface $request, array $options = []): PromiseInterface {
-    return $this->httpClient->sendAsync($request, $options);
+    try {
+      return $this->httpClient->sendAsync($request, $options);
+    }
+    catch (\Exception $e) {
+      return $this->getExceptionResponse($request->getMethod(), $request->getUri()->getPath(), $e);
+    }
   }
 
   /**
    * {@inheritdoc}
    */
-  public function request($method, $uri, array $options = []): ResponseInterface {
-    return $this->httpClient->request($method, $uri, $options);
+  public function request(string $method, $uri, array $options = []): ResponseInterface {
+    try {
+      return $this->httpClient->request($method, $uri, $options);
+    }
+    catch (\Exception $e) {
+      return $this->getExceptionResponse($method, $uri, $e);
+    }
   }
 
   /**
    * {@inheritdoc}
    */
-  public function requestAsync($method, $uri, array $options = []): PromiseInterface {
-    return $this->httpClient->requestAsync($method, $uri, $options);
+  public function requestAsync(string $method, $uri, array $options = []): PromiseInterface {
+    try {
+      return $this->httpClient->requestAsync($method, $uri, $options);
+    }
+    catch (\Exception $e) {
+      return $this->getExceptionResponse($method, $uri, $e);
+    }
+  }
+
+  /**
+   * Create and send an HTTP GET request.
+   *
+   * @param string $uri
+   *   URI object or string.
+   * @param array $options
+   *   Request options to apply.
+   */
+  public function get(string $uri, array $options = []): ResponseInterface {
+    return $this->request('GET', $uri, $options);
+  }
+
+  /**
+   * Create and send an HTTP PUT request.
+   *
+   * @param string $uri
+   *   URI object or string.
+   * @param array $options
+   *   Request options to apply.
+   */
+  public function put(string $uri, array $options = []): ResponseInterface {
+    return $this->request('PUT', $uri, $options);
+  }
+
+  /**
+   * Create and send an HTTP POST request.
+   *
+   * @param string $uri
+   *   URI object or string.
+   * @param array $options
+   *   Request options to apply.
+   */
+  public function post(string $uri, array $options = []): ResponseInterface {
+    return $this->request('POST', $uri, $options);
+  }
+
+  /**
+   * Create and send an HTTP DELETE request.
+   *
+   * @param string $uri
+   *   URI object or string.
+   * @param array $options
+   *   Request options to apply.
+   */
+  public function delete(string $uri, array $options = []): ResponseInterface {
+    return $this->request('DELETE', $uri, $options);
   }
 
   /**

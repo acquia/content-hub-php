@@ -7,10 +7,8 @@ use Acquia\ContentHubClient\SearchCriteria\SearchCriteria;
 use Acquia\ContentHubClient\SearchCriteria\SearchCriteriaBuilder;
 use Acquia\Hmac\Guzzle\HmacAuthMiddleware;
 use GuzzleHttp\ClientInterface;
-use GuzzleHttp\ClientTrait;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\ClientException;
-use GuzzleHttp\Exception\InvalidArgumentException;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\RequestOptions;
@@ -26,7 +24,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class ContentHubClient implements ClientInterface {
 
-  use ClientTrait;
   use ContentHubClientTrait;
 
   const OPTION_NAME_LANGUAGES = 'client-languages';
