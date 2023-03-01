@@ -8,18 +8,14 @@ use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\UriInterface;
 use Psr\Log\LogLevel;
 
 /**
  * Common trait for CH Client and CH Logging Client.
- *
- * @method ResponseInterface get(string|UriInterface $uri, array $options = [])
- * @method ResponseInterface put(string|UriInterface $uri, array $options = [])
- * @method ResponseInterface post(string|UriInterface $uri, array $options = [])
- * @method ResponseInterface delete(string|UriInterface $uri, array $options = [])
  */
 trait ContentHubClientTrait {
+
+  use ContentHubClientCommonTrait;
 
   /**
    * GuzzleHttp client.
@@ -27,6 +23,13 @@ trait ContentHubClientTrait {
    * @var \GuzzleHttp\ClientInterface
    */
   protected $httpClient;
+
+  /**
+   * Custom configurations.
+   *
+   * @var array
+   */
+  protected $config;
 
   /**
    * Attaches RequestResponseHandler to handlers stack.
@@ -254,35 +257,70 @@ trait ContentHubClientTrait {
    * {@inheritdoc}
    */
   public function send(RequestInterface $request, array $options = []): ResponseInterface {
-    return $this->httpClient->send($request, $options);
+    try {
+      return $this->httpClient->send($request, $options);
+    }
+    catch (\Exception $e) {
+      return $this->getExceptionResponse($request->getMethod(), $request->getUri()->getPath(), $e);
+    }
   }
 
   /**
-   * {@inheritdoc}
+   * Create and send an HTTP GET request.
+   *
+   * @param string $uri
+   *   URI object or string.
+   * @param array $options
+   *   Request options to apply.
    */
-  public function sendAsync(RequestInterface $request, array $options = []): PromiseInterface {
-    return $this->httpClient->sendAsync($request, $options);
+  public function get(string $uri, array $options = []): ResponseInterface {
+    return $this->request('GET', $uri, $options);
   }
 
   /**
-   * {@inheritdoc}
+   * Create and send an HTTP PUT request.
+   *
+   * @param string $uri
+   *   URI object or string.
+   * @param array $options
+   *   Request options to apply.
    */
-  public function request($method, $uri, array $options = []): ResponseInterface {
-    return $this->httpClient->request($method, $uri, $options);
+  public function put(string $uri, array $options = []): ResponseInterface {
+    return $this->request('PUT', $uri, $options);
   }
 
   /**
-   * {@inheritdoc}
+   * Create and send an HTTP POST request.
+   *
+   * @param string $uri
+   *   URI object or string.
+   * @param array $options
+   *   Request options to apply.
    */
-  public function requestAsync($method, $uri, array $options = []): PromiseInterface {
-    return $this->httpClient->requestAsync($method, $uri, $options);
+  public function post(string $uri, array $options = []): ResponseInterface {
+    return $this->request('POST', $uri, $options);
   }
 
   /**
-   * {@inheritdoc}
+   * Create and send an HTTP DELETE request.
+   *
+   * @param string $uri
+   *   URI object or string.
+   * @param array $options
+   *   Request options to apply.
    */
-  public function getConfig($option = NULL) {
-    return $this->httpClient->getConfig($option);
+  public function delete(string $uri, array $options = []): ResponseInterface {
+    return $this->request('DELETE', $uri, $options);
+  }
+
+  /**
+   * Sets configurations.
+   *
+   * @param array $config
+   *   Array of configurations.
+   */
+  public function setConfigs(array $config): void {
+    $this->config = $config;
   }
 
 }

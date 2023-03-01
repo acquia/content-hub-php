@@ -121,39 +121,9 @@ class ContentHubClient implements ClientInterface {
     $this->addRequestResponseHandler($config);
 
     $this->httpClient = ObjectFactory::getGuzzleClient($config);
+    $this->setConfigs($config);
   }
   // phpcs:enable
-
-  /**
-   * {@inheritdoc}
-   *
-   * @codeCoverageIgnore
-   */
-  public function __call($method, $args) {
-    try {
-      if (strpos($args[0], '?')) {
-        [$uri, $query] = explode('?', $args[0]);
-        $parts = explode('/', $uri);
-        if ($query) {
-          $last = array_pop($parts);
-          $last .= "?$query";
-          $parts[] = $last;
-        }
-      }
-      else {
-        $parts = explode('/', $args[0]);
-      }
-      $args[0] = self::makePath(...$parts);
-
-      $args = $this->addSearchCriteriaHeader($args);
-
-      return $this->httpClient->__call($method, $args);
-
-    }
-    catch (\Exception $e) {
-      return $this->getExceptionResponse($method, $args, $e);
-    }
-  }
 
   /**
    * Discoverability of the API.
