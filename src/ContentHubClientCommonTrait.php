@@ -6,6 +6,7 @@ use GuzzleHttp\Promise\PromiseInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
+// @todo Remove `if condition` when we support guzzle >= 7.
 if (defined('\GuzzleHttp\ClientInterface::MAJOR_VERSION')) {
   /**
    * Common client trait for guzzle 7 and above.
