@@ -15,6 +15,8 @@ use Psr\Log\LogLevel;
  */
 trait ContentHubClientTrait {
 
+  use ContentHubClientCommonTrait;
+
   /**
    * GuzzleHttp client.
    *
@@ -264,42 +266,6 @@ trait ContentHubClientTrait {
   }
 
   /**
-   * {@inheritdoc}
-   */
-  public function sendAsync(RequestInterface $request, array $options = []): PromiseInterface {
-    try {
-      return $this->httpClient->sendAsync($request, $options);
-    }
-    catch (\Exception $e) {
-      return $this->getExceptionResponse($request->getMethod(), $request->getUri()->getPath(), $e);
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function request(string $method, $uri, array $options = []): ResponseInterface {
-    try {
-      return $this->httpClient->request($method, $uri, $options);
-    }
-    catch (\Exception $e) {
-      return $this->getExceptionResponse($method, $uri, $e);
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function requestAsync(string $method, $uri, array $options = []): PromiseInterface {
-    try {
-      return $this->httpClient->requestAsync($method, $uri, $options);
-    }
-    catch (\Exception $e) {
-      return $this->getExceptionResponse($method, $uri, $e);
-    }
-  }
-
-  /**
    * Create and send an HTTP GET request.
    *
    * @param string $uri
@@ -345,21 +311,6 @@ trait ContentHubClientTrait {
    */
   public function delete(string $uri, array $options = []): ResponseInterface {
     return $this->request('DELETE', $uri, $options);
-  }
-
-  /**
-   * Get a client configuration option.
-   *
-   * @param string|null $option
-   *   The config option to retrieve.
-   *
-   * @return mixed
-   *   The client configurations.
-   */
-  public function getConfig(?string $option = NULL) {
-    return $option === NULL
-      ? $this->config
-      : ($this->config[$option] ?? NULL);
   }
 
   /**
