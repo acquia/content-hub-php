@@ -22,7 +22,14 @@ trait ContentHubClientTrait {
    *
    * @var \GuzzleHttp\ClientInterface
    */
-  protected $httpClient;
+  public $httpClient;
+
+  /**
+   * The logger responsible for tracking request failures.
+   *
+   * @var \Psr\Log\LoggerInterface
+   */
+  public $logger;
 
   /**
    * Custom configurations.
@@ -152,7 +159,7 @@ trait ContentHubClientTrait {
    *
    *  @codeCoverageIgnore
    */
-  protected function getExceptionResponse($method, string $api_call, \Exception $exception) {
+  protected function getExceptionResponse(string $method, string $api_call, \Exception $exception): ResponseInterface {
     // If we reach here it is because there was an exception raised in the API call.
     $response = $exception->getResponse();
     if (!$response) {

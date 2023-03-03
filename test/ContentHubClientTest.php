@@ -7,6 +7,7 @@ use Acquia\ContentHubClient\CDFDocument;
 use Acquia\ContentHubClient\ContentHubClient;
 use Acquia\ContentHubClient\ContentHubLibraryEvents;
 use Acquia\ContentHubClient\Event\GetCDFTypeEvent;
+use Acquia\ContentHubClient\LoggerMock;
 use Acquia\ContentHubClient\Syndication\SyndicationStatus;
 use Acquia\ContentHubClient\ObjectFactory;
 use Acquia\ContentHubClient\SearchCriteria\SearchCriteria;
@@ -26,6 +27,7 @@ use GuzzleHttp\Psr7\Utils;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 use Psr\Log\NullLogger;
 use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -181,7 +183,7 @@ class ContentHubClientTest extends TestCase {
     $this->dispatcher = $this->getMockDispatcher();
 
     $this->ch_client = $this->makeMockCHClient(
-      new NullLogger(),
+      new LoggerMock(),
       $this->makeMockSettings(
         $this->test_data['name'],
         $this->test_data['uuid'],
@@ -334,6 +336,46 @@ class ContentHubClientTest extends TestCase {
     $this->assertSame($response->getStatusCode(), $response_code);
     $this->assertSame($response_body, $this->ch_client::getResponseJson($response));
     $this->assertSame($this->guzzle_client->getConfig(), $config);
+  }
+
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::getExceptionResponse
+   * @throws \Exception
+   */
+  public function testExceptionHandling(): void {
+    $response_body = [
+      'request_id' => 'test-request-uuid',
+      'error' => 'end-point-not-available',
+    ];
+    $log_message = 'Request ID: test-request-uuid, Method: GET, Path: "test-endpoint", Status Code: 202, Reason: some-reason, Error Code: , Error Message: "". Error data: "end-point-not-available"';
+    $response_code = SymfonyResponse::HTTP_ACCEPTED;
+    $exception = \Mockery::mock(\Exception::class);
+    $exception->shouldReceive('getResponse')
+      ->andReturn($this->makeMockResponse($response_code, [], json_encode($response_body)));
+
+    $this->object_factory->shouldReceive('request')
+      ->andThrows($exception);
+
+    $response = $this->ch_client->get('test-endpoint');
+    $logs = $this->ch_client->logger->getLogMessages();
+
+    $this->assertSame($response->getStatusCode(), $response_code);
+    $this->assertTrue(array_key_exists(LogLevel::ERROR, $logs));
+    $this->assertSame($log_message, $logs[LogLevel::ERROR][0]['message']);
+
+    $log_message = 'Request ID: test-request-uuid, Method: GET, Path: "settings/webhooks", Status Code: 202, Reason: some-reason, Error Code: , Error Message: "". Error data: "end-point-not-available"';
+    $this->ch_client->logger->reset();
+    $response = $this->ch_client->get('settings/webhooks');
+    $logs = $this->ch_client->logger->getLogMessages();
+    $this->assertTrue(array_key_exists(LogLevel::WARNING, $logs));
+    $this->assertSame($log_message, $logs[LogLevel::WARNING][0]['message']);
+
+    $log_message = 'Request ID: test-request-uuid, Method: GET, Path: "/filters?name=abc", Status Code: 202, Reason: some-reason, Error Code: , Error Message: "". Error data: "end-point-not-available"';
+    $this->ch_client->logger->reset();
+    $response = $this->ch_client->get('/filters?name=abc');
+    $logs = $this->ch_client->logger->getLogMessages();
+    $this->assertTrue(array_key_exists(LogLevel::NOTICE, $logs));
+    $this->assertSame($log_message, $logs[LogLevel::NOTICE][0]['message']);
   }
 
   /**
@@ -2296,6 +2338,7 @@ class ContentHubClientTest extends TestCase {
     $response->shouldReceive('getHeaders')->andReturn($headers);
     $response->shouldReceive('getBody')
       ->andReturn(Utils::streamFor($body));
+    $response->shouldReceive('getReasonPhrase')->andReturn('some-reason');
 
     return $response;
   }
@@ -2388,7 +2431,8 @@ class ContentHubClientTest extends TestCase {
 
         return $config[$key] ?? NULL;
       });
-
+    $client->httpClient = $this->object_factory;
+    $client->logger = $logger;
     $client->shouldReceive('getSettings')->andReturn($settings);
     $client->shouldReceive('getRemoteSettings')->andReturn([
       'hostname' => $this->test_data['host-name'],

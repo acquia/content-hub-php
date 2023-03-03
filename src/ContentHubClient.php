@@ -44,13 +44,6 @@ class ContentHubClient implements ClientInterface {
   protected $settings;
 
   /**
-   * The logger responsible for tracking request failures.
-   *
-   * @var \Psr\Log\LoggerInterface
-   */
-  protected $logger;
-
-  /**
    * The Event Dispatcher.
    *
    * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
