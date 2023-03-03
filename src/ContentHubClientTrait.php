@@ -142,8 +142,8 @@ trait ContentHubClientTrait {
    *
    * @param string $method
    *   The Request to Plexus, as defined in the content-hub-php library.
-   * @param array $args
-   *   The Request arguments.
+   * @param string $api_call
+   *   The api endpoint.
    * @param \Exception $exception
    *   The Exception object.
    *
@@ -152,9 +152,8 @@ trait ContentHubClientTrait {
    *
    *  @codeCoverageIgnore
    */
-  protected function getExceptionResponse($method, array $args, \Exception $exception) {
+  protected function getExceptionResponse($method, string $api_call, \Exception $exception) {
     // If we reach here it is because there was an exception raised in the API call.
-    $api_call = $args[0];
     $response = $exception->getResponse();
     if (!$response) {
       $response = $this->getErrorResponse($exception->getCode(), $exception->getMessage());
