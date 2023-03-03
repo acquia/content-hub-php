@@ -22,7 +22,14 @@ trait ContentHubClientTrait {
    *
    * @var \GuzzleHttp\ClientInterface
    */
-  protected $httpClient;
+  public $httpClient;
+
+  /**
+   * The logger responsible for tracking request failures.
+   *
+   * @var \Psr\Log\LoggerInterface
+   */
+  public $logger;
 
   /**
    * Custom configurations.
@@ -142,19 +149,18 @@ trait ContentHubClientTrait {
    *
    * @param string $method
    *   The Request to Plexus, as defined in the content-hub-php library.
-   * @param array $args
-   *   The Request arguments.
+   * @param string $api_call
+   *   The api endpoint.
    * @param \Exception $exception
    *   The Exception object.
    *
-   * @return \GuzzleHttp\Psr7\ResponseInterface
+   * @return \Psr\Http\Message\ResponseInterface
    *   The response after raising an exception.
    *
    *  @codeCoverageIgnore
    */
-  protected function getExceptionResponse($method, array $args, \Exception $exception) {
+  protected function getExceptionResponse(string $method, string $api_call, \Exception $exception): ResponseInterface {
     // If we reach here it is because there was an exception raised in the API call.
-    $api_call = $args[0];
     $response = $exception->getResponse();
     if (!$response) {
       $response = $this->getErrorResponse($exception->getCode(), $exception->getMessage());
