@@ -154,7 +154,7 @@ trait ContentHubClientTrait {
    * @param \Exception $exception
    *   The Exception object.
    *
-   * @return \GuzzleHttp\Psr7\ResponseInterface
+   * @return \Psr\Http\Message\ResponseInterface
    *   The response after raising an exception.
    *
    *  @codeCoverageIgnore
