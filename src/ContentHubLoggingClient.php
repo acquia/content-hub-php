@@ -11,7 +11,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  *
  * @package Acquia\ContentHubClient
  */
-final class ContentHubLoggingClient implements ContentHubLoggingClientInterface {
+class ContentHubLoggingClient implements ContentHubLoggingClientInterface {
 
   use ContentHubClientTrait;
 
