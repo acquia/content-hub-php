@@ -128,6 +128,14 @@ class ContentHubLoggingClientTest extends TestCase {
   }
 
   /**
+   * Tests if the config is set and available during execution.
+   */
+  public function testConfig(): void {
+    $base_url = $this->ch_client->getConfig('base_url');
+    $this->assertEquals('some-host-name', $base_url, 'Configuration is available during runtime.');
+  }
+
+  /**
    * Mock Content Hub Logging Client.
    *
    * @param array $config
