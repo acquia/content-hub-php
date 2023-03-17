@@ -3,16 +3,15 @@
 namespace Acquia\ContentHubClient;
 
 use Acquia\Hmac\Guzzle\HmacAuthMiddleware;
-use GuzzleHttp\ClientInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
- * Class ContentHubClient.
+ * Class ContentHubLoggingClient.
  *
  * @package Acquia\ContentHubClient
  */
-class ContentHubLoggingClient implements ClientInterface {
+class ContentHubLoggingClient implements ContentHubLoggingClientInterface {
 
   use ContentHubClientTrait;
 
@@ -76,51 +75,15 @@ class ContentHubLoggingClient implements ClientInterface {
     $this->addRequestResponseHandler($config);
 
     $this->httpClient = ObjectFactory::getGuzzleClient($config);
+    $this->config = $config;
   }
 
   /**
    * {@inheritdoc}
-   *
-   * @codeCoverageIgnore
    */
-  public function __call($method, $args) {
-    try {
-      if (strpos($args[0], '?')) {
-        [$uri, $query] = explode('?', $args[0]);
-        $parts = explode('/', $uri);
-        if ($query) {
-          $last = array_pop($parts);
-          $last .= "?$query";
-          $parts[] = $last;
-        }
-      }
-      else {
-        $parts = explode('/', $args[0]);
-      }
-      $args[0] = self::makePath(...$parts);
-
-      return $this->httpClient->__call($method, $args);
-
-    }
-    catch (\Exception $e) {
-      return $this->getExceptionResponse($method, $args, $e);
-    }
-  }
-
-  /**
-   * Sends event logs to events microservice.
-   *
-   * @param array $logs
-   *   Array of logs.
-   *
-   * @return mixed
-   *   Response from logging service.
-   *
-   * @throws \Exception
-   */
-  public function sendLogs(array $logs) {
+  public function sendLogs(array $logs): array {
     $options['body'] = json_encode($logs, JSON_THROW_ON_ERROR);
-    return self::getResponseJson($this->post('events', $options));
+    return self::getResponseJson($this->post('events', $options)) ?? [];
   }
 
 }

@@ -167,7 +167,7 @@ trait ContentHubClientTrait {
     }
     $response_body = json_decode($response->getBody(), TRUE);
     $error_code = $response_body['error']['code'] ?? '';
-    $error_message = $response_body['error']['message'] ?? '';
+    $error_message = $response_body['error']['message'] ?? $exception->getMessage();
 
     // Customize Error messages according to API Call.
     switch ($api_call) {
@@ -250,7 +250,7 @@ trait ContentHubClientTrait {
    *
    * @since 0.2.0
    */
-  public function ping() {
+  public function ping(): ResponseInterface {
     $makeBaseURL = self::makeBaseURL($this->getConfig()['base_url']);
     $client = ObjectFactory::getGuzzleClient([
       'base_uri' => $makeBaseURL,
