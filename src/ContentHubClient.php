@@ -102,7 +102,9 @@ class ContentHubClient implements ClientInterface {
 
     // Setting up the headers.
     $config['headers']['Content-Type'] = 'application/json';
-    $config['headers']['X-Acquia-Plexus-Client-Id'] = $settings->getUuid();
+    if ($settings->getUuid()) {
+      $config['headers']['X-Acquia-Plexus-Client-Id'] = $settings->getUuid();
+    }
     $config['headers']['User-Agent'] = $user_agent_string;
 
     // Add the authentication handler.
@@ -163,11 +165,11 @@ class ContentHubClient implements ClientInterface {
   public static function register(
     LoggerInterface $logger,
     EventDispatcherInterface $dispatcher,
-    $name,
-    $url,
-    $api_key,
-    $secret,
-    $api_version = 'v2'
+    array $client_details,
+    string $url,
+    string $api_key,
+    string $secret,
+    string $api_version = 'v2'
   ) {
     $config = [
       'base_uri' => self::makeBaseURL($url, $api_version),
@@ -177,6 +179,13 @@ class ContentHubClient implements ClientInterface {
       ],
       'handler' => ObjectFactory::getHandlerStack(),
     ];
+    $name = $client_details['name'];
+    $uuid = $client_details['uuid'] ?? '';
+    $body = ['name' => $name];
+    if ($uuid) {
+      $body['originUUID'] = $uuid;
+    }
+
 
     // Add the authentication handler.
     // @see https://github.com/acquia/http-hmac-spec
@@ -184,7 +193,7 @@ class ContentHubClient implements ClientInterface {
     $middleware = ObjectFactory::getHmacAuthMiddleware($key);
     $config['handler']->push($middleware);
     $client = ObjectFactory::getGuzzleClient($config);
-    $options['body'] = json_encode(['name' => $name]);
+    $options['body'] = json_encode($body);
     try {
       $response = $client->post('register', $options);
       $values = self::getResponseJson($response);
@@ -1411,6 +1420,11 @@ class ContentHubClient implements ClientInterface {
   public function isFeatured(): bool {
     $remote = $this->getRemoteSettings();
     return $remote['featured'] ?? FALSE;
+  }
+
+  public function getRemoteConfig(): array {
+    // Fetches it from /settings/client/:uuid.
+    return [];
   }
 
 }
