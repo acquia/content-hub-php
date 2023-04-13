@@ -850,7 +850,7 @@ class ContentHubClientTest extends TestCase {
     $this->ch_client
       ->shouldReceive('delete')
       ->once()
-      ->with("interest/${uuid}/${webhook_uuid}")
+      ->with("interest/{$uuid}/{$webhook_uuid}")
       ->andReturn($this->makeMockResponse($response_code, [], ''));
 
     $api_response = $this->ch_client->deleteInterest($uuid, $webhook_uuid);
@@ -1000,7 +1000,7 @@ class ContentHubClientTest extends TestCase {
     $filter_query = [];
 
     foreach ($filters as $key => $value) {
-      $filter_query["filter:${key}"] = $value;
+      $filter_query["filter:{$key}"] = $value;
     }
 
     $total = 2;
@@ -2122,7 +2122,7 @@ class ContentHubClientTest extends TestCase {
     $this->ch_client
       ->shouldReceive('get')
       ->once()
-      ->with("settings/webhooks/${webhook_uuid}/filters")
+      ->with("settings/webhooks/{$webhook_uuid}/filters")
       ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response)));
 
     $this->assertSame($this->ch_client->listFiltersForWebhook($webhook_uuid), $response);
@@ -2143,7 +2143,7 @@ class ContentHubClientTest extends TestCase {
     $this->ch_client
       ->shouldReceive('post')
       ->once()
-      ->with("settings/webhooks/${webhook_id}/filters", ['body' => json_encode(['filter_id' => $filter_id])])
+      ->with("settings/webhooks/{$webhook_id}/filters", ['body' => json_encode(['filter_id' => $filter_id])])
       ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response)));
 
     $this->assertSame($this->ch_client->addFilterToWebhook($filter_id, $webhook_id), $response);
@@ -2168,7 +2168,7 @@ class ContentHubClientTest extends TestCase {
     $this->ch_client
       ->shouldReceive('post')
       ->once()
-      ->with("settings/webhooks/${webhook_id}/filters", ['body' => json_encode(['filter_id' => $filter_id])])
+      ->with("settings/webhooks/{$webhook_id}/filters", ['body' => json_encode(['filter_id' => $filter_id])])
       ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_NOT_FOUND, [], json_encode($response)));
 
     $this->assertSame($this->ch_client->addFilterToWebhook($filter_id, $webhook_id), $response);
@@ -2193,7 +2193,7 @@ class ContentHubClientTest extends TestCase {
     $this->ch_client
       ->shouldReceive('post')
       ->once()
-      ->with("settings/webhooks/${webhook_id}/filters", ['body' => json_encode(['filter_id' => $filter_id])])
+      ->with("settings/webhooks/{$webhook_id}/filters", ['body' => json_encode(['filter_id' => $filter_id])])
       ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_NOT_FOUND, [], json_encode($response)));
 
     $this->assertSame($this->ch_client->addFilterToWebhook($filter_id, $webhook_id), $response);
@@ -2218,7 +2218,7 @@ class ContentHubClientTest extends TestCase {
     $this->ch_client
       ->shouldReceive('delete')
       ->once()
-      ->with("settings/webhooks/${webhook_id}/filters", ['body' => json_encode(['filter_id' => $filter_id])])
+      ->with("settings/webhooks/{$webhook_id}/filters", ['body' => json_encode(['filter_id' => $filter_id])])
       ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_NOT_FOUND, [], json_encode($response)));
 
     $this->assertSame($this->ch_client->removeFilterFromWebhook($filter_id, $webhook_id), $response);
@@ -2239,7 +2239,7 @@ class ContentHubClientTest extends TestCase {
     $this->ch_client
       ->shouldReceive('delete')
       ->once()
-      ->with("settings/webhooks/${webhook_id}/filters", ['body' => json_encode(['filter_id' => $filter_id])])
+      ->with("settings/webhooks/{$webhook_id}/filters", ['body' => json_encode(['filter_id' => $filter_id])])
       ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response)));
 
     $this->assertSame($this->ch_client->removeFilterFromWebhook($filter_id, $webhook_id), $response);
