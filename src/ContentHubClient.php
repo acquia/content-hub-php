@@ -576,7 +576,7 @@ class ContentHubClient implements ClientInterface {
     ];
 
     foreach ($variables['filters'] as $key => $value) {
-      $variables["filter:${key}"] = $value;
+      $variables["filter:{$key}"] = $value;
     }
     unset($variables['filters']);
 
