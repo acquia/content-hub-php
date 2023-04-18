@@ -13,7 +13,7 @@ final class LogRecordParameter {
   private string $apiCall;
   private int $statusCode;
   private string $reasonPhrase;
-  private int $errorCode;
+  private ?int $errorCode;
   private string $errorMessage;
   private string $data;
 
@@ -75,9 +75,9 @@ final class LogRecordParameter {
   }
 
   /**
-   * @return int
+   * @return int|null
    */
-  public function getErrorCode(): int {
+  public function getErrorCode(): ?int {
     return $this->errorCode;
   }
 

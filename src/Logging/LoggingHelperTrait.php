@@ -40,7 +40,7 @@ trait LoggingHelperTrait {
       $response = $this->getErrorResponse($exception->getCode(), $exception->getMessage());
     }
     $response_body = json_decode($response->getBody(), TRUE);
-    $error_code = $response_body['error']['code'] ?? '';
+    $error_code = $response_body['error']['code'] ?? NULL;
     $error_message = $response_body['error']['message'] ?? $exception->getMessage();
 
     $log_record = new LogRecordParameter(
