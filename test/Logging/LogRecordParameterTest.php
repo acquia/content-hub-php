@@ -2,7 +2,6 @@
 
 namespace Acquia\ContentHubClient\test\Logging;
 
-
 use Acquia\ContentHubClient\Logging\LogRecordParameter;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;

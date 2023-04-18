@@ -13,6 +13,8 @@ use Psr\Log\LogLevel;
 trait LoggingHelperTrait {
 
   /**
+   * The logger service.
+   *
    * @var \Psr\Log\LoggerInterface
    */
   protected LoggerInterface $logger;
