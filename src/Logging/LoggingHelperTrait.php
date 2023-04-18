@@ -17,7 +17,7 @@ trait LoggingHelperTrait {
    *
    * @var \Psr\Log\LoggerInterface
    */
-  protected LoggerInterface $logger;
+  public LoggerInterface $logger;
 
   /**
    * Obtains the appropriate exception Response, logging error messages according to API call.
