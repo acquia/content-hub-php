@@ -209,4 +209,14 @@ class Settings {
     return $this->sharedSecret;
   }
 
+  /**
+   * Updates webhook data.
+   *
+   * @param array $webhook
+   *   The webhook data.
+   */
+  public function updateWebhook(array $webhook): void {
+    $this->webhook = $webhook;
+  }
+
 }
