@@ -139,10 +139,10 @@ trait LoggingHelperTrait {
    * @param string|null $request_id
    *   The request id from the ContentHub service if available.
    *
-   * @return \GuzzleHttp\Psr7\Response
+   * @return \Psr\Http\Message\ResponseInterface
    *   Response.
    */
-  protected function getErrorResponse($code, $reason, $request_id = NULL) {
+  protected function getErrorResponse($code, $reason, $request_id = NULL): ResponseInterface {
     if ($code < 100 || $code >= 600) {
       $code = 500;
     }

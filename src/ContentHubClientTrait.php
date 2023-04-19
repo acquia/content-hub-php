@@ -4,13 +4,9 @@ namespace Acquia\ContentHubClient;
 
 use Acquia\ContentHubClient\Guzzle\Middleware\RequestResponseHandler;
 use Acquia\ContentHubClient\Logging\LoggingHelperTrait;
-use Drupal\Core\Logger\LoggerChannelTrait;
 use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Promise\PromiseInterface;
-use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Psr\Log\LogLevel;
 
 /**
  * Common trait for CH Client and CH Logging Client.
