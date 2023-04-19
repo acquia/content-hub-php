@@ -142,7 +142,7 @@ trait LoggingHelperTrait {
    * @return \Psr\Http\Message\ResponseInterface
    *   Response.
    */
-  protected function getErrorResponse($code, $reason, $request_id = NULL): ResponseInterface {
+  protected function getErrorResponse(int $code, string $reason, ?string $request_id = NULL): ResponseInterface {
     if ($code < 100 || $code >= 600) {
       $code = 500;
     }
