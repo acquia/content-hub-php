@@ -43,7 +43,7 @@ trait LoggingHelperTrait {
     $error_code = $response_body['error']['code'] ?? NULL;
     $error_message = $response_body['error']['message'] ?? $exception->getMessage();
 
-    $log_record = new LogRecordParameter(
+    $log_record = new RequestErrorLogParameter(
       LogLevel::ERROR,
       $response_body['request_id'] ?? '',
       strtoupper($method),
@@ -78,13 +78,13 @@ trait LoggingHelperTrait {
   /**
    * Returns a response reason based on the handler.
    *
-   * @param \Acquia\ContentHubClient\Logging\LogRecordParameter $record
+   * @param \Acquia\ContentHubClient\Logging\RequestErrorLogParameter $record
    *   The log record parameter object.
    *
    * @return string
    *   The formatted log record.
    */
-  protected function getResponseReason(LogRecordParameter $record): string {
+  protected function getResponseReason(RequestErrorLogParameter $record): string {
     switch ($record) {
       case $record->getStatusCode() === 404:
         return $this->get404ResponseReason($record);
@@ -100,7 +100,7 @@ trait LoggingHelperTrait {
    * @return string
    *   The reason.
    */
-  protected function get404ResponseReason(LogRecordParameter $record): string {
+  protected function get404ResponseReason(RequestErrorLogParameter $record): string {
     $record->logLevel = LogLevel::WARNING;
     return sprintf('Resource not found in Content Hub: %s.',
       $record->getApiCall(),
@@ -110,13 +110,13 @@ trait LoggingHelperTrait {
   /**
    * Returns a default reason.
    *
-   * @param \Acquia\ContentHubClient\Logging\LogRecordParameter $record
+   * @param \Acquia\ContentHubClient\Logging\RequestErrorLogParameter $record
    *   The log record parameter object.
    *
    * @return string
    *   The formatted reason.
    */
-  protected function getDefaultResponseReason(LogRecordParameter $record): string {
+  protected function getDefaultResponseReason(RequestErrorLogParameter $record): string {
     return sprintf('Request ID: %s, Method: %s, Path: "%s", Status Code: %s, Reason: %s, Error Code: %s, Error Message: "%s". Error data: "%s"',
       $record->getRequestId(),
       $record->getMethod(),
@@ -125,7 +125,7 @@ trait LoggingHelperTrait {
       $record->getReasonPhrase(),
       $record->getErrorCode(),
       $record->getErrorMessage(),
-      $record->getData(),
+      $record->getMetadata(),
     );
   }
 

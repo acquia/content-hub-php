@@ -5,7 +5,7 @@ namespace Acquia\ContentHubClient\Logging;
 /**
  * Parameter object, represents a log record.
  */
-final class LogRecordParameter {
+final class RequestErrorLogParameter {
 
   public string $logLevel;
   private string $requestId;
@@ -15,7 +15,7 @@ final class LogRecordParameter {
   private string $reasonPhrase;
   private ?int $errorCode;
   private string $errorMessage;
-  private string $data;
+  private string $metadata;
 
   public function __construct(
     string $log_level,
@@ -24,9 +24,9 @@ final class LogRecordParameter {
     string $api_call,
     int $status_code,
     string $reason_phrase,
-    int $error_code,
+    ?int $error_code,
     string $error_message,
-    string $data
+    string $metadata
   ) {
     $this->logLevel = $log_level;
     $this->requestId = $request_id;
@@ -36,7 +36,7 @@ final class LogRecordParameter {
     $this->reasonPhrase = $reason_phrase;
     $this->errorCode = $error_code;
     $this->errorMessage = $error_message;
-    $this->data = $data;
+    $this->metadata = $metadata;
   }
 
   /**
@@ -91,8 +91,8 @@ final class LogRecordParameter {
   /**
    * @return string
    */
-  public function getData(): string {
-    return $this->data;
+  public function getMetadata(): string {
+    return $this->metadata;
   }
 
 }
