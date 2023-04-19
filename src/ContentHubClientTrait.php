@@ -3,12 +3,10 @@
 namespace Acquia\ContentHubClient;
 
 use Acquia\ContentHubClient\Guzzle\Middleware\RequestResponseHandler;
+use Acquia\ContentHubClient\Logging\LoggingHelperTrait;
 use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Promise\PromiseInterface;
-use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Psr\Log\LogLevel;
 
 /**
  * Common trait for CH Client and CH Logging Client.
@@ -16,6 +14,7 @@ use Psr\Log\LogLevel;
 trait ContentHubClientTrait {
 
   use ContentHubClientCommonTrait;
+  use LoggingHelperTrait;
 
   /**
    * GuzzleHttp client.
@@ -23,13 +22,6 @@ trait ContentHubClientTrait {
    * @var \GuzzleHttp\ClientInterface
    */
   public $httpClient;
-
-  /**
-   * The logger responsible for tracking request failures.
-   *
-   * @var \Psr\Log\LoggerInterface
-   */
-  public $logger;
 
   /**
    * Custom configurations.
@@ -115,92 +107,6 @@ trait ContentHubClientTrait {
    */
   protected static function makePath(...$path_components): string { // phpcs:ignore
     return self::gluePartsTogether($path_components, '/');
-  }
-
-  /**
-   * Returns error response.
-   *
-   * @param int $code
-   *   Status code.
-   * @param string $reason
-   *   Reason.
-   * @param string|null $request_id
-   *   The request id from the ContentHub service if available.
-   *
-   * @return \GuzzleHttp\Psr7\Response
-   *   Response.
-   */
-  protected function getErrorResponse($code, $reason, $request_id = NULL) {
-    if ($code < 100 || $code >= 600) {
-      $code = 500;
-    }
-    $body = [
-      'request_id' => $request_id,
-      'error' => [
-        'code' => $code,
-        'message' => $reason,
-      ],
-    ];
-    return new Response($code, [], json_encode($body), '1.1', $reason);
-  }
-
-  /**
-   * Obtains the appropriate exception Response, logging error messages according to API call.
-   *
-   * @param string $method
-   *   The Request to Plexus, as defined in the content-hub-php library.
-   * @param string $api_call
-   *   The api endpoint.
-   * @param \Exception $exception
-   *   The Exception object.
-   *
-   * @return \Psr\Http\Message\ResponseInterface
-   *   The response after raising an exception.
-   *
-   *  @codeCoverageIgnore
-   */
-  protected function getExceptionResponse(string $method, string $api_call, \Exception $exception): ResponseInterface {
-    // If we reach here it is because there was an exception raised in the API call.
-    $response = $exception->getResponse();
-    if (!$response) {
-      $response = $this->getErrorResponse($exception->getCode(), $exception->getMessage());
-    }
-    $response_body = json_decode($response->getBody(), TRUE);
-    $error_code = $response_body['error']['code'] ?? '';
-    $error_message = $response_body['error']['message'] ?? $exception->getMessage();
-
-    // Customize Error messages according to API Call.
-    switch ($api_call) {
-      case'settings/webhooks':
-        $log_level = LogLevel::WARNING;
-        break;
-
-      case (preg_match('/filters\?name=*/', $api_call) ? TRUE : FALSE):
-      case (preg_match('/settings\/clients\/*/', $api_call) ? TRUE : FALSE):
-      case (preg_match('/settings\/webhooks\/.*\/filters/', $api_call) ? TRUE : FALSE):
-        $log_level = LogLevel::NOTICE;
-        break;
-
-      default:
-        // The default log level is ERROR.
-        $log_level = LogLevel::ERROR;
-        break;
-    }
-
-    $reason = sprintf("Request ID: %s, Method: %s, Path: \"%s\", Status Code: %s, Reason: %s, Error Code: %s, Error Message: \"%s\". Error data: \"%s\"",
-      $response_body['request_id'] ?? '',
-      strtoupper($method),
-      $api_call,
-      $response->getStatusCode(),
-      $response->getReasonPhrase(),
-      $error_code,
-      $error_message,
-      print_r($response_body['error']['data'] ?? $response_body['error'] ?? '', TRUE)
-    );
-    $this->logger->log($log_level, $reason);
-
-    // Return the response.
-    return $response;
   }
 
   /**

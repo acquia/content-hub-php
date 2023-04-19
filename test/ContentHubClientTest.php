@@ -365,17 +365,42 @@ class ContentHubClientTest extends TestCase {
 
     $log_message = 'Request ID: test-request-uuid, Method: GET, Path: "settings/webhooks", Status Code: 202, Reason: some-reason, Error Code: , Error Message: "". Error data: "end-point-not-available"';
     $this->ch_client->logger->reset();
-    $response = $this->ch_client->get('settings/webhooks');
+    $this->ch_client->get('settings/webhooks');
     $logs = $this->ch_client->logger->getLogMessages();
     $this->assertTrue(array_key_exists(LogLevel::WARNING, $logs));
     $this->assertSame($log_message, $logs[LogLevel::WARNING][0]['message']);
 
     $log_message = 'Request ID: test-request-uuid, Method: GET, Path: "/filters?name=abc", Status Code: 202, Reason: some-reason, Error Code: , Error Message: "". Error data: "end-point-not-available"';
     $this->ch_client->logger->reset();
-    $response = $this->ch_client->get('/filters?name=abc');
+    $this->ch_client->get('/filters?name=abc');
     $logs = $this->ch_client->logger->getLogMessages();
     $this->assertTrue(array_key_exists(LogLevel::NOTICE, $logs));
     $this->assertSame($log_message, $logs[LogLevel::NOTICE][0]['message']);
+  }
+
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::getExceptionResponse
+   */
+  public function testExceptionHandlingFor404s(): void {
+    $response_body = [
+      'request_id' => 'test-request-uuid',
+      'error' => 'not found',
+    ];
+    $log_message = 'Resource not found in Content Hub: entities/random-uuid.';
+    $response_code = SymfonyResponse::HTTP_NOT_FOUND;
+    $exception = \Mockery::mock(\Exception::class);
+    $exception->shouldReceive('getResponse')
+      ->andReturn($this->makeMockResponse($response_code, [], json_encode($response_body)));
+
+    $this->object_factory->shouldReceive('request')
+      ->andThrows($exception);
+
+    $response = $this->ch_client->get('entities/random-uuid');
+    $logs = $this->ch_client->logger->getLogMessages();
+
+    $this->assertSame($response->getStatusCode(), $response_code);
+    $this->assertTrue(array_key_exists(LogLevel::WARNING, $logs));
+    $this->assertSame($log_message, $logs[LogLevel::WARNING][0]['message']);
   }
 
   /**
