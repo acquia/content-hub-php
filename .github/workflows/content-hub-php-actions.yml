@@ -3,8 +3,6 @@ on: [push, pull_request]
 jobs:
   build:
     runs-on: ${{ matrix.os }}
-    env:
-      COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     strategy:
       matrix:
         os: [ ubuntu-latest ]
@@ -21,9 +19,7 @@ jobs:
           coverage: xdebug
 
       - name: Install composer dependencies
-        run: |
-          composer require --dev php-coveralls/php-coveralls:^2
-          composer install
+        run: composer install
 
       - name: Run phpcs
         run: |
@@ -32,9 +28,6 @@ jobs:
 
       - name: Run PHPUnit
         run: ./vendor/bin/phpunit test/
-
-      - name: Run Coveralls
-        run: ./vendor/bin/php-coveralls -v
 
       - name: Run phpstan
         run: ./vendor/bin/phpstan analyse -c ./phpstan.neon
