@@ -674,14 +674,14 @@ class ContentHubClient implements ClientInterface {
    * @param string $url
    *   URL.
    *
-   * @return array
+   * @return \Acquia\ContentHubClient\Webhook|array
    *   Webhook.
    *
    * @throws \Exception
    *
    * @codeCoverageIgnore
    */
-  public function getWebHook($url) {
+  public function getWebHook(string $url) {
     return current(array_filter($this->getWebHooks(),
         function (Webhook $webhook) use ($url) {
           return $webhook->getUrl() === $url;
