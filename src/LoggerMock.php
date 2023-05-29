@@ -3,12 +3,15 @@
 namespace Acquia\ContentHubClient;
 
 use Psr\Log\LoggerInterface;
+use Psr\Log\LoggerTrait;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Mock Logger created for fetching log messages.
  */
 class LoggerMock implements LoggerInterface {
+
+  use LoggerTrait;
 
   /**
    * Log messages.
@@ -20,7 +23,7 @@ class LoggerMock implements LoggerInterface {
   /**
    * {@inheritDoc}
    */
-  public function log($level, string|\Stringable $message, array $context = []): void {
+  public function log($level, $message, array $context = []): void {
     $log_data['message'] = strip_tags($message);
     $log_data['context'] = $context;
 
@@ -43,54 +46,6 @@ class LoggerMock implements LoggerInterface {
    */
   public function reset(): void {
     $this->logMessages = [];
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public function emergency(string|\Stringable $message, array $context = []): void {
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public function alert(string|\Stringable $message, array $context = []): void {
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public function critical(string|\Stringable $message, array $context = []): void {
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public function error(string|\Stringable $message, array $context = []): void {
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public function warning(string|\Stringable $message, array $context = []): void {
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public function notice(string|\Stringable $message, array $context = []): void {
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public function info(string|\Stringable $message, array $context = []): void {
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public function debug(string|\Stringable $message, array $context = []): void {
   }
 
 }
