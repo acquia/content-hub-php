@@ -77,7 +77,8 @@ class ContentHubClient implements ClientInterface {
     HmacAuthMiddleware $middleware,
     EventDispatcherInterface $dispatcher,
     array $config = [],
-    $api_version = 'v2'
+    string $app_id = '',
+    string $api_version = 'v2'
   ) {
     $this->logger = $logger;
     $this->settings = $settings;
@@ -106,6 +107,10 @@ class ContentHubClient implements ClientInterface {
       $config['headers']['X-Acquia-Plexus-Client-Id'] = $settings->getUuid();
     }
     $config['headers']['User-Agent'] = $user_agent_string;
+    if (!$app_id) {
+      throw new \Exception('Content Hub App ID must be specified');
+    }
+    $config['headers']['X-Acquia-Plexus-App-Id'] = $app_id;
 
     // Add the authentication handler.
     // @see https://github.com/acquia/http-hmac-spec
@@ -165,10 +170,11 @@ class ContentHubClient implements ClientInterface {
   public static function register(
     LoggerInterface $logger,
     EventDispatcherInterface $dispatcher,
-    array $client_details,
+    string $name,
     string $url,
     string $api_key,
     string $secret,
+    string $app_id,
     string $api_version = 'v2'
   ) {
     $config = [
@@ -176,16 +182,11 @@ class ContentHubClient implements ClientInterface {
       'headers' => [
         'Content-Type' => 'application/json',
         'User-Agent' => ContentHubDescriptor::userAgent(),
+        'X-Acquia-Plexus-App-Id' => $app_id,
       ],
       'handler' => ObjectFactory::getHandlerStack(),
     ];
-    $name = $client_details['name'];
-    $uuid = $client_details['uuid'] ?? '';
     $body = ['name' => $name];
-    if ($uuid) {
-      $body['originUUID'] = $uuid;
-    }
-
 
     // Add the authentication handler.
     // @see https://github.com/acquia/http-hmac-spec
@@ -203,7 +204,7 @@ class ContentHubClient implements ClientInterface {
         'base_url' => $settings->getUrl(),
       ];
       $client = ObjectFactory::getCHClient($logger, $settings,
-        $settings->getMiddleware(), $dispatcher, $config);
+        $settings->getMiddleware(), $dispatcher, $config, $app_id);
       // @todo remove this once shared secret is returned on the register
       // endpoint.
       // We need the shared secret to be fully functional, so an additional
@@ -215,7 +216,7 @@ class ContentHubClient implements ClientInterface {
         $settings->getUuid(), $settings->getApiKey(), $settings->getSecretKey(),
         $settings->getUrl(), $remote['shared_secret']);
       return ObjectFactory::getCHClient($logger, $settings,
-        $settings->getMiddleware(), $dispatcher, $config);
+        $settings->getMiddleware(), $dispatcher, $config, $app_id);
     }
     catch (\Exception $exception) {
       if ($exception instanceof BadResponseException) {
@@ -1423,8 +1424,7 @@ class ContentHubClient implements ClientInterface {
   }
 
   public function getRemoteConfig(): array {
-    // Fetches it from /settings/client/:uuid.
-    return [];
+    return $this::getResponseJson($this->get('settings/client')) ?? [];
   }
 
 }
