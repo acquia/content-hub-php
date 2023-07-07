@@ -355,6 +355,9 @@ class ContentHubClient implements ClientInterface {
       ];
       $options['body'] = json_encode($query);
       $results = self::getResponseJson($this->get('_search', $options));
+      if (!isset($results['hits'])) {
+        throw new \RuntimeException('Content Hub Search endpoint is not reachable.');
+      }
       if (isset($results['hits']['total'])) {
         foreach ($results['hits']['hits'] as $key => $item) {
           $objects[] = $this->getCDFObject($item['_source']['data']);
