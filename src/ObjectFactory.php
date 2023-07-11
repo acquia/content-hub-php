@@ -122,10 +122,11 @@ class ObjectFactory {
     HmacAuthMiddleware $middleware,
     EventDispatcherInterface $dispatcher,
     array $config,
+    string $app_id,
     string $api_version = 'v2'
   ): ContentHubClient {
     return new ContentHubClient($logger, $settings, $middleware,
-      $dispatcher, $config, $api_version);
+      $dispatcher, $config, $app_id, $api_version);
   }
 
   /**
