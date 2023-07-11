@@ -704,6 +704,47 @@ class ContentHubClientTest extends TestCase {
   }
 
   /**
+   * Tests that runtime exception is thrown.
+   *
+   * When search endpoint doesn't respond with hits.
+   *
+   * @throws \Exception
+   */
+  public function testGetEntitiesThrowsExceptionWhenSearchNotAvailable(): void {
+    $total = 50;
+    $chunk_size = 50;
+    $uuids = array_fill(0, $total, 'some-non-existing-uuid');
+
+    foreach (array_chunk($uuids, $chunk_size) as $chunk) {
+      $call_params = [
+        'size' => $chunk_size,
+        'query' => [
+          'constant_score' => [
+            'filter' => [
+              'terms' => [
+                'uuid' => $chunk,
+              ],
+            ],
+          ],
+        ],
+      ];
+      $this->ch_client
+        ->shouldReceive('get')
+        ->once()
+        ->with('_search', ['body' => json_encode($call_params)])
+        ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [],
+          json_encode([
+            'error' => 'Search not available',
+          ])));
+    }
+
+    $this->expectException(\RuntimeException::class);
+    $this->expectExceptionMessage('Content Hub Search endpoint is not reachable.');
+    $this->ch_client->getEntities($uuids);
+
+  }
+
+  /**
    * @covers \Acquia\ContentHubClient\ContentHubClient::getCDFObject
    * @throws \ReflectionException
    */
