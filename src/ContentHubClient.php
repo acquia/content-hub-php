@@ -3,6 +3,7 @@
 namespace Acquia\ContentHubClient;
 
 use Acquia\ContentHubClient\CDF\CDFObject;
+use Acquia\ContentHubClient\MetaData\ClientMetaData;
 use Acquia\ContentHubClient\SearchCriteria\SearchCriteria;
 use Acquia\ContentHubClient\SearchCriteria\SearchCriteriaBuilder;
 use Acquia\Hmac\Guzzle\HmacAuthMiddleware;
@@ -152,6 +153,8 @@ class ContentHubClient implements ClientInterface {
    *   API key.
    * @param string $secret
    *   API secret.
+   * @param \Acquia\ContentHubClient\MetaData\ClientMetaData $client_metadata
+   *   Client metadata.
    * @param string $api_version
    *   API version.
    *
@@ -167,6 +170,7 @@ class ContentHubClient implements ClientInterface {
     $url,
     $api_key,
     $secret,
+    $client_metadata,
     $api_version = 'v2'
   ) {
     $config = [
@@ -184,7 +188,11 @@ class ContentHubClient implements ClientInterface {
     $middleware = ObjectFactory::getHmacAuthMiddleware($key);
     $config['handler']->push($middleware);
     $client = ObjectFactory::getGuzzleClient($config);
-    $options['body'] = json_encode(['name' => $name]);
+    $body = [
+      'name' => $name,
+      'metadata' => $client_metadata->getMetadata(),
+    ];
+    $options['body'] = json_encode($body);
     try {
       $response = $client->post('register', $options);
       $values = self::getResponseJson($response);
@@ -1018,17 +1026,61 @@ class ContentHubClient implements ClientInterface {
    *
    * @param string $uuid
    *   The UUID of the client to update.
-   * @param string $name
+   * @param string|null $new_name
    *   The new name for the client we're updating.
+   * @param \Acquia\ContentHubClient\MetaData\ClientMetaData|null $client_metadata
+   *   Client metadata.
    *
    * @return \Psr\Http\Message\ResponseInterface
    *   Response.
-   *
-   * @throws \GuzzleHttp\Exception\RequestException
    */
-  public function updateClient($uuid, $name) {
-    $options['body'] = json_encode(['name' => $name]);
+  public function updateClient(string $uuid, ?string $new_name = NULL, ?ClientMetaData $client_metadata = NULL) {
+    $options = $this->getOptionsForClientUpdate($new_name, $client_metadata);
     return $this->put("settings/client/uuid/$uuid", $options);
+  }
+
+  /**
+   * Sets options for updating the client.
+   *
+   * @param string|null $new_name
+   *   The new name for the client we're updating.
+   * @param \Acquia\ContentHubClient\MetaData\ClientMetaData|null $client_metadata
+   *   Client metadata.
+   *
+   * @return array
+   *   Options array for request.
+   */
+  protected function getOptionsForClientUpdate(?string $new_name, ?ClientMetaData $client_metadata): array {
+    if (empty($new_name) && empty($client_metadata)) {
+      throw new \RuntimeException('Both new_name and client_metadata are empty. At least one of them is required.');
+    }
+    $body = [];
+    if ($new_name) {
+      $body['name'] = $new_name;
+    }
+    if ($client_metadata) {
+      $body['metadata'] = $client_metadata->getMetadata();
+    }
+    $options['body'] = json_encode($body);
+    return $options;
+  }
+
+  /**
+   * Updates a client based on name.
+   *
+   * @param string $current_name
+   *   Current client name.
+   * @param string|null $new_name
+   *   New client name.
+   * @param \Acquia\ContentHubClient\MetaData\ClientMetaData|null $client_metadata
+   *   Client metadata.
+   *
+   * @return \Psr\Http\Message\ResponseInterface
+   *   Response from service.
+   */
+  public function updateClientByName(string $current_name, ?string $new_name = NULL, ?ClientMetaData $client_metadata = NULL) {
+    $options = $this->getOptionsForClientUpdate($new_name, $client_metadata);
+    return $this->put("settings/client/name/$current_name", $options);
   }
 
   /**
