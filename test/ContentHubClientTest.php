@@ -1826,6 +1826,76 @@ class ContentHubClientTest extends TestCase {
   /**
    * @covers \Acquia\ContentHubClient\ContentHubClient::updateClient
    */
+  public function testUpdateClientMetadata(): void {
+    $client_uuid = 'some-non-existing-uuid';
+    $response = json_encode([
+      'success' => TRUE,
+      'request_id' => 'some-request-uuid',
+    ]);
+    $this->ch_client
+      ->shouldReceive('put')
+      ->once()
+      ->with('settings/client/uuid/' . $client_uuid, [
+        'body' => json_encode([
+          'metadata' => $this->test_data['client_metadata']->getMetadata(),
+        ])
+      ])
+      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], $response));
+    $api_response = $this->ch_client->updateClient($client_uuid, NULL, $this->test_data['client_metadata']);
+    $this->assertSame($api_response->getStatusCode(), SymfonyResponse::HTTP_OK);
+    $this->assertSame($api_response->getBody()->getContents(), $response);
+  }
+
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::updateClientByName
+   */
+  public function testUpdateClientMetadataByName(): void {
+    $client_name = 'some-client-name';
+    $response = json_encode([
+      'success' => TRUE,
+      'request_id' => 'some-request-uuid',
+    ]);
+    $this->ch_client
+      ->shouldReceive('put')
+      ->once()
+      ->with('settings/client/name/' . $client_name, [
+        'body' => json_encode([
+          'metadata' => $this->test_data['client_metadata']->getMetadata(),
+        ])
+      ])
+      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], $response));
+    $api_response = $this->ch_client->updateClientByName($client_name, NULL, $this->test_data['client_metadata']);
+    $this->assertSame($api_response->getStatusCode(), SymfonyResponse::HTTP_OK);
+    $this->assertSame($api_response->getBody()->getContents(), $response);
+  }
+
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::updateClientByName
+   */
+  public function testUpdateClientNameByName(): void {
+    $old_client_name = 'old-client-name';
+    $new_name = 'new-client-name';
+    $response = json_encode([
+      'success' => TRUE,
+      'request_id' => 'some-request-uuid',
+    ]);
+    $this->ch_client
+      ->shouldReceive('put')
+      ->once()
+      ->with('settings/client/name/' . $old_client_name, [
+        'body' => json_encode([
+          'name' => $new_name,
+        ])
+      ])
+      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], $response));
+    $api_response = $this->ch_client->updateClientByName($old_client_name, $new_name);
+    $this->assertSame($api_response->getStatusCode(), SymfonyResponse::HTTP_OK);
+    $this->assertSame($api_response->getBody()->getContents(), $response);
+  }
+
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::updateClient
+   */
   public function testUpdateClientAcceptsAUniqueNameForAnExistingClient(): void { // phpcs:ignore
     $client_uuid = 'some-existing-uuid';
     $new_name = 'some-unique-name';
