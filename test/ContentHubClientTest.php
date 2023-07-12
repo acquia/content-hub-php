@@ -8,6 +8,7 @@ use Acquia\ContentHubClient\ContentHubClient;
 use Acquia\ContentHubClient\ContentHubLibraryEvents;
 use Acquia\ContentHubClient\Event\GetCDFTypeEvent;
 use Acquia\ContentHubClient\LoggerMock;
+use Acquia\ContentHubClient\MetaData\ClientMetaData;
 use Acquia\ContentHubClient\Syndication\SyndicationStatus;
 use Acquia\ContentHubClient\ObjectFactory;
 use Acquia\ContentHubClient\SearchCriteria\SearchCriteria;
@@ -119,6 +120,16 @@ class ContentHubClientTest extends TestCase {
       'secret-key' => 'some-secret-key',
       'url' => 'https://some-url/',
       'api-version' => '//v2//',
+      'client_metadata' => ClientMetaData::fromArray([
+        'client_type' => 'drupal',
+        'is_publisher' => TRUE,
+        'is_subscriber' => FALSE,
+        'config' => [
+          'valid_ssl' => TRUE,
+          'drupal_version' => '10.1.1',
+          'ch_version' => '3.3.0',
+        ],
+      ]),
       'host-name' => 'some-host-name',
       'shared-secret' => 'some-shared-secret',
       'webhook-uuid' => 'some-webhook-uuid',
@@ -2506,6 +2517,7 @@ class ContentHubClientTest extends TestCase {
       $this->test_data['url'],
       $this->test_data['api-key'],
       $this->test_data['secret-key'],
+      $this->test_data['client_metadata'],
       $this->test_data['api-version']
     );
   }
