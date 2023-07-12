@@ -166,12 +166,12 @@ class ContentHubClient implements ClientInterface {
   public static function register(
     LoggerInterface $logger,
     EventDispatcherInterface $dispatcher,
-    $name,
-    $url,
-    $api_key,
-    $secret,
-    $client_metadata,
-    $api_version = 'v2'
+    string $name,
+    string $url,
+    string $api_key,
+    string $secret,
+    ClientMetaData $client_metadata,
+    string $api_version = 'v2'
   ) {
     $config = [
       'base_uri' => self::makeBaseURL($url, $api_version),
