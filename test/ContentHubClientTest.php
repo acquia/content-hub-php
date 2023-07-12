@@ -426,7 +426,13 @@ class ContentHubClientTest extends TestCase {
     $this->guzzle_client
       ->shouldReceive('post')
       ->once()
-      ->with('register', ['body' => json_encode(['name' => $this->test_data['name']])])
+      ->with('register', [
+        'body' => json_encode(
+        [
+          'name' => $this->test_data['name'],
+          'metadata' => $this->test_data['client_metadata']->getMetadata(),
+        ])
+      ])
       ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response_body)));
 
     $response = $this->makeRegistrationRequest(new NullLogger());
@@ -445,7 +451,13 @@ class ContentHubClientTest extends TestCase {
     $this->guzzle_client
       ->shouldReceive('post')
       ->once()
-      ->with('register', ['body' => json_encode(['name' => $this->test_data['name']])])
+      ->with('register', [
+        'body' => json_encode(
+          [
+            'name' => $this->test_data['name'],
+            'metadata' => $this->test_data['client_metadata']->getMetadata(),
+          ])
+      ])
       ->andThrow(new BadResponseException('Some message', $request, $response));
 
     $this->expectException(RequestException::class);
@@ -464,7 +476,13 @@ class ContentHubClientTest extends TestCase {
     $this->guzzle_client
       ->shouldReceive('post')
       ->once()
-      ->with('register', ['body' => json_encode(['name' => $this->test_data['name']])])
+      ->with('register', [
+        'body' => json_encode(
+          [
+            'name' => $this->test_data['name'],
+            'metadata' => $this->test_data['client_metadata']->getMetadata(),
+          ])
+      ])
       ->andThrow(new RequestException('Some message', $request, $response));
 
     $this->expectException(RequestException::class);
@@ -481,7 +499,13 @@ class ContentHubClientTest extends TestCase {
     $this->guzzle_client
       ->shouldReceive('post')
       ->once()
-      ->with('register', ['body' => json_encode(['name' => $this->test_data['name']])])
+      ->with('register', [
+        'body' => json_encode(
+          [
+            'name' => $this->test_data['name'],
+            'metadata' => $this->test_data['client_metadata']->getMetadata(),
+          ])
+      ])
       ->andThrow(new \Exception());
 
     $this->expectException(\Exception::class);
