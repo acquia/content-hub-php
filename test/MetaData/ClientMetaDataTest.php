@@ -1,6 +1,6 @@
 <?php
 
-namespace test\MetaData;
+namespace Acquia\ContentHubClient\test\MetaData;
 
 use Acquia\ContentHubClient\MetaData\ClientMetaData;
 use PHPUnit\Framework\TestCase;
