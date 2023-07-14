@@ -49,7 +49,7 @@ class ClientMetaData {
    * @param array $client_config
    *   Additional config metadata.
    */
-  public function __construct(string $client_type, bool $is_publisher, bool $is_subscriber, array $client_config) {
+  public function __construct(string $client_type, bool $is_publisher, bool $is_subscriber, array $client_config = []) {
     $this->clientType = $client_type;
     $this->isPublisher = $is_publisher;
     $this->isSubscriber = $is_subscriber;
