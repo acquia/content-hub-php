@@ -79,12 +79,12 @@ class ClientMetaData {
   }
 
   /**
-   * Returns metadata of the client.
+   * Returns metadata of the client in array.
    *
    * @return array
-   *   Client metadata.
+   *   Client metadata array.
    */
-  public function getMetadata(): array {
+  public function toArray(): array {
     return [
       'client_type' => $this->clientType,
       'is_publisher' => $this->isPublisher,

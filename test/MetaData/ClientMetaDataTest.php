@@ -36,13 +36,13 @@ class ClientMetaDataTest extends TestCase {
   protected ClientMetaData $sut;
 
   /**
-   * Tests getMetadata method.
+   * Tests toArray method.
    *
-   * @covers ::getMetadata
+   * @covers ::toArray
    */
   public function testGetMetaData(): void {
     $this->sut = new ClientMetaData($this->metadata['client_type'], $this->metadata['is_publisher'], $this->metadata['is_subscriber'], $this->metadata['config']);
-    $client_metadata = $this->sut->getMetadata();
+    $client_metadata = $this->sut->toArray();
     $this->assertEquals($this->metadata, $client_metadata);
   }
 
@@ -53,7 +53,7 @@ class ClientMetaDataTest extends TestCase {
    */
   public function testMetaDataCreationFromArray(): void {
     $this->sut = ClientMetaData::fromArray($this->metadata);
-    $client_metadata = $this->sut->getMetadata();
+    $client_metadata = $this->sut->toArray();
     $this->assertEquals($this->metadata, $client_metadata);
   }
 

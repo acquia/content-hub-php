@@ -430,7 +430,7 @@ class ContentHubClientTest extends TestCase {
         'body' => json_encode(
         [
           'name' => $this->test_data['name'],
-          'metadata' => $this->test_data['client_metadata']->getMetadata(),
+          'metadata' => $this->test_data['client_metadata']->toArray(),
         ])
       ])
       ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response_body)));
@@ -455,7 +455,7 @@ class ContentHubClientTest extends TestCase {
         'body' => json_encode(
           [
             'name' => $this->test_data['name'],
-            'metadata' => $this->test_data['client_metadata']->getMetadata(),
+            'metadata' => $this->test_data['client_metadata']->toArray(),
           ])
       ])
       ->andThrow(new BadResponseException('Some message', $request, $response));
@@ -480,7 +480,7 @@ class ContentHubClientTest extends TestCase {
         'body' => json_encode(
           [
             'name' => $this->test_data['name'],
-            'metadata' => $this->test_data['client_metadata']->getMetadata(),
+            'metadata' => $this->test_data['client_metadata']->toArray(),
           ])
       ])
       ->andThrow(new RequestException('Some message', $request, $response));
@@ -503,7 +503,7 @@ class ContentHubClientTest extends TestCase {
         'body' => json_encode(
           [
             'name' => $this->test_data['name'],
-            'metadata' => $this->test_data['client_metadata']->getMetadata(),
+            'metadata' => $this->test_data['client_metadata']->toArray(),
           ])
       ])
       ->andThrow(new \Exception());
@@ -1837,7 +1837,7 @@ class ContentHubClientTest extends TestCase {
       ->once()
       ->with('settings/client/uuid/' . $client_uuid, [
         'body' => json_encode([
-          'metadata' => $this->test_data['client_metadata']->getMetadata(),
+          'metadata' => $this->test_data['client_metadata']->toArray(),
         ])
       ])
       ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], $response));
@@ -1860,7 +1860,7 @@ class ContentHubClientTest extends TestCase {
       ->once()
       ->with('settings/client/name/' . $client_name, [
         'body' => json_encode([
-          'metadata' => $this->test_data['client_metadata']->getMetadata(),
+          'metadata' => $this->test_data['client_metadata']->toArray(),
         ])
       ])
       ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], $response));

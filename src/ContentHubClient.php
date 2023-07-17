@@ -190,7 +190,7 @@ class ContentHubClient implements ClientInterface {
     $client = ObjectFactory::getGuzzleClient($config);
     $body = [
       'name' => $name,
-      'metadata' => $client_metadata->getMetadata(),
+      'metadata' => $client_metadata->toArray(),
     ];
     $options['body'] = json_encode($body);
     try {
@@ -1059,7 +1059,7 @@ class ContentHubClient implements ClientInterface {
       $body['name'] = $new_name;
     }
     if ($client_metadata) {
-      $body['metadata'] = $client_metadata->getMetadata();
+      $body['metadata'] = $client_metadata->toArray();
     }
     $options['body'] = json_encode($body);
     return $options;
