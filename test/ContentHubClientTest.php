@@ -8,6 +8,7 @@ use Acquia\ContentHubClient\ContentHubClient;
 use Acquia\ContentHubClient\ContentHubLibraryEvents;
 use Acquia\ContentHubClient\Event\GetCDFTypeEvent;
 use Acquia\ContentHubClient\LoggerMock;
+use Acquia\ContentHubClient\MetaData\ClientMetaData;
 use Acquia\ContentHubClient\Syndication\SyndicationStatus;
 use Acquia\ContentHubClient\ObjectFactory;
 use Acquia\ContentHubClient\SearchCriteria\SearchCriteria;
@@ -119,6 +120,16 @@ class ContentHubClientTest extends TestCase {
       'secret-key' => 'some-secret-key',
       'url' => 'https://some-url/',
       'api-version' => '//v2//',
+      'client_metadata' => ClientMetaData::fromArray([
+        'client_type' => 'drupal',
+        'is_publisher' => TRUE,
+        'is_subscriber' => FALSE,
+        'config' => [
+          'valid_ssl' => TRUE,
+          'drupal_version' => '10.1.1',
+          'ch_version' => '3.3.0',
+        ],
+      ]),
       'host-name' => 'some-host-name',
       'shared-secret' => 'some-shared-secret',
       'webhook-uuid' => 'some-webhook-uuid',
@@ -415,7 +426,13 @@ class ContentHubClientTest extends TestCase {
     $this->guzzle_client
       ->shouldReceive('post')
       ->once()
-      ->with('register', ['body' => json_encode(['name' => $this->test_data['name']])])
+      ->with('register', [
+        'body' => json_encode(
+        [
+          'name' => $this->test_data['name'],
+          'metadata' => $this->test_data['client_metadata']->toArray(),
+        ])
+      ])
       ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response_body)));
 
     $response = $this->makeRegistrationRequest(new NullLogger());
@@ -434,7 +451,13 @@ class ContentHubClientTest extends TestCase {
     $this->guzzle_client
       ->shouldReceive('post')
       ->once()
-      ->with('register', ['body' => json_encode(['name' => $this->test_data['name']])])
+      ->with('register', [
+        'body' => json_encode(
+          [
+            'name' => $this->test_data['name'],
+            'metadata' => $this->test_data['client_metadata']->toArray(),
+          ])
+      ])
       ->andThrow(new BadResponseException('Some message', $request, $response));
 
     $this->expectException(RequestException::class);
@@ -453,7 +476,13 @@ class ContentHubClientTest extends TestCase {
     $this->guzzle_client
       ->shouldReceive('post')
       ->once()
-      ->with('register', ['body' => json_encode(['name' => $this->test_data['name']])])
+      ->with('register', [
+        'body' => json_encode(
+          [
+            'name' => $this->test_data['name'],
+            'metadata' => $this->test_data['client_metadata']->toArray(),
+          ])
+      ])
       ->andThrow(new RequestException('Some message', $request, $response));
 
     $this->expectException(RequestException::class);
@@ -470,7 +499,13 @@ class ContentHubClientTest extends TestCase {
     $this->guzzle_client
       ->shouldReceive('post')
       ->once()
-      ->with('register', ['body' => json_encode(['name' => $this->test_data['name']])])
+      ->with('register', [
+        'body' => json_encode(
+          [
+            'name' => $this->test_data['name'],
+            'metadata' => $this->test_data['client_metadata']->toArray(),
+          ])
+      ])
       ->andThrow(new \Exception());
 
     $this->expectException(\Exception::class);
@@ -1832,6 +1867,76 @@ class ContentHubClientTest extends TestCase {
   /**
    * @covers \Acquia\ContentHubClient\ContentHubClient::updateClient
    */
+  public function testUpdateClientMetadata(): void {
+    $client_uuid = 'some-non-existing-uuid';
+    $response = json_encode([
+      'success' => TRUE,
+      'request_id' => 'some-request-uuid',
+    ]);
+    $this->ch_client
+      ->shouldReceive('put')
+      ->once()
+      ->with('settings/client/uuid/' . $client_uuid, [
+        'body' => json_encode([
+          'metadata' => $this->test_data['client_metadata']->toArray(),
+        ])
+      ])
+      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], $response));
+    $api_response = $this->ch_client->updateClient($client_uuid, NULL, $this->test_data['client_metadata']);
+    $this->assertSame($api_response->getStatusCode(), SymfonyResponse::HTTP_OK);
+    $this->assertSame($api_response->getBody()->getContents(), $response);
+  }
+
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::updateClientByName
+   */
+  public function testUpdateClientMetadataByName(): void {
+    $client_name = 'some-client-name';
+    $response = json_encode([
+      'success' => TRUE,
+      'request_id' => 'some-request-uuid',
+    ]);
+    $this->ch_client
+      ->shouldReceive('put')
+      ->once()
+      ->with('settings/client/name/' . $client_name, [
+        'body' => json_encode([
+          'metadata' => $this->test_data['client_metadata']->toArray(),
+        ])
+      ])
+      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], $response));
+    $api_response = $this->ch_client->updateClientByName($client_name, NULL, $this->test_data['client_metadata']);
+    $this->assertSame($api_response->getStatusCode(), SymfonyResponse::HTTP_OK);
+    $this->assertSame($api_response->getBody()->getContents(), $response);
+  }
+
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::updateClientByName
+   */
+  public function testUpdateClientNameByName(): void {
+    $old_client_name = 'old-client-name';
+    $new_name = 'new-client-name';
+    $response = json_encode([
+      'success' => TRUE,
+      'request_id' => 'some-request-uuid',
+    ]);
+    $this->ch_client
+      ->shouldReceive('put')
+      ->once()
+      ->with('settings/client/name/' . $old_client_name, [
+        'body' => json_encode([
+          'name' => $new_name,
+        ])
+      ])
+      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], $response));
+    $api_response = $this->ch_client->updateClientByName($old_client_name, $new_name);
+    $this->assertSame($api_response->getStatusCode(), SymfonyResponse::HTTP_OK);
+    $this->assertSame($api_response->getBody()->getContents(), $response);
+  }
+
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::updateClient
+   */
   public function testUpdateClientAcceptsAUniqueNameForAnExistingClient(): void { // phpcs:ignore
     $client_uuid = 'some-existing-uuid';
     $new_name = 'some-unique-name';
@@ -2547,6 +2652,7 @@ class ContentHubClientTest extends TestCase {
       $this->test_data['url'],
       $this->test_data['api-key'],
       $this->test_data['secret-key'],
+      $this->test_data['client_metadata'],
       $this->test_data['api-version']
     );
   }
