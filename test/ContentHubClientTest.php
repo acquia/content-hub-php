@@ -1347,7 +1347,7 @@ class ContentHubClientTest extends TestCase {
     $this->ch_client
       ->shouldReceive('get')
       ->once()
-      ->with("interest/webhook/$webhook_uuid/$site_role")
+      ->with("interest/webhook/$webhook_uuid/$site_role", [])
       ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response)));
 
     $this->assertSame($this->ch_client->getInterestsByWebhookAndSiteRole($webhook_uuid, $site_role), $response['data']);
@@ -1370,10 +1370,62 @@ class ContentHubClientTest extends TestCase {
     $this->ch_client
       ->shouldReceive('get')
       ->once()
-      ->with("interest/webhook/$webhook_uuid/$site_role")
+      ->with("interest/webhook/$webhook_uuid/$site_role", [])
       ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response)));
 
     $this->assertSame($this->ch_client->getInterestsByWebhookAndSiteRole($webhook_uuid, $site_role), []);
+  }
+
+  /**
+   * @covers ::getInterestsByWebhookAndSiteRole
+   */
+  public function testGetDisabledInterestsByWebhookAndSiteRoleIfAny(): void {
+    $response = [
+      'success' => TRUE,
+      'data' => [
+        '0e714009-72f9-4016-8f26-5fae32e6abb8' => [
+          'status' => SyndicationStatus::IMPORT_SUCCESSFUL,
+          'reason' => 'ipsum',
+          'event_ref' => '0e714009-72f9-4016-8f26-5fae32e6abb9',
+          'disabled_syndication' => TRUE,
+        ],
+      ],
+    ];
+    $webhook_uuid = 'some-webhook-uuid';
+    $site_role = 'subscriber';
+    $this->ch_client
+      ->shouldReceive('get')
+      ->once()
+      ->with("interest/webhook/$webhook_uuid/$site_role", ['query' => ['disable_syndication' => TRUE]])
+      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response)));
+
+    $this->assertSame($this->ch_client->getInterestsByWebhookAndSiteRole($webhook_uuid, $site_role, TRUE), $response['data']);
+  }
+
+  /**
+   * @covers ::getInterestsByWebhookAndSiteRole
+   */
+  public function testGetEnabledInterestsByWebhookAndSiteRoleIfAny(): void {
+    $response = [
+      'success' => TRUE,
+      'data' => [
+        '0e714009-72f9-4016-8f26-5fae32e6abb8' => [
+          'status' => SyndicationStatus::IMPORT_SUCCESSFUL,
+          'reason' => 'ipsum',
+          'event_ref' => '0e714009-72f9-4016-8f26-5fae32e6abb9',
+          'disabled_syndication' => FALSE,
+        ],
+      ],
+    ];
+    $webhook_uuid = 'some-webhook-uuid';
+    $site_role = 'subscriber';
+    $this->ch_client
+      ->shouldReceive('get')
+      ->once()
+      ->with("interest/webhook/$webhook_uuid/$site_role", ['query' => ['disable_syndication' => FALSE]])
+      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response)));
+
+    $this->assertSame($this->ch_client->getInterestsByWebhookAndSiteRole($webhook_uuid, $site_role, FALSE), $response['data']);
   }
 
   /**
