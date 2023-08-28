@@ -1029,8 +1029,13 @@ class ContentHubClient implements ClientInterface {
     $settings = $this->getSettings();
     $uuid = $client_uuid ?? $settings->getUuid();
     $response = $this->deleteEntity($uuid);
-    if (!$response || $response->getStatusCode() < 200 || $response->getStatusCode() >= 300) {
+    if (!$response) {
       throw new \Exception(sprintf("Entity with UUID = %s cannot be deleted.", $uuid));
+    }
+    if ($response->getStatusCode() !== 404 &&
+      ($response->getStatusCode() < 200 || $response->getStatusCode() >= 300)
+    ) {
+      throw new \Exception(sprintf("Entity with UUID = %s cannot be deleted. Message: %s", $uuid, (string) $response->getBody()));
     }
     return $this->delete("settings/client/uuid/$uuid");
   }

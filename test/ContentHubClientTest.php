@@ -1858,7 +1858,7 @@ class ContentHubClientTest extends TestCase {
       ->shouldReceive('delete')
       ->once()
       ->with('entities/' . $client_uuid)
-      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_NOT_FOUND, [], ''));
+      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_INTERNAL_SERVER_ERROR, [], ''));
 
     $this->expectException(\Exception::class);
     $this->ch_client->deleteClient($client_uuid);
