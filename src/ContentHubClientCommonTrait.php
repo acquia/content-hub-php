@@ -37,13 +37,13 @@ if (defined('\GuzzleHttp\ClientInterface::MAJOR_VERSION')) {
      */
     public function request(string $method, $uri, array $options = []): ResponseInterface {
       try {
-        return $this->httpClient->request($method, $uri, $options);
+        $response = $this->httpClient->request($method, $uri, $options);
       }
       catch (\Exception $e) {
         $response = $this->getExceptionResponse($method, $uri, $e);
-        $this->response = $response;
-        return $response;
       }
+      $this->response = $response;
+      return $response;
     }
 
     /**
@@ -111,13 +111,13 @@ else {
      */
     public function request($method, $uri, array $options = []) {
       try {
-        return $this->httpClient->request($method, $uri, $options);
+        $response = $this->httpClient->request($method, $uri, $options);
       }
       catch (\Exception $e) {
         $response = $this->getExceptionResponse($method, $uri, $e);
-        $this->response = $response;
-        return $response;
       }
+      $this->response = $response;
+      return $response;
     }
 
     /**
