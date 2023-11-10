@@ -2,11 +2,10 @@
 
 namespace Acquia\ContentHubClient\test;
 
-use Acquia\ContentHubClient\CDF\CDFObject;
-use Acquia\ContentHubClient\CDFDocument;
-use Acquia\ContentHubClient\ContentHubClient;
-use Acquia\ContentHubClient\ContentHubLibraryEvents;
-use Acquia\ContentHubClient\Event\GetCDFTypeEvent;
+use Acquia\ContentHubClient\LoggerMock;
+use Acquia\ContentHubClient\MetaData\ClientMetaData;
+use Acquia\ContentHubClient\StatusCodes;
+use Acquia\ContentHubClient\Syndication\SyndicationStatus;
 use Acquia\ContentHubClient\ObjectFactory;
 use Acquia\ContentHubClient\SearchCriteria\SearchCriteria;
 use Acquia\ContentHubClient\Settings;
@@ -2638,6 +2637,33 @@ class ContentHubClientTest extends TestCase {
     $this->assertSame($response1, $actual);
     $actual = $this->ch_client->getRemoteSettings();
     $this->assertSame($response1, $actual);
+  }
+
+  public function testGetResponse(): void {
+    $resp = new Response(SymfonyResponse::HTTP_OK, [], json_encode(['version' => 'version_number']));
+    $this->guzzle_client
+      ->shouldReceive('get')
+      ->once()
+      ->with('ping')
+      ->andReturn($resp);
+
+    $actual = $this->ch_client->ping();
+    $this->assertSame($resp, $actual);
+
+    $resp = new Response(SymfonyResponse::HTTP_SERVICE_UNAVAILABLE, [], json_encode([
+      'error' => [
+        'code' => StatusCodes::SERVICE_UNDER_MAINTENANCE,
+        'message' => 'service under maintenance',
+      ],
+    ]));
+    $this->guzzle_client
+      ->shouldReceive('get')
+      ->once()
+      ->with('ping')
+      ->andReturn($resp);
+
+    $actual = $this->ch_client->ping();
+    $this->assertSame($resp, $actual, 'Subsequent call returns the new response object.');
   }
 
 }
