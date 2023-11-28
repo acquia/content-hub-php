@@ -2,6 +2,7 @@
 
 namespace Acquia\ContentHubClient\Logging;
 
+use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
@@ -35,7 +36,7 @@ trait LoggingHelperTrait {
    *  @codeCoverageIgnore
    */
   protected function getExceptionResponse(string $method, string $api_call, \Exception $exception): ResponseInterface {
-    $response = $exception->getResponse();
+    $response = method_exists($exception, 'getResponse')  ? $exception->getResponse() : NULL;
     if (!$response) {
       $response = $this->getErrorResponse($exception->getCode(), $exception->getMessage());
     }
