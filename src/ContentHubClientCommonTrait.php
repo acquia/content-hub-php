@@ -50,6 +50,18 @@ if (defined('\GuzzleHttp\ClientInterface::MAJOR_VERSION')) {
     }
 
     /**
+     * Returns the response object from the last call.
+     *
+     * In case further examination needed e.g. status code or error message.
+     *
+     * @return \Psr\Http\Message\ResponseInterface
+     *   The response object.
+     */
+    public function getResponse(): ResponseInterface {
+      return $this->response;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getConfig(?string $option = NULL) {
