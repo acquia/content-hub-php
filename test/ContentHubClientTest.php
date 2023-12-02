@@ -178,15 +178,7 @@ class ContentHubClientTest extends TestCase {
     $this->dispatcher = $this->getMockDispatcher();
 
     $this->ch_client = $this->makeMockCHClient(
-      [
-        'base_url' => $this->test_data['url'],
-        'client-languages' => [
-          'en',
-          'es',
-          'und',
-        ],
-      ],
-      new NullLogger(),
+      new LoggerMock(),
       $this->makeMockSettings(
         $this->test_data['name'],
         $this->test_data['uuid'],
@@ -198,6 +190,14 @@ class ContentHubClientTest extends TestCase {
       ),
       \Mockery::mock(HmacAuthMiddleware::class),
       $this->dispatcher,
+      [
+        'base_url' => $this->test_data['url'],
+        'client-languages' => [
+          'en',
+          'es',
+          'und',
+        ],
+      ],
       'v2'
     );
 
