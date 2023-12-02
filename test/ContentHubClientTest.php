@@ -2639,6 +2639,9 @@ class ContentHubClientTest extends TestCase {
     $this->assertSame($response1, $actual);
   }
 
+  /**
+   * @covers ::getResponse
+   */
   public function testGetResponse(): void {
     $resp = new Response(SymfonyResponse::HTTP_OK, [], json_encode(['version' => 'version_number']));
     $this->guzzle_client
