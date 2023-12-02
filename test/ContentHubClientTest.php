@@ -230,15 +230,15 @@ class ContentHubClientTest extends TestCase {
       });
     $this->object_factory->shouldReceive('getCHClient')
       ->andReturnUsing(function (
-        array $config,
         LoggerInterface $logger,
         Settings $settings,
         HmacAuthMiddleware $middleware,
         EventDispatcherInterface $dispatcher,
+        array $config,
         string $api_version = 'v2'
       ) {
-        return $this->makeMockCHClient($config, $logger, $settings, $middleware,
-          $dispatcher, $api_version);
+        return $this->makeMockCHClient($logger, $settings, $middleware,
+          $dispatcher, $config, $api_version);
       });
     $this->object_factory->shouldReceive('getCDFDocument')
       ->andReturnUsing(function (...$entities) {
@@ -2127,11 +2127,11 @@ class ContentHubClientTest extends TestCase {
    * @throws \ReflectionException
    */
   public function makeMockCHClient( // phpcs:ignore
-    array $config,
     LoggerInterface $logger,
     Settings $settings,
     HmacAuthMiddleware $middleware,
     EventDispatcherInterface $dispatcher,
+    array $config,
     string $api_version = 'v2'
   ): ContentHubClient {
     $client = \Mockery::mock(ContentHubClient::class)
@@ -2150,6 +2150,8 @@ class ContentHubClientTest extends TestCase {
         return $config[$key] ?? NULL;
       });
 
+    $client->httpClient = $this->object_factory;
+    $client->logger = $logger;
     $client->shouldReceive('getSettings')->andReturn($settings);
     $client->shouldReceive('getRemoteSettings')->andReturn([
       'hostname' => $this->test_data['host-name'],
