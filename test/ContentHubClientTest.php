@@ -2108,8 +2108,6 @@ class ContentHubClientTest extends TestCase {
   /**
    * Mock CH client.
    *
-   * @param array $config
-   *   Config.
    * @param \Psr\Log\LoggerInterface $logger
    *   Logger.
    * @param \Acquia\ContentHubClient\Settings $settings
@@ -2118,6 +2116,8 @@ class ContentHubClientTest extends TestCase {
    *   Middleware.
    * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
    *   Event dispatcher.
+   * @param array $config
+   *   Config.
    * @param string $api_version
    *   API version.
    *
