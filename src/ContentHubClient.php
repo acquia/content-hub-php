@@ -50,13 +50,6 @@ class ContentHubClient implements ClientInterface {
   protected $settings;
 
   /**
-   * The logger responsible for tracking request failures.
-   *
-   * @var \Psr\Log\LoggerInterface
-   */
-  protected $logger;
-
-  /**
    * The Event Dispatcher.
    *
    * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
@@ -1085,7 +1078,7 @@ class ContentHubClient implements ClientInterface {
    * @return array
    *   Processed arguments.
    */
-  protected function addSearchCriteriaHeader(array $args) {
+  public function addSearchCriteriaHeader(array $args) {
     $result = explode('?', $args[0] ?? '');
     if (count($result) < 2) {
       return $args;
