@@ -230,11 +230,11 @@ class ContentHubClientTest extends TestCase {
       });
     $this->object_factory->shouldReceive('getCHClient')
       ->andReturnUsing(function (
+        array $config,
         LoggerInterface $logger,
         Settings $settings,
         HmacAuthMiddleware $middleware,
         EventDispatcherInterface $dispatcher,
-        array $config,
         string $api_version = 'v2'
       ) {
         return $this->makeMockCHClient($logger, $settings, $middleware,
