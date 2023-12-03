@@ -2,6 +2,11 @@
 
 namespace Acquia\ContentHubClient\test;
 
+use Acquia\ContentHubClient\CDF\CDFObject;
+use Acquia\ContentHubClient\CDFDocument;
+use Acquia\ContentHubClient\ContentHubClient;
+use Acquia\ContentHubClient\ContentHubLibraryEvents;
+use Acquia\ContentHubClient\Event\GetCDFTypeEvent;
 use Acquia\ContentHubClient\LoggerMock;
 use Acquia\ContentHubClient\MetaData\ClientMetaData;
 use Acquia\ContentHubClient\StatusCodes;
@@ -30,7 +35,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 /**
- * @coversDefaultClass  \Acquia\ContentHubClient\ContentHubClient
+ * @coversDefaultClass \Acquia\ContentHubClient\ContentHubClient
  *
  * @runTestsInSeparateProcesses
  * @preserveGlobalState disabled
@@ -38,7 +43,7 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 class ContentHubClientTest extends TestCase {
 
   /**
-   * CH client.
+   * Content Hub client.
    *
    * @var \Acquia\ContentHubClient\ContentHubClient
    */
