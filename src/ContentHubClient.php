@@ -1274,6 +1274,35 @@ class ContentHubClient implements ClientInterface {
   }
 
   /**
+   * Returns an extended interest list based on the site role.
+   *
+   * @param string $webhook_uuid
+   *   Identifier of the webhook.
+   * @param string $site_role
+   *   The role of the site.
+   * @param bool|null $disable_syndication
+   *   Filter for disabled entities.
+   *   If set to true, only disabled entities will be returned.
+   *   If set to false, only enabled entities will be returned.
+   *   If not set, all the entities will be returned.
+   *
+   * @return array
+   *   An associate array keyed by the entity uuid.
+   *
+   * @throws \Exception
+   */
+  public function getInterestsByWebhookAndSiteRole(string $webhook_uuid, string $site_role, ?bool $disable_syndication = NULL): array {
+    $options = [];
+    if (isset($disable_syndication)) {
+      $options['query'] = [
+        'disable_syndication' => $disable_syndication,
+      ];
+    }
+    $data = self::getResponseJson($this->get("interest/webhook/$webhook_uuid/$site_role", $options));
+    return $data['data'] ?? [];
+  }
+
+  /**
    * The extended interest list to add based on site role.
    *
    * Format:
