@@ -3,6 +3,7 @@
 namespace Acquia\ContentHubClient;
 
 use Acquia\ContentHubClient\Guzzle\Middleware\RequestResponseHandler;
+use Acquia\ContentHubClient\Logging\LoggingHelperTrait;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Response;
@@ -16,6 +17,7 @@ use Psr\Log\LogLevel;
 trait ContentHubClientTrait {
 
   use ContentHubClientCommonTrait;
+  use LoggingHelperTrait;
 
   /**
    * GuzzleHttp client.
