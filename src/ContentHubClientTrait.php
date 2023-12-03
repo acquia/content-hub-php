@@ -22,7 +22,7 @@ trait ContentHubClientTrait {
    *
    * @var \GuzzleHttp\ClientInterface
    */
-  protected $httpClient;
+  public $httpClient;
 
   /**
    * Custom configurations.
