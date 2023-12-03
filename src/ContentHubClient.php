@@ -1273,4 +1273,55 @@ class ContentHubClient implements ClientInterface {
     return $remote['featured'] ?? FALSE;
   }
 
+  /**
+   * The extended interest list to add based on site role.
+   *
+   * Format:
+   * [
+   *   'fe5f27d1-6e41-4609-b65a-2cb179549d1e' => [
+   *     'status' => '',
+   *     'reason' => '',
+   *     'event_ref' => '',
+   *   ],
+   * ]
+   *
+   * @param string $webhook_uuid
+   *   The webhook uuid to register interest items for.
+   * @param string $site_role
+   *   The site role.
+   * @param array $interest_list
+   *   An array of interest items.
+   *
+   * @return \Psr\Http\Message\ResponseInterface
+   *   Response object.
+   */
+  public function addEntitiesToInterestListBySiteRole(string $webhook_uuid, string $site_role, array $interest_list): ResponseInterface {
+    $options['body'] = json_encode($interest_list);
+
+    return $this->post("interest/webhook/$webhook_uuid/$site_role", $options);
+  }
+
+  /**
+   * The extended interest list to add based on site role.
+   *
+   * Format:
+   *
+   *   @see \Acquia\ContentHubClient\ContentHubClient::addEntitiesToInterestListBySiteRole
+   *
+   * @param string $webhook_uuid
+   *   The webhook uuid to register interest items for.
+   * @param string $site_role
+   *   The site role.
+   * @param array $interest_list
+   *   An array of interest items.
+   *
+   * @return \Psr\Http\Message\ResponseInterface
+   *   Response object.
+   */
+  public function updateInterestListBySiteRole(string $webhook_uuid, string $site_role, array $interest_list): ResponseInterface {
+    $options['body'] = json_encode($interest_list);
+
+    return $this->put("interest/webhook/$webhook_uuid/$site_role", $options);
+  }
+
 }
