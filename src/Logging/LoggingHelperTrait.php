@@ -27,7 +27,7 @@ trait LoggingHelperTrait {
    *   The Request to Plexus, as defined in the content-hub-php library.
    * @param string $api_call
    *   The api endpoint.
-   * @param \Exception $exception
+   * @param RequestException $exception
    *   The Exception object.
    *
    * @return \Psr\Http\Message\ResponseInterface
