@@ -36,7 +36,7 @@ trait LoggingHelperTrait {
    *  @codeCoverageIgnore
    */
   protected function getExceptionResponse(string $method, string $api_call, \Exception $exception): ResponseInterface {
-    $response = method_exists($exception, 'getResponse')  ? $exception->getResponse() : NULL;
+    $response = method_exists($exception, 'getResponse') ? $exception->getResponse() : NULL;
     if (!$response) {
       $response = $this->getErrorResponse($exception->getCode(), $exception->getMessage());
     }
