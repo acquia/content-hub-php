@@ -14,15 +14,24 @@ if (defined('\GuzzleHttp\ClientInterface::MAJOR_VERSION')) {
   trait ContentHubClientCommonTrait {
 
     /**
+     * The last call's response object.
+     *
+     * @var \Psr\Http\Message\ResponseInterface
+     */
+    private $response;
+
+    /**
      * {@inheritdoc}
      */
     public function request(string $method, $uri, array $options = []): ResponseInterface {
       try {
-        return $this->httpClient->request($method, $uri, $options);
+        $response = $this->httpClient->request($method, $uri, $options);
       }
       catch (\Exception $e) {
-        return $this->getExceptionResponse($method, $uri, $e);
+        $response = $this->getExceptionResponse($method, $uri, $e);
       }
+      $this->response = $response;
+      return $response;
     }
 
     /**
@@ -76,6 +85,18 @@ if (defined('\GuzzleHttp\ClientInterface::MAJOR_VERSION')) {
         : ($this->config[$option] ?? NULL);
     }
 
+    /**
+     * Returns the response object from the last call.
+     *
+     * In case further examination needed e.g. status code or error message.
+     *
+     * @return \Psr\Http\Message\ResponseInterface
+     *   The response object.
+     */
+    public function getResponse(): ResponseInterface {
+      return $this->response;
+    }
+
   }
 }
 else {
@@ -85,15 +106,36 @@ else {
   trait ContentHubClientCommonTrait {
 
     /**
+     * The last call's response object.
+     *
+     * @var \Psr\Http\Message\ResponseInterface
+     */
+    private $response;
+
+    /**
      * {@inheritdoc}
      */
     public function request($method, $uri, array $options = []) {
       try {
-        return $this->httpClient->request($method, $uri, $options);
+        $response = $this->httpClient->request($method, $uri, $options);
       }
       catch (\Exception $e) {
-        return $this->getExceptionResponse($method, $uri, $e);
+        $response = $this->getExceptionResponse($method, $uri, $e);
       }
+      $this->response = $response;
+      return $response;
+    }
+
+    /**
+     * Returns the response object from the last call.
+     *
+     * In case further examination needed e.g. status code or error message.
+     *
+     * @return \Psr\Http\Message\ResponseInterface
+     *   The response object.
+     */
+    public function getResponse(): ResponseInterface {
+      return $this->response;
     }
 
     /**
