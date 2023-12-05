@@ -361,7 +361,7 @@ class ContentHubClientTest extends TestCase {
     ];
     $log_message = 'Request ID: test-request-uuid, Method: GET, Path: "test-endpoint", Status Code: 202, Reason: some-reason, Error Code: , Error Message: "". Error data: "end-point-not-available"';
     $response_code = SymfonyResponse::HTTP_ACCEPTED;
-    $exception = \Mockery::mock(\Exception::class);
+    $exception = \Mockery::mock(RequestException::class);
     $exception->shouldReceive('getResponse')
       ->andReturn($this->makeMockResponse($response_code, [], json_encode($response_body)));
 
@@ -400,7 +400,7 @@ class ContentHubClientTest extends TestCase {
     ];
     $log_message = 'Resource not found in Content Hub: entities/random-uuid.';
     $response_code = SymfonyResponse::HTTP_NOT_FOUND;
-    $exception = \Mockery::mock(\Exception::class);
+    $exception = \Mockery::mock(RequestException::class);
     $exception->shouldReceive('getResponse')
       ->andReturn($this->makeMockResponse($response_code, [], json_encode($response_body)));
 
