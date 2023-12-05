@@ -10,6 +10,6 @@ final class StatusCodes {
   /**
    * Returned when the service is intentionally configured to be in maintenance.
    */
-  public const SERVICE_UNDER_MAINTENANCE = 5301;
+  public const SERVICE_UNDER_MAINTENANCE = 5031;
 
 }
