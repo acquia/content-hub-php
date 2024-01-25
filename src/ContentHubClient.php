@@ -768,9 +768,9 @@ class ContentHubClient implements ClientInterface {
    * @param string $webhook_uuid
    *   Webhook UUID.
    * @param array $interest_list
-   *     An array of interest items.
+   *   An array of interest items.
    * @param string $site_role
-   *    Site Role.
+   *   Site Role.
    *
    * @return \Psr\Http\Message\ResponseInterface
    *   Response.
