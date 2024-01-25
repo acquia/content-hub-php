@@ -763,6 +763,24 @@ class ContentHubClient implements ClientInterface {
   }
 
   /**
+   * Deletes multiple entities from a webhook's interest list.
+   *
+   * @param string $webhook_uuid
+   *   Webhook UUID.
+   * @param array $interest_list
+   *     An array of interest items.
+   * @param string $site_role
+   *    Site Role.
+   *
+   * @return \Psr\Http\Message\ResponseInterface
+   *   Response.
+   */
+  public function deleteMultipleInterest(string $webhook_uuid, array $interest_list, string $site_role): ResponseInterface {
+    $options['body'] = json_encode($interest_list);
+    return $this->delete("v2/interest/$webhook_uuid/$site_role", $options);
+  }
+
+  /**
    * Returns an extended interest list based on the site role.
    *
    * @param string $webhook_uuid
