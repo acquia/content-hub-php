@@ -967,7 +967,7 @@ class ContentHubClientTest extends TestCase {
     $site_role = 'subscriber';
 
     // Test for single interest item.
-    $interest_list = ['uuids' => [$this->test_data['uuid']]];
+    $interest_list = [$this->test_data['uuid']];
 
     $this->ch_client
       ->shouldReceive('delete')
@@ -979,7 +979,7 @@ class ContentHubClientTest extends TestCase {
     $this->assertSame(SymfonyResponse::HTTP_OK, $api_response->getStatusCode());
 
     // Test for multiple interest item.
-    $interest_list = ['uuids' => [$this->test_data['uuid'], 'some-uuid-2']];
+    $interest_list = [$this->test_data['uuid'], 'some-uuid-2'];
 
     $this->ch_client
       ->shouldReceive('delete')
