@@ -962,29 +962,29 @@ class ContentHubClientTest extends TestCase {
   /**
    * @covers \Acquia\ContentHubClient\ContentHubClient::deleteMultipleInterest
    */
-  public function testDeleteMultipleInterest(): void { // phpcs:ignore
+  public function testDeleteMultipleInterest(): void {
     $webhook_uuid = $this->test_data['webhook-uuid'];
     $site_role = 'subscriber';
 
     // Test for single interest item.
-    $interest_list['uuids'][] = $this->test_data['uuid'];
+    $interest_list = ['uuids' => [$this->test_data['uuid']]];
 
     $this->ch_client
       ->shouldReceive('delete')
       ->once()
-      ->with("v2/interest/{$webhook_uuid}/{$site_role}", ['body' => json_encode($interest_list)])
+      ->with("v2/interest/$webhook_uuid/$site_role", ['body' => json_encode($interest_list)])
       ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], ''));
 
     $api_response = $this->ch_client->deleteMultipleInterest($webhook_uuid, $interest_list, 'subscriber');
     $this->assertSame(SymfonyResponse::HTTP_OK, $api_response->getStatusCode());
 
     // Test for multiple interest item.
-    $interest_list['uuids'][] = $this->test_data['uuid'] . ',some-uuid-2,some-uuid-3,';
+    $interest_list = ['uuids' => [$this->test_data['uuid'], 'some-uuid-2', 'some-uuid-3']];
 
     $this->ch_client
       ->shouldReceive('delete')
       ->once()
-      ->with("v2/interest/{$webhook_uuid}/{$site_role}", ['body' => json_encode($interest_list)])
+      ->with("v2/interest/$webhook_uuid/$site_role", ['body' => json_encode($interest_list)])
       ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], ''));
 
     $api_response = $this->ch_client->deleteMultipleInterest($webhook_uuid, $interest_list, 'subscriber');
