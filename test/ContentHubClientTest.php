@@ -972,7 +972,7 @@ class ContentHubClientTest extends TestCase {
     $this->ch_client
       ->shouldReceive('delete')
       ->once()
-      ->with("v2/interest/$webhook_uuid/$site_role", ['body' => json_encode($interest_list)])
+      ->with("v2/interest/$webhook_uuid/$site_role", ['body' => json_encode(['uuids' => [$interest_list]])])
       ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], ''));
 
     $api_response = $this->ch_client->deleteMultipleInterest($webhook_uuid, $interest_list, 'subscriber');
@@ -984,7 +984,7 @@ class ContentHubClientTest extends TestCase {
     $this->ch_client
       ->shouldReceive('delete')
       ->once()
-      ->with("v2/interest/$webhook_uuid/$site_role", ['body' => json_encode($interest_list)])
+      ->with("v2/interest/$webhook_uuid/$site_role", ['body' => json_encode(['uuids' => [$interest_list]])])
       ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], ''));
 
     $api_response = $this->ch_client->deleteMultipleInterest($webhook_uuid, $interest_list, 'subscriber');

@@ -776,7 +776,7 @@ class ContentHubClient implements ClientInterface {
    *   Response.
    */
   public function deleteMultipleInterest(string $webhook_uuid, array $interest_list, string $site_role): ResponseInterface {
-    $options['body'] = json_encode($interest_list);
+    $options['body'] = json_encode(['uuids' => [$interest_list]]);
     return $this->delete("v2/interest/$webhook_uuid/$site_role", $options);
   }
 
