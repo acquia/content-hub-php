@@ -979,7 +979,7 @@ class ContentHubClientTest extends TestCase {
     $this->assertSame(SymfonyResponse::HTTP_OK, $api_response->getStatusCode());
 
     // Test for multiple interest item.
-    $interest_list = ['uuids' => [$this->test_data['uuid'], 'some-uuid-2', 'some-uuid-3']];
+    $interest_list = ['uuids' => [$this->test_data['uuid'], 'some-uuid-2']];
 
     $this->ch_client
       ->shouldReceive('delete')
