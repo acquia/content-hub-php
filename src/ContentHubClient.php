@@ -439,14 +439,16 @@ class ContentHubClient implements ClientInterface {
    *
    * @param string $uuid
    *   Entity UUID.
+   * @param bool $propagate
+   *   Boolean flag, which triggers webhook.
    *
    * @return \Psr\Http\Message\ResponseInterface
    *   Response.
    *
    * @throws \GuzzleHttp\Exception\RequestException
    */
-  public function deleteEntity($uuid) {
-    return $this->delete("entities/$uuid");
+  public function deleteEntity(string $uuid, bool $propagate = TRUE) {
+    return $this->delete("entities/$uuid/?propagate=" . $propagate);
   }
 
   /**
