@@ -362,9 +362,17 @@ class ContentHubClient implements ClientInterface {
         ],
       ];
       $options['body'] = json_encode($query);
-      $results = self::getResponseJson($this->get('_search', $options));
+      $response = $this->get('_search', $options);
+      $results = self::getResponseJson($response);
       if (!isset($results['hits'])) {
-        throw new \RuntimeException('Content Hub Search endpoint is not reachable.');
+        $exception_message = 'Content Hub Search endpoint is not reachable.';
+        if (isset($results['request_id'])) {
+          $exception_message = $exception_message . ' Request id: ' . $results['request_id'];
+        }
+        if ($response->getStatusCode()) {
+          $exception_message = $exception_message . ' Status code: ' . $response->getStatusCode();
+        }
+        throw new \RuntimeException($exception_message);
       }
       if (isset($results['hits']['total'])) {
         foreach ($results['hits']['hits'] as $key => $item) {
