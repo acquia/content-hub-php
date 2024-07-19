@@ -747,7 +747,8 @@ class ContentHubClient implements ClientInterface {
    * @return array
    *   Interests list.
    *
-   * @deprecated use getInterestList().
+   * @deprecated in 3.5.3 and is removed from 3.6.0. Use getInterestList().
+   * @see getInterestList()
    *
    * @throws \Exception
    */
@@ -806,7 +807,8 @@ class ContentHubClient implements ClientInterface {
    * @return array
    *   An associate array keyed by the entity uuid.
    *
-   * @deprecated use getInterestList().
+   * @deprecated in 3.5.3 and is removed from 3.6.0. Use getInterestList().
+   * @see getInterestList()
    *
    * @throws \Exception
    */

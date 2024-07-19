@@ -1487,7 +1487,12 @@ class ContentHubClientTest extends TestCase {
     $this->ch_client
       ->shouldReceive('get')
       ->once()
-      ->with("interest/webhook/$webhook_uuid/$site_role", ['query' => ['size' => 1, 'from' => 1]])
+      ->with("interest/webhook/$webhook_uuid/$site_role", [
+        'query' => [
+          'size' => 1,
+          'from' => 1,
+        ],
+      ])
       ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response)));
 
     $query = [
