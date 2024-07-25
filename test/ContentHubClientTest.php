@@ -125,6 +125,7 @@ class ContentHubClientTest extends TestCase {
         'client_type' => 'drupal',
         'is_publisher' => TRUE,
         'is_subscriber' => FALSE,
+        'webhook_version' => '2.0',
         'config' => [
           'valid_ssl' => TRUE,
           'drupal_version' => '10.1.1',
