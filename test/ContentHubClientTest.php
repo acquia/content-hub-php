@@ -1362,9 +1362,9 @@ class ContentHubClientTest extends TestCase {
   }
 
   /**
-   * @covers ::getInterestsByWebhookAndSiteRole
+   * @covers ::getInterestList
    */
-  public function testGetInterestsByWebhookAndSiteRoleIfAny(): void {
+  public function testGetInterestsListIfAny(): void {
     $response = [
       'success' => TRUE,
       'data' => [
@@ -1383,13 +1383,13 @@ class ContentHubClientTest extends TestCase {
       ->with("interest/webhook/$webhook_uuid/$site_role", [])
       ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response)));
 
-    $this->assertSame($this->ch_client->getInterestsByWebhookAndSiteRole($webhook_uuid, $site_role), $response['data']);
+    $this->assertSame($this->ch_client->getInterestList($webhook_uuid, $site_role), $response['data']);
   }
 
   /**
-   * @covers ::getInterestsByWebhookAndSiteRole
+   * @covers ::getInterestList
    */
-  public function testGetInterestsByWebhookAndSiteRoleIfNone(): void {
+  public function testGetInterestsListIfNone(): void {
     $response = [
       'success' => FALSE,
       'error' => [
@@ -1406,13 +1406,13 @@ class ContentHubClientTest extends TestCase {
       ->with("interest/webhook/$webhook_uuid/$site_role", [])
       ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response)));
 
-    $this->assertSame($this->ch_client->getInterestsByWebhookAndSiteRole($webhook_uuid, $site_role), []);
+    $this->assertSame($this->ch_client->getInterestList($webhook_uuid, $site_role), []);
   }
 
   /**
-   * @covers ::getInterestsByWebhookAndSiteRole
+   * @covers ::getInterestList
    */
-  public function testGetDisabledInterestsByWebhookAndSiteRoleIfAny(): void {
+  public function testGetDisabledInterestsListIfAny(): void {
     $response = [
       'success' => TRUE,
       'data' => [
@@ -1432,13 +1432,16 @@ class ContentHubClientTest extends TestCase {
       ->with("interest/webhook/$webhook_uuid/$site_role", ['query' => ['disable_syndication' => TRUE]])
       ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response)));
 
-    $this->assertSame($this->ch_client->getInterestsByWebhookAndSiteRole($webhook_uuid, $site_role, TRUE), $response['data']);
+    $query = [
+      'disable_syndication' => TRUE,
+    ];
+    $this->assertSame($this->ch_client->getInterestList($webhook_uuid, $site_role, $query), $response['data']);
   }
 
   /**
-   * @covers ::getInterestsByWebhookAndSiteRole
+   * @covers ::getInterestList
    */
-  public function testGetEnabledInterestsByWebhookAndSiteRoleIfAny(): void {
+  public function testGetEnabledInterestsListIfAny(): void {
     $response = [
       'success' => TRUE,
       'data' => [
@@ -1458,7 +1461,74 @@ class ContentHubClientTest extends TestCase {
       ->with("interest/webhook/$webhook_uuid/$site_role", ['query' => ['disable_syndication' => FALSE]])
       ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response)));
 
-    $this->assertSame($this->ch_client->getInterestsByWebhookAndSiteRole($webhook_uuid, $site_role, FALSE), $response['data']);
+    $query = [
+      'disable_syndication' => FALSE,
+    ];
+    $this->assertSame($this->ch_client->getInterestList($webhook_uuid, $site_role, $query), $response['data']);
+  }
+
+  /**
+   * @covers ::getInterestList
+   */
+  public function testGetInterestsListBySizeAndFrom(): void {
+    $response = [
+      'success' => TRUE,
+      'data' => [
+        '0e714009-72f9-4016-8f26-5fae32e6abb8' => [
+          'status' => SyndicationStatus::IMPORT_SUCCESSFUL,
+          'reason' => 'ipsum',
+          'event_ref' => '0e714009-72f9-4016-8f26-5fae32e6abb9',
+          'disabled_syndication' => FALSE,
+        ],
+      ],
+    ];
+    $webhook_uuid = 'some-webhook-uuid';
+    $site_role = 'subscriber';
+    $this->ch_client
+      ->shouldReceive('get')
+      ->once()
+      ->with("interest/webhook/$webhook_uuid/$site_role", [
+        'query' => [
+          'size' => 1,
+          'from' => 1,
+        ],
+      ])
+      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response)));
+
+    $query = [
+      'size' => 1,
+      'from' => 1,
+    ];
+    $this->assertSame($this->ch_client->getInterestList($webhook_uuid, $site_role, $query), $response['data']);
+  }
+
+  /**
+   * @covers ::getInterestList
+   */
+  public function testGetInterestsListByUuids(): void {
+    $response = [
+      'success' => TRUE,
+      'data' => [
+        '0e714009-72f9-4016-8f26-5fae32e6abb8' => [
+          'status' => SyndicationStatus::IMPORT_SUCCESSFUL,
+          'reason' => 'ipsum',
+          'event_ref' => '0e714009-72f9-4016-8f26-5fae32e6abb9',
+          'disabled_syndication' => FALSE,
+        ],
+      ],
+    ];
+    $webhook_uuid = 'some-webhook-uuid';
+    $site_role = 'subscriber';
+    $this->ch_client
+      ->shouldReceive('get')
+      ->once()
+      ->with("interest/webhook/$webhook_uuid/$site_role", ['query' => ['uuids' => '0e714009-72f9-4016-8f26-5fae32e6abb8']])
+      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response)));
+
+    $query = [
+      'uuids' => '0e714009-72f9-4016-8f26-5fae32e6abb8'
+    ];
+    $this->assertSame($this->ch_client->getInterestList($webhook_uuid, $site_role, $query), $response['data']);
   }
 
   /**

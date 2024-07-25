@@ -747,6 +747,9 @@ class ContentHubClient implements ClientInterface {
    * @return array
    *   Interests list.
    *
+   * @deprecated in 3.5.3 and is removed from 3.6.0. Use getInterestList().
+   * @see getInterestList()
+   *
    * @throws \Exception
    */
   public function getInterestsByWebhook(string $webhook_uuid): array {
@@ -804,14 +807,54 @@ class ContentHubClient implements ClientInterface {
    * @return array
    *   An associate array keyed by the entity uuid.
    *
+   * @deprecated in 3.5.3 and is removed from 3.6.0. Use getInterestList().
+   * @see getInterestList()
+   *
    * @throws \Exception
    */
   public function getInterestsByWebhookAndSiteRole(string $webhook_uuid, string $site_role, ?bool $disable_syndication = NULL): array {
-    $options = [];
     if (isset($disable_syndication)) {
-      $options['query'] = [
-        'disable_syndication' => $disable_syndication,
-      ];
+      return $this->getInterestList($webhook_uuid, $site_role, ['disable_syndication' => $disable_syndication]);
+    }
+    return $this->getInterestList($webhook_uuid, $site_role);
+  }
+
+  /**
+   * Returns an interest list based on the site role and query parameters.
+   *
+   * @param string $webhook_uuid
+   *   Identifier of the webhook.
+   * @param string $site_role
+   *   The role of the site.
+   * @param array $query
+   *   Query params. Accepts disable_syndication, size, from and uuids.
+   *
+   * @code
+   *   disable_syndication: boolean.
+   *     Filter for disabled entities.
+   *     If set to true, only disabled entities will be returned.
+   *     If set to false, only enabled entities will be returned.
+   *     If not set, all the entities will be returned.
+   *   size: integer.
+   *     Size of the interest list items to return.
+   *     Max is 3000. Min is 1.
+   *   from: integer.
+   *     This is the offset value.
+   *     Must be positive integer.
+   *   uuids: string.
+   *     This are the comma seprated uuid values.
+   *     Max 3000 uuids can be passed.
+   * @endcode
+   *
+   * @return array
+   *   An associate array keyed by the entity uuid.
+   *
+   * @throws \Exception
+   */
+  public function getInterestList(string $webhook_uuid, string $site_role, array $query = []): array {
+    $options = [];
+    if (!empty($query)) {
+      $options['query'] = $query;
     }
     $data = self::getResponseJson($this->get("interest/webhook/$webhook_uuid/$site_role", $options));
     return $data['data'] ?? [];
