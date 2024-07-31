@@ -21,6 +21,7 @@ class ClientMetaDataTest extends TestCase {
     'client_type' => 'drupal',
     'is_publisher' => TRUE,
     'is_subscriber' => FALSE,
+    'webhook_version' => '2.0',
     'config' => [
       'valid_ssl' => TRUE,
       'drupal_version' => '10.1.1',
@@ -41,7 +42,7 @@ class ClientMetaDataTest extends TestCase {
    * @covers ::toArray
    */
   public function testGetMetaData(): void {
-    $this->sut = new ClientMetaData($this->metadata['client_type'], $this->metadata['is_publisher'], $this->metadata['is_subscriber'], $this->metadata['config']);
+    $this->sut = new ClientMetaData($this->metadata['client_type'], $this->metadata['is_publisher'], $this->metadata['is_subscriber'], $this->metadata['webhook_version'], $this->metadata['config']);
     $client_metadata = $this->sut->toArray();
     $this->assertEquals($this->metadata, $client_metadata);
   }
