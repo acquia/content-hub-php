@@ -2465,8 +2465,8 @@ class ContentHubClientTest extends TestCase {
     $response = [
       'request_id' => 'some-request-uuid',
       'error' => [
-        'code' => 4004,
-        'message' => 'Webhook with the given uuid is not found.',
+        'code' => 4001,
+        'message' => 'filter is not registered for this account',
       ],
       'success' => FALSE,
     ];
@@ -2474,7 +2474,7 @@ class ContentHubClientTest extends TestCase {
     $this->ch_client
       ->shouldReceive('delete')
       ->once()
-      ->with("settings/webhooks/{$webhook_id}/filters", ['body' => json_encode(['filter_id' => $filter_id])])
+      ->with("filters/$filter_id/subscriptions/$webhook_id")
       ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_NOT_FOUND, [], json_encode($response)));
 
     $this->assertSame($this->ch_client->removeFilterFromWebhook($filter_id, $webhook_id), $response);
@@ -2495,7 +2495,7 @@ class ContentHubClientTest extends TestCase {
     $this->ch_client
       ->shouldReceive('delete')
       ->once()
-      ->with("settings/webhooks/{$webhook_id}/filters", ['body' => json_encode(['filter_id' => $filter_id])])
+      ->with("filters/$filter_id/subscriptions/$webhook_id")
       ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response)));
 
     $this->assertSame($this->ch_client->removeFilterFromWebhook($filter_id, $webhook_id), $response);
