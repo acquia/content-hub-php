@@ -1334,7 +1334,6 @@ class ContentHubClient implements ClientInterface {
    * @throws \Exception
    */
   public function removeFilterFromWebhook($filter_id, $webhook_id) {
-    $options = ['body' => json_encode(['filter_id' => $filter_id])];
     $response = $this->delete("filters/$filter_id/subscriptions/$webhook_id");
 
     return self::getResponseJson($response);
