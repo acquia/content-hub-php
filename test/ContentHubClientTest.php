@@ -523,7 +523,7 @@ class ContentHubClientTest extends TestCase {
     $this->guzzle_client
       ->shouldReceive('get')
       ->once()
-      ->with('settings/clients/' . $this->test_data['name']);
+      ->with('settings/client/name/' . $this->test_data['name']);
 
     $exists = $this->ch_client::clientNameExists(
       $this->test_data['name'],
@@ -549,7 +549,7 @@ class ContentHubClientTest extends TestCase {
     $this->guzzle_client
       ->shouldReceive('get')
       ->once()
-      ->with('settings/clients/' . $this->test_data['name'])
+      ->with('settings/client/name/' . $this->test_data['name'])
       ->andThrows(new ClientException('some-message', $request, $response));
 
     $exists = $this->ch_client::clientNameExists(
