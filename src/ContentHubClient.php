@@ -281,7 +281,7 @@ class ContentHubClient implements ClientInterface {
     $options['body'] = json_encode(['name' => $name]);
     // Attempt to fetch the client name, if it works.
     try {
-      $client->get("settings/clients/$name");
+      $client->get("settings/client/name/$name");
 
       return TRUE;
     }
