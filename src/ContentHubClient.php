@@ -253,9 +253,11 @@ class ContentHubClient implements ClientInterface {
    * @param string $api_version
    *   API version.
    *
-   * @deprecated in 3.7.0 and is removed from 3.8.0.
    * @return bool
    *   Whether the clientName from the request matches the name passed to it.
+   *
+   * @deprecated in 3.7.0 and is removed from 3.8.0.
+   * @see getClientByName()
    */
   public static function clientNameExists(
     $name,
