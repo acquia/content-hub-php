@@ -256,7 +256,7 @@ class ContentHubClient implements ClientInterface {
    * @return bool
    *   Whether the clientName from the request matches the name passed to it.
    *
-   * @deprecated in 3.7.0 and is removed from 3.8.0.
+   * @deprecated in 3.7.0 and is removed from 3.8.0. Use getClientByName().
    * @see getClientByName()
    */
   public static function clientNameExists(
