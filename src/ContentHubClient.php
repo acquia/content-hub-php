@@ -255,9 +255,6 @@ class ContentHubClient implements ClientInterface {
    *
    * @return bool
    *   Whether the clientName from the request matches the name passed to it.
-   *
-   * @deprecated in 3.7.0 and is removed from 3.8.0. Use getClientByName().
-   * @see getClientByName()
    */
   public static function clientNameExists(
     $name,
@@ -284,7 +281,7 @@ class ContentHubClient implements ClientInterface {
     $options['body'] = json_encode(['name' => $name]);
     // Attempt to fetch the client name, if it works.
     try {
-      $client->get("settings/client/name/$name");
+      $client->get("settings/clients/$name");
 
       return TRUE;
     }
