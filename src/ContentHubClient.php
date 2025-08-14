@@ -742,26 +742,6 @@ class ContentHubClient implements ClientInterface {
   }
 
   /**
-   * Returns interests list.
-   *
-   * @param string $webhook_uuid
-   *   Webhook UUID.
-   *
-   * @return array
-   *   Interests list.
-   *
-   * @deprecated in 3.6.0 and is removed from 3.7.0. Use getInterestList().
-   * @see getInterestList()
-   *
-   * @throws \Exception
-   */
-  public function getInterestsByWebhook(string $webhook_uuid): array {
-    $data = self::getResponseJson($this->get("interest/webhook/$webhook_uuid"));
-
-    return $data['data']['interests'] ?? [];
-  }
-
-  /**
    * Deletes an entity from a webhook's interest list.
    *
    * @param string $uuid
@@ -792,34 +772,6 @@ class ContentHubClient implements ClientInterface {
   public function deleteMultipleInterest(string $webhook_uuid, array $interest_list, string $site_role): ResponseInterface {
     $options['body'] = json_encode(['uuids' => $interest_list]);
     return $this->delete("interest/webhook/$webhook_uuid/$site_role", $options);
-  }
-
-  /**
-   * Returns an extended interest list based on the site role.
-   *
-   * @param string $webhook_uuid
-   *   Identifier of the webhook.
-   * @param string $site_role
-   *   The role of the site.
-   * @param bool|null $disable_syndication
-   *   Filter for disabled entities.
-   *   If set to true, only disabled entities will be returned.
-   *   If set to false, only enabled entities will be returned.
-   *   If not set, all the entities will be returned.
-   *
-   * @return array
-   *   An associate array keyed by the entity uuid.
-   *
-   * @deprecated in 3.6.0 and is removed from 3.7.0. Use getInterestList().
-   * @see getInterestList()
-   *
-   * @throws \Exception
-   */
-  public function getInterestsByWebhookAndSiteRole(string $webhook_uuid, string $site_role, ?bool $disable_syndication = NULL): array {
-    if (isset($disable_syndication)) {
-      return $this->getInterestList($webhook_uuid, $site_role, ['disable_syndication' => $disable_syndication]);
-    }
-    return $this->getInterestList($webhook_uuid, $site_role);
   }
 
   /**
