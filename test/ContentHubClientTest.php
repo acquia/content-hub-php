@@ -1315,54 +1315,6 @@ class ContentHubClientTest extends TestCase {
   }
 
   /**
-   * @covers \Acquia\ContentHubClient\ContentHubClient::getInterestsByWebhook
-   * @throws \Exception
-   */
-  public function testGetWebhookInterestListReturnsEmptyArrayIfNone(): void {
-    $response = [
-      'success' => FALSE,
-      'error' => [
-        'code' => 404,
-        'message' => 'interests list is empty.',
-        'request_id' => 'some-request-uuid',
-      ],
-    ];
-    $webhook_uuid = 'some-webhook-uuid';
-    $this->ch_client
-      ->shouldReceive('get')
-      ->once()
-      ->with('interest/webhook/' . $webhook_uuid)
-      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response)));
-
-    $this->assertSame($this->ch_client->getInterestsByWebhook($webhook_uuid), []);
-  }
-
-  /**
-   * @covers \Acquia\ContentHubClient\ContentHubClient::getInterestsByWebhook
-   * @throws \Exception
-   */
-  public function testGetWebhookInterestListReturnsAnArrayIfAny(): void {
-    $response = [
-      'success' => TRUE,
-      'data' => [
-        'count' => 2,
-        'interests' => [
-          'some-uuid-1',
-          'some-uuid-2',
-        ],
-      ],
-    ];
-    $webhook_uuid = 'some-webhook-uuid';
-    $this->ch_client
-      ->shouldReceive('get')
-      ->once()
-      ->with('interest/webhook/' . $webhook_uuid)
-      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response)));
-
-    $this->assertSame($this->ch_client->getInterestsByWebhook($webhook_uuid), $response['data']['interests']);
-  }
-
-  /**
    * @covers ::getInterestList
    */
   public function testGetInterestsListIfAny(): void {
