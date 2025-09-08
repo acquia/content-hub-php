@@ -876,10 +876,19 @@ class ContentHubClientTest extends TestCase {
     $this->ch_client
       ->shouldReceive('delete')
       ->once()
-      ->with('entities/' . $uuid)
+      ->with('entities/' . $uuid, ['propagate' => FALSE])
       ->andReturn($this->makeMockResponse($response_code, [], ''));
 
     $api_response = $this->ch_client->deleteEntity($uuid);
+    $this->assertSame($response_code, $api_response->getStatusCode());
+
+    $this->ch_client
+      ->shouldReceive('delete')
+      ->once()
+      ->with('entities/' . $uuid, ['propagate' => TRUE])
+      ->andReturn($this->makeMockResponse($response_code, [], ''));
+
+    $api_response = $this->ch_client->deleteEntity($uuid, TRUE);
     $this->assertSame($response_code, $api_response->getStatusCode());
   }
 
@@ -896,7 +905,15 @@ class ContentHubClientTest extends TestCase {
     $this->ch_client
       ->shouldReceive('delete')
       ->once()
-      ->with('entities', ['body' => json_encode($uuids)])
+      ->with('entities', ['body' => json_encode($uuids), 'propagate' => TRUE])
+      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_ACCEPTED, [], json_encode($response_body)));
+
+    $this->assertSame($response_body, $this->ch_client->deleteEntities($uuids, TRUE));
+
+    $this->ch_client
+      ->shouldReceive('delete')
+      ->once()
+      ->with('entities', ['body' => json_encode($uuids), 'propagate' => FALSE])
       ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_ACCEPTED, [], json_encode($response_body)));
 
     $this->assertSame($response_body, $this->ch_client->deleteEntities($uuids));
@@ -1933,7 +1950,7 @@ class ContentHubClientTest extends TestCase {
     $this->ch_client
       ->shouldReceive('delete')
       ->once()
-      ->with('entities/' . $client_uuid)
+      ->with('entities/' . $client_uuid, ['propagate' => FALSE])
       ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_ACCEPTED, [], ''));
 
     $response = json_encode([
@@ -1961,7 +1978,7 @@ class ContentHubClientTest extends TestCase {
     $this->ch_client
       ->shouldReceive('delete')
       ->once()
-      ->with('entities/' . $client_uuid)
+      ->with('entities/' . $client_uuid, ['propagate' => FALSE])
       ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_INTERNAL_SERVER_ERROR, [], ''));
 
     $this->expectException(\Exception::class);
