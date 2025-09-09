@@ -450,7 +450,7 @@ class ContentHubClient implements ClientInterface {
    *
    * @param string $uuid
    *   Entity UUID.
-   * @param boolean $propagate
+   * @param bool $propagate
    *   Entity propagation flag.
    *
    * @return \Psr\Http\Message\ResponseInterface
@@ -467,7 +467,7 @@ class ContentHubClient implements ClientInterface {
    *
    * @param array $uuids
    *   Uuids to delete.
-   * @param boolean $propagate
+   * @param bool $propagate
    *   Propagation flag for Uuids.
    *
    * @return mixed
