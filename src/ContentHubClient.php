@@ -458,7 +458,7 @@ class ContentHubClient implements ClientInterface {
    *
    * @throws \GuzzleHttp\Exception\RequestException
    */
-  public function deleteEntity(string $uuid, bool $propagate = FALSE) {
+  public function deleteEntity(string $uuid, bool $propagate = TRUE) {
     return $this->delete("entities/$uuid", ['propagate' => $propagate]);
   }
 
@@ -475,7 +475,7 @@ class ContentHubClient implements ClientInterface {
    *
    * @throws \Exception
    */
-  public function deleteEntities(array $uuids, bool $propagate = FALSE) {
+  public function deleteEntities(array $uuids, bool $propagate = TRUE) {
     $options['body'] = json_encode($uuids);
     $options['propagate'] = $propagate;
     return self::getResponseJson($this->delete("entities", $options));
