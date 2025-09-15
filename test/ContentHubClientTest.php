@@ -905,7 +905,10 @@ class ContentHubClientTest extends TestCase {
     $this->ch_client
       ->shouldReceive('delete')
       ->once()
-      ->with('entities', ['body' => json_encode($uuids), 'query' => ['propagate' => 'true']])
+      ->with('entities', [
+        'body' => json_encode($uuids),
+        'query' => ['propagate' => 'true']
+      ])
       ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_ACCEPTED, [], json_encode($response_body)));
 
     $this->assertSame($response_body, $this->ch_client->deleteEntities($uuids));
@@ -913,7 +916,10 @@ class ContentHubClientTest extends TestCase {
     $this->ch_client
       ->shouldReceive('delete')
       ->once()
-      ->with('entities', ['body' => json_encode($uuids), 'query' => ['propagate' => 'false']])
+      ->with('entities', [
+        'body' => json_encode($uuids),
+        'query' => ['propagate' => 'false']
+      ])
       ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_ACCEPTED, [], json_encode($response_body)));
 
     $this->assertSame($response_body, $this->ch_client->deleteEntities($uuids, FALSE));
