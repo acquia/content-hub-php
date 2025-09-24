@@ -36,6 +36,13 @@ class ClientMetaData {
   protected string $webhookVersion;
 
   /**
+   * Syndication Mode.
+   *
+   * @var string
+   */
+  protected string $syndicationMode;
+
+  /**
    * Additional config metadata.
    *
    * E.g. drupal_version, ch module version, valid ssl etc.
@@ -55,15 +62,18 @@ class ClientMetaData {
    *   Whether this site is a subscriber or not.
    * @param string $webhook_version
    *   Version of webhook.
+   * @param string $syndication_mode
+   *   Mode of Syndication being used i.e, pull/push.
    * @param array $client_config
    *   Additional config metadata.
    */
-  public function __construct(string $client_type, bool $is_publisher, bool $is_subscriber, string $webhook_version, array $client_config = []) {
+  public function __construct(string $client_type, bool $is_publisher, bool $is_subscriber, string $webhook_version, string $syndication_mode, array $client_config = []) {
     $this->clientType = $client_type;
     $this->isPublisher = $is_publisher;
     $this->isSubscriber = $is_subscriber;
     $this->webhookVersion = $webhook_version;
     $this->clientConfig = $client_config;
+    $this->syndicationMode = $syndication_mode;
   }
 
   /**
@@ -81,12 +91,13 @@ class ClientMetaData {
       $metadata['is_publisher'] = FALSE;
       $metadata['is_subscriber'] = FALSE;
       $metadata['webhook_version'] = '2.0';
+      $metadata['syndication_mode'] = 'push';
       $metadata['config'] = [];
     }
-    if (isset($metadata['client_type'], $metadata['is_publisher'], $metadata['is_subscriber'], $metadata['webhook_version'])) {
-      return new static($metadata['client_type'], $metadata['is_publisher'], $metadata['is_subscriber'], $metadata['webhook_version'], $metadata['config'] ?? []);
+    if (isset($metadata['client_type'], $metadata['is_publisher'], $metadata['is_subscriber'], $metadata['webhook_version'], $metadata['syndication_mode'])) {
+      return new static($metadata['client_type'], $metadata['is_publisher'], $metadata['is_subscriber'], $metadata['webhook_version'], $metadata['syndication_mode'], $metadata['config'] ?? []);
     }
-    throw new \RuntimeException('All the attributes: "client_type", "is_publisher", "is_subscriber", "webhook_version" are required.');
+    throw new \RuntimeException('All the attributes: "client_type", "is_publisher", "is_subscriber", "webhook_version", "syndication_mode" are required.');
   }
 
   /**
@@ -101,6 +112,7 @@ class ClientMetaData {
       'is_publisher' => $this->isPublisher,
       'is_subscriber' => $this->isSubscriber,
       'webhook_version' => $this->webhookVersion,
+      'syndication_mode' => $this->syndicationMode,
       'config' => $this->clientConfig,
     ];
   }
