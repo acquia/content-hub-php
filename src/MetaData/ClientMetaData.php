@@ -94,8 +94,8 @@ class ClientMetaData {
       $metadata['syndication_mode'] = 'push';
       $metadata['config'] = [];
     }
-    if (isset($metadata['client_type'], $metadata['is_publisher'], $metadata['is_subscriber'], $metadata['webhook_version'])) {
-      return new static($metadata['client_type'], $metadata['is_publisher'], $metadata['is_subscriber'], $metadata['webhook_version'], $metadata['syndication_mode'] ?? 'push', $metadata['config'] ?? []);
+    if (isset($metadata['client_type'], $metadata['is_publisher'], $metadata['is_subscriber'], $metadata['webhook_version'], $metadata['syndication_mode'])) {
+      return new static($metadata['client_type'], $metadata['is_publisher'], $metadata['is_subscriber'], $metadata['webhook_version'], $metadata['syndication_mode'], $metadata['config'] ?? []);
     }
     throw new \RuntimeException('All the attributes: "client_type", "is_publisher", "is_subscriber", "webhook_version" are required.');
   }
