@@ -62,6 +62,8 @@ class ClientMetaData {
    *   Whether this site is a subscriber or not.
    * @param string $webhook_version
    *   Version of webhook.
+   * @param string $syndication_mode
+   *   Mode of Syndication being used i.e, pull/push.
    * @param array $client_config
    *   Additional config metadata.
    */
