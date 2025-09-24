@@ -68,14 +68,17 @@ class ClientMetaDataTest extends TestCase {
     $this->sut = ClientMetaData::fromArray([
       'client_type' => $this->metadata['client_type'],
       'is_publisher' => $this->metadata['is_publisher'],
-      'is_subscriber' => $this->metadata['is_subscriber']]);
+      'is_subscriber' => $this->metadata['is_subscriber'],
+    ]);
     $client_metadata = $this->sut->toArray();
-    $this->assertEquals(['client_type' => 'drupal',
-      'is_publisher' => true,
-      'is_subscriber' => false,
+    $this->assertEquals([
+      'client_type' => 'drupal',
+      'is_publisher' => TRUE,
+      'is_subscriber' => FALSE,
       'webhook_version' => '2.0',
       'syndication_mode' => 'push',
-      'config' => []], $client_metadata);
+      'config' => [],
+    ], $client_metadata);
   }
 
 }
