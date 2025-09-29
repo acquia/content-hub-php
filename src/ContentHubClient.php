@@ -1588,4 +1588,43 @@ class ContentHubClient implements ClientInterface {
     return self::getResponseJson($this->delete('queues/syndications', $options));
   }
 
+  /**
+   * Fetches entities from service queue for processing.
+   *
+   * @param int $limit
+   *   Maximum number of items to return.
+   * @param string $visibility_timeout
+   *   Duration for which the fetched entities will be invisible to other
+   *   queue consumers. Must be suffixed with duration unit (m, s, h, d, etc).
+   * @param array $queue_filters
+   *   An array of queue filters to apply. Supported values are:
+   *   - 'failed'
+   *   - 'queued'
+   *   - 'processing'
+   *   If not specified, queued items will be returned.
+   *
+   * @return array|null
+   *   Response from backend call.
+   *
+   * @throws \Exception
+   */
+  public function fetchEntities(int $limit, string $visibility_timeout, array $queue_filters = []): ?array {
+    $config = $this->getConfig();
+    $config['headers']['X-Acquia-Content-Hub-Syndication'] = 'ReceiveQueueItems';
+    $this->setConfigs($config);
+
+    $options = [
+      'body' => json_encode([
+        'max_number_of_items' => $limit,
+        'visibility_timeout' => $visibility_timeout,
+      ]),
+    ];
+    if (!empty($queue_filters)) {
+      $body = json_decode($options['body'], TRUE);
+      $body['queue_filters']['state'] = $queue_filters;
+      $options['body'] = json_encode($body);
+    }
+    return self::getResponseJson($this->post('queues/syndications', $options));
+  }
+
 }
