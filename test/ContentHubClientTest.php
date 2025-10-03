@@ -3309,7 +3309,7 @@ class ContentHubClientTest extends TestCase {
   public function testGetAllEntitiesFromServiceQueue() {
     $response_body = [
       "total" => 3,
-      "success" => true,
+      "success" => TRUE,
       "data" => [
         [
           "id" => "1",
@@ -3369,10 +3369,10 @@ class ContentHubClientTest extends TestCase {
    */
   public function testDeleteEntitiesFromServiceQueue() {
     $expected_request_body = [
-      'all' => true,
+      'all' => TRUE,
     ];
     $response_body = [
-      'success' => true,
+      'success' => TRUE,
       'request_id' => '1c6f7a8a-5cf6-4be2-8e09-e64c0d63629c',
     ];
 
@@ -3391,7 +3391,7 @@ class ContentHubClientTest extends TestCase {
     ];
 
     $response_body = [
-      'success' => true,
+      'success' => TRUE,
       'request_id' => '1c6f7a8a-5cf6-4be2-8e09-e64c0d636343c',
     ];
 
@@ -3405,4 +3405,5 @@ class ContentHubClientTest extends TestCase {
 
     $this->assertSame($response_body, $result);
   }
+
 }
