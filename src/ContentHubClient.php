@@ -1528,8 +1528,8 @@ class ContentHubClient implements ClientInterface {
    * Deletes entities from service queue.
    *
    * @param array $options
-   * - all: (bool) If true, all items will be deleted.
-   * - ids: (string|null) Comma-separated list of IDs to delete.
+   *   - all: (bool) If true, all items will be deleted.
+   *   - ids: (string|null) Comma-separated list of IDs to delete.
    *
    * @return array|null
    *   Response from backend call.
