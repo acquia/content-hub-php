@@ -3301,4 +3301,108 @@ class ContentHubClientTest extends TestCase {
     $this->assertSame($resp, $actual, 'Subsequent call returns the new response object.');
   }
 
+  /**
+   * Tests getAllEntitiesFromServiceQueue.
+   *
+   * @covers::getAllEntitiesFromServiceQueue
+   */
+  public function testGetAllEntitiesFromServiceQueue() {
+    $response_body = [
+      "total" => 3,
+      "success" => true,
+      "data" => [
+        [
+          "id" => "1",
+          "entity_uuid" => "5f71af85-cbb0-48ac-84f3-97083bf16367",
+          "client_uuid" => "8fb4c61c-bc0c-4451-a1aa-f576bf4eb966",
+          "state" => "queued",
+          "payload" => [
+            "action" => "entity_create"
+          ],
+          "visible_at" => "1753879023",
+          "created_at" => "1753879023",
+          "updated_at" => "1753879023"
+        ],
+        [
+          "id" => "2",
+          "entity_uuid" => "6f71af85-cbb0-48ac-84f3-97083bf16367",
+          "client_uuid" => "8fb4c61c-bc0c-4451-a1aa-f576bf4eb966",
+          "state" => "processing",
+          "payload" => [
+            "action" => "entity_update"
+          ],
+          "visible_at" => "1753879023",
+          "created_at" => "1753879023",
+          "updated_at" => "1753879023"
+        ],
+        [
+          "id" => "3",
+          "entity_uuid" => "7f71af85-cbb0-48ac-84f3-97083bf16367",
+          "client_uuid" => "8fb4c61c-bc0c-4451-a1aa-f576bf4eb966",
+          "state" => "processed",
+          "payload" => [
+            "action" => "entity_delete"
+          ],
+          "visible_at" => "1753879023",
+          "created_at" => "1753879023",
+          "updated_at" => "1753879023"
+        ]
+      ]
+    ];
+
+    $this->ch_client
+      ->shouldReceive('get')
+      ->once()
+      ->with('queues/syndications')
+      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response_body)));
+
+    $result = $this->ch_client->getAllEntitiesFromServiceQueue();
+
+    $this->assertSame($response_body, $result);
+    $this->assertSame($response_body['total'], $result['total']);
+  }
+
+  /**
+   * Tests deleteEntitiesFromServiceQueue.
+   *
+   * @covers::deleteEntitiesFromServiceQueue
+   */
+  public function testDeleteEntitiesFromServiceQueue() {
+    $expected_request_body = [
+      'all' => true,
+    ];
+    $response_body = [
+      'success' => true,
+      'request_id' => '1c6f7a8a-5cf6-4be2-8e09-e64c0d63629c',
+    ];
+
+    $this->ch_client
+      ->shouldReceive('delete')
+      ->once()
+      ->with('queues/syndications')
+      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response_body)));
+
+    $result = $this->ch_client->deleteEntitiesFromServiceQueue($expected_request_body);
+
+    $this->assertSame($response_body, $result);
+
+    $expected_request_body = [
+      'ids' => '1,2,3',
+    ];
+
+    $response_body = [
+      'success' => true,
+      'request_id' => '1c6f7a8a-5cf6-4be2-8e09-e64c0d636343c',
+    ];
+
+    $this->ch_client
+      ->shouldReceive('delete')
+      ->once()
+      ->with('queues/syndications', ['ids' => '1,2,3'])
+      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response_body)));
+
+    $result = $this->ch_client->deleteEntitiesFromServiceQueue($expected_request_body);
+
+    $this->assertSame($response_body, $result);
+  }
 }

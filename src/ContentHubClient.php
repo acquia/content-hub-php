@@ -1512,4 +1512,44 @@ class ContentHubClient implements ClientInterface {
     return $remote['featured'] ?? FALSE;
   }
 
+  /**
+   * Get entities from service queue.
+   *
+   * @return array
+   *   Response from backend call.
+   *
+   * @throws \Exception
+   */
+  public function getAllEntitiesFromServiceQueue(): array {
+    return self::getResponseJson($this->get('queues/syndications'));
+  }
+
+  /**
+   * Deletes entities from service queue.
+   *
+   * @param array $options
+   *   [
+   *     'all' => true|false,      // If true, all items will be deleted.
+   *     'ids' => '1,2,3'|null,   // Comma-separated list of IDs to delete.
+   *   ]
+   *
+   * @return array|null
+   *   Response from backend call.
+   *
+   * @throws \Exception
+   */
+  public function deleteEntitiesFromServiceQueue(array $options): ?array {
+
+    if (isset($options['all'])) {
+      return self::getResponseJson($this->delete('queues/syndications'));
+    }
+
+    if (isset($options['ids'])) {
+      $body['ids'] = $options['ids'];
+      return self::getResponseJson($this->delete('queues/syndications', $body));
+    }
+
+    return NULL;
+  }
+
 }
