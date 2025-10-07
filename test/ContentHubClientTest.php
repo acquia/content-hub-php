@@ -3368,9 +3368,6 @@ class ContentHubClientTest extends TestCase {
    * @covers::deleteEntitiesFromServiceQueue
    */
   public function testDeleteEntitiesFromServiceQueue() {
-    $expected_request_body = [
-      'all' => TRUE,
-    ];
     $response_body = [
       'success' => TRUE,
       'request_id' => '1c6f7a8a-5cf6-4be2-8e09-e64c0d63629c',
@@ -3379,15 +3376,15 @@ class ContentHubClientTest extends TestCase {
     $this->ch_client
       ->shouldReceive('delete')
       ->once()
-      ->with('queues/syndications')
+      ->with('queues/syndications', [])
       ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response_body)));
 
-    $result = $this->ch_client->deleteEntitiesFromServiceQueue($expected_request_body);
+    $result = $this->ch_client->deleteEntitiesFromServiceQueue();
 
     $this->assertSame($response_body, $result);
 
     $expected_request_body = [
-      'ids' => '1,2,3',
+      'syndication_ids' => '1,2,3',
     ];
 
     $response_body = [
@@ -3398,7 +3395,7 @@ class ContentHubClientTest extends TestCase {
     $this->ch_client
       ->shouldReceive('delete')
       ->once()
-      ->with('queues/syndications', ['ids' => '1,2,3'])
+      ->with('queues/syndications', ['syndication_ids' => '1,2,3'])
       ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response_body)));
 
     $result = $this->ch_client->deleteEntitiesFromServiceQueue($expected_request_body);

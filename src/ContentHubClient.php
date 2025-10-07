@@ -1528,26 +1528,17 @@ class ContentHubClient implements ClientInterface {
    * Deletes entities from service queue.
    *
    * @param array $options
-   *   - all: (bool) If true, all items will be deleted.
-   *   - ids: (string|null) Comma-separated list of IDs to delete.
+   *   If empty, all items will be deleted.
+   *   Otherwise comma-separated specific ids should be sent
+   *   as $options['syndication_ids'] = '1,2' for deletion.
    *
    * @return array|null
    *   Response from backend call.
    *
    * @throws \Exception
    */
-  public function deleteEntitiesFromServiceQueue(array $options): ?array {
-
-    if (isset($options['all'])) {
-      return self::getResponseJson($this->delete('queues/syndications'));
-    }
-
-    if (isset($options['ids'])) {
-      $body['ids'] = $options['ids'];
-      return self::getResponseJson($this->delete('queues/syndications', $body));
-    }
-
-    return NULL;
+  public function deleteEntitiesFromServiceQueue(array $options = []): ?array {
+     return self::getResponseJson($this->delete('queues/syndications', $options));
   }
 
 }
