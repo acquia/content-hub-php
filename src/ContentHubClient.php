@@ -1538,7 +1538,7 @@ class ContentHubClient implements ClientInterface {
    * @throws \Exception
    */
   public function deleteEntitiesFromServiceQueue(array $options = []): ?array {
-     return self::getResponseJson($this->delete('queues/syndications', $options));
+    return self::getResponseJson($this->delete('queues/syndications', $options));
   }
 
 }
