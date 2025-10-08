@@ -1515,27 +1515,28 @@ class ContentHubClient implements ClientInterface {
   /**
    * Provides an array of queue items.
    *
-   * @return array
-   *   Returns array of queue items from cloud queue with count.
-   *   Format:
-   *   [
-   *    'total' => 3,
-   *    'success' => true,
-   *    'data' => [
+   * Format:
+   * [
+   *   'total' => 3,
+   *   'success' => true,
+   *   'data' => [
    *     [
    *       'id' => '1',
    *       'entity_uuid' => '5f71af85-cbb0-48ac-84f3-97083bf16367',
    *       'client_uuid' => '8fb4c61c-bc0c-4451-a1aa-f576bf4eb966',
    *       'state' => 'queued',
    *       'payload' => [
-   *         'action' => 'entity_create'
-   *       ],
+   *       'action' => 'entity_create'
+   *     ],
    *     'visible_at' => '1753879023',
    *     'created_at' => '1753879023',
    *     'updated_at' => '1753879023'
    *     ],
    *    ]
    *  ]
+   *
+   * @return array
+   *   Returns array of queue items from cloud queue with count.
    *
    * @throws \Exception
    */
@@ -1558,12 +1559,15 @@ class ContentHubClient implements ClientInterface {
   /**
    * Deletes items from service queue using the specified syndication_ids.
    *
-   * @param array $options
+   * Example of how to structure the $options parameter:
    * <code>
-   *  $options = [
-   *      "syndication_ids": [1,2,3,4,5],
-   *  ];
-   *  </code>
+   * $options = [
+   *     'syndication_ids': [1,2,3,4,5],
+   * ];
+   * </code>
+   *
+   * @param array $options
+   *   Query options.
    *
    * @return array|null
    *   Response from Pull Syndication API.
@@ -1577,12 +1581,15 @@ class ContentHubClient implements ClientInterface {
   /**
    * Deletes items from service queue using the specified entity_uuids.
    *
-   * @param array $options
+   * Example of how to structure the $options parameter:
    * <code>
-   *  $options = [
-   *      "entity_uuids": ["1c6f7a8a-5cf6-4bb2-8e09-e64c0d63629d","4c6f7a8a-5cf6-4bb2-8e09-e64c0d63629e"]
-   *  ];
-   *  </code>
+   * $options = [
+   *     'entity_uuids: ["1c6f7a8a-5cf6-4bb2-8e09-e64c0d63629d","4c6f7a8a-5cf6-4bb2-8e09-e64c0d63629e"]
+   * ];
+   * </code>
+   *
+   * @param array $options
+   *   Query options.
    *
    * @return array|null
    *   Response from Pull Syndication API.
