@@ -1548,7 +1548,7 @@ class ContentHubClient implements ClientInterface {
    * Deletes all items from service queue.
    *
    * @return array|null
-   *   Response from Pull Syndication API.
+   *   Response from Syndication Queue API.
    *
    * @throws \Exception
    */
@@ -1563,7 +1563,7 @@ class ContentHubClient implements ClientInterface {
    *   Array with syndication IDs of items to be removed.
    *
    * @return array|null
-   *   Response from Pull Syndication API.
+   *   Response from Syndication Queue API.
    *
    * @throws \Exception
    */
@@ -1579,7 +1579,7 @@ class ContentHubClient implements ClientInterface {
    *   Array of entity uuids.
    *
    * @return array|null
-   *   Response from Pull Syndication API.
+   *   Response from Syndication Queue API.
    *
    * @throws \Exception
    */
