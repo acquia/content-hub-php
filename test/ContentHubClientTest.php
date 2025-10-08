@@ -3433,11 +3433,11 @@ class ContentHubClientTest extends TestCase {
   }
 
   /**
-   * Tests fetchEntities.
+   * Tests receiveQueueItems.
    *
-   * @covers::fetchEntities
+   * @covers::receiveQueueItems
    */
-  public function testFetchEntities(): void {
+  public function testReceiveQueueItems(): void {
     $limit = 10;
     $visibility_timeout = '1d';
     $queue_filters = ['queued'];
@@ -3489,7 +3489,7 @@ class ContentHubClientTest extends TestCase {
       ->with('queues/syndications', ['body' => json_encode($expected_request_body)])
       ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response_body)));
 
-    $result = $this->ch_client->fetchEntities($limit, $visibility_timeout, $queue_filters);
+    $result = $this->ch_client->receiveQueueItems($limit, $visibility_timeout, $queue_filters);
 
     $this->assertSame($response_body, $result);
     $this->assertTrue($result['success']);

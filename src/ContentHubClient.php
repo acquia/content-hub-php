@@ -1589,12 +1589,12 @@ class ContentHubClient implements ClientInterface {
   }
 
   /**
-   * Fetches entities from service queue for processing.
+   * Receives queue items from service queue for processing.
    *
    * @param int $limit
-   *   Maximum number of items to return.
+   *   Maximum number of queue items to return.
    * @param string $visibility_timeout
-   *   Duration for which the fetched entities will be invisible to other
+   *   Duration for which the fetched queue items will be invisible to other
    *   queue consumers. Must be suffixed with duration unit (m, s, h, d, etc).
    * @param array $queue_filters
    *   An array of queue filters to apply. Supported values are:
@@ -1604,11 +1604,11 @@ class ContentHubClient implements ClientInterface {
    *   If not specified, queued items will be returned.
    *
    * @return array|null
-   *   Response from backend call.
+   *   Response from backend call, that contains array of queue items.
    *
    * @throws \Exception
    */
-  public function fetchEntities(int $limit, string $visibility_timeout, array $queue_filters = []): ?array {
+  public function receiveQueueItems(int $limit, string $visibility_timeout, array $queue_filters = []): ?array {
     $config = $this->getConfig();
     $config['headers']['X-Acquia-Content-Hub-Syndication'] = 'ReceiveQueueItems';
     $this->setConfigs($config);
