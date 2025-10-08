@@ -1512,4 +1512,80 @@ class ContentHubClient implements ClientInterface {
     return $remote['featured'] ?? FALSE;
   }
 
+  /**
+   * Provides an array of queue items.
+   *
+   * Format:
+   * [
+   *   'total' => 3,
+   *   'success' => true,
+   *   'data' => [
+   *    [
+   *       'id' => '1',
+   *       'entity_uuid' => '5f71af85-cbb0-48ac-84f3-97083bf16367',
+   *       'client_uuid' => '8fb4c61c-bc0c-4451-a1aa-f576bf4eb966',
+   *       'state' => 'queued',
+   *       'payload' => [
+   *         'action' => 'entity_create'
+   *        ],
+   *       'visible_at' => '1753879023',
+   *       'created_at' => '1753879023',
+   *       'updated_at' => '1753879023'
+   *     ],
+   *   ]
+   * ]
+   *
+   * @return array
+   *   Returns array of queue items from cloud queue with count.
+   *
+   * @throws \Exception
+   */
+  public function getAllQueueItems(): array {
+    return self::getResponseJson($this->get('queues/syndications'));
+  }
+
+  /**
+   * Deletes all items from service queue.
+   *
+   * @return array|null
+   *   Response from Syndication Queue API.
+   *
+   * @throws \Exception
+   */
+  public function purgeQueue(): ?array {
+    return self::getResponseJson($this->delete('queues/syndications'));
+  }
+
+  /**
+   * Deletes items from service queue using the specified syndication_ids.
+   *
+   * @param array $syndication_ids
+   *   Array with syndication IDs of items to be removed.
+   *
+   * @return array|null
+   *   Response from Syndication Queue API.
+   *
+   * @throws \Exception
+   */
+  public function deleteQueueItemsBySyndicationIds(array $syndication_ids): ?array {
+    $options['syndication_ids'] = $syndication_ids;
+    return self::getResponseJson($this->delete('queues/syndications', $options));
+  }
+
+  /**
+   * Deletes items from service queue using the specified entity_uuids.
+   *
+   * @param array $entity_uuids
+   *   Array of entity uuids.
+   *
+   * @return array|null
+   *   Response from Syndication Queue API.
+   *
+   * @throws \Exception
+   */
+  public function deleteQueueItemsByEntityUuids(array $entity_uuids): ?array {
+    $options['entity_uuids'] = $entity_uuids;
+    return self::getResponseJson($this->delete('queues/syndications', $options));
+  }
+
 }
