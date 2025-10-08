@@ -3414,7 +3414,7 @@ class ContentHubClientTest extends TestCase {
    * @covers::deleteQueueItemsByEntityUuids
    */
   public function testDeleteQueueItemsByEntityUuids() {
-    $expected_request_body = ['uuid-1', 'uuid-2', 'uuid-3'];
+    $expected_request_body = ['uuid-1', 'uuid-2'];
 
     $response_body = [
       'success' => TRUE,
@@ -3424,7 +3424,7 @@ class ContentHubClientTest extends TestCase {
     $this->ch_client
       ->shouldReceive('delete')
       ->once()
-      ->with('queues/syndications', ['entity_uuids' => ['uuid-1', 'uuid-2', 'uuid-3']])
+      ->with('queues/syndications', ['entity_uuids' => ['uuid-1', 'uuid-2']])
       ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response_body)));
 
     $result = $this->ch_client->deleteQueueItemsByEntityUuids($expected_request_body);
