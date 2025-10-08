@@ -1514,25 +1514,25 @@ class ContentHubClient implements ClientInterface {
 
   /**
    * Provides an array of queue items.
-   *  Format:
-   *  [
-   *    'total' => 3,
-   *    'success' => true,
-   *    'data' => [
-   *     [
-   *        'id' => '1',
-   *        'entity_uuid' => '5f71af85-cbb0-48ac-84f3-97083bf16367',
-   *        'client_uuid' => '8fb4c61c-bc0c-4451-a1aa-f576bf4eb966',
-   *        'state' => 'queued',
-   *        'payload' => [
-   *          'action' => 'entity_create'
-   *         ],
-   *        'visible_at' => '1753879023',
-   *        'created_at' => '1753879023',
-   *        'updated_at' => '1753879023'
-   *      ],
-   *    ]
-   *  ]
+   * Format:
+   * [
+   *   'total' => 3,
+   *   'success' => true,
+   *   'data' => [
+   *    [
+   *       'id' => '1',
+   *       'entity_uuid' => '5f71af85-cbb0-48ac-84f3-97083bf16367',
+   *       'client_uuid' => '8fb4c61c-bc0c-4451-a1aa-f576bf4eb966',
+   *       'state' => 'queued',
+   *       'payload' => [
+   *         'action' => 'entity_create'
+   *        ],
+   *       'visible_at' => '1753879023',
+   *       'created_at' => '1753879023',
+   *       'updated_at' => '1753879023'
+   *     ],
+   *   ]
+   * ]
    *
    * @return array
    *   Returns array of queue items from cloud queue with count.
