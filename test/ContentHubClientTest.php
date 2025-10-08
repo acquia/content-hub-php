@@ -3302,11 +3302,11 @@ class ContentHubClientTest extends TestCase {
   }
 
   /**
-   * Tests getAllEntitiesFromServiceQueue.
+   * Tests getAllQueueItems.
    *
-   * @covers::getAllEntitiesFromServiceQueue
+   * @covers::getAllQueueItems
    */
-  public function testGetAllEntitiesFromServiceQueue() {
+  public function testGetAllQueueItems() {
     $response_body = [
       "total" => 3,
       "success" => TRUE,
@@ -3356,18 +3356,18 @@ class ContentHubClientTest extends TestCase {
       ->with('queues/syndications')
       ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response_body)));
 
-    $result = $this->ch_client->getAllEntitiesFromServiceQueue();
+    $result = $this->ch_client->getAllQueueItems();
 
     $this->assertSame($response_body, $result);
     $this->assertSame($response_body['total'], $result['total']);
   }
 
   /**
-   * Tests deleteEntitiesFromServiceQueue.
+   * Tests purgeQueue.
    *
-   * @covers::deleteEntitiesFromServiceQueue
+   * @covers::purgeQueue
    */
-  public function testDeleteEntitiesFromServiceQueue() {
+  public function testPurgeQueue() {
     $response_body = [
       'success' => TRUE,
       'request_id' => '1c6f7a8a-5cf6-4be2-8e09-e64c0d63629c',
@@ -3376,13 +3376,20 @@ class ContentHubClientTest extends TestCase {
     $this->ch_client
       ->shouldReceive('delete')
       ->once()
-      ->with('queues/syndications', [])
+      ->with('queues/syndications')
       ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response_body)));
 
-    $result = $this->ch_client->deleteEntitiesFromServiceQueue();
+    $result = $this->ch_client->purgeQueue();
 
     $this->assertSame($response_body, $result);
+  }
 
+  /**
+   * Tests deleteQueueItemsBySyndicationIds.
+   *
+   * @covers::deleteQueueItemsBySyndicationIds
+   */
+  public function testDeleteQueueItemsBySyndicationIds() {
     $expected_request_body = [
       'syndication_ids' => '1,2,3',
     ];
@@ -3398,7 +3405,33 @@ class ContentHubClientTest extends TestCase {
       ->with('queues/syndications', ['syndication_ids' => '1,2,3'])
       ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response_body)));
 
-    $result = $this->ch_client->deleteEntitiesFromServiceQueue($expected_request_body);
+    $result = $this->ch_client->deleteQueueItemsBySyndicationIds($expected_request_body);
+
+    $this->assertSame($response_body, $result);
+  }
+
+  /**
+   * Tests deleteQueueItemsByEntityUuids.
+   *
+   * @covers::deleteQueueItemsByEntityUuids
+   */
+  public function testDeleteQueueItemsByEntityUuids() {
+    $expected_request_body = [
+      'entity_uuids' => '1,2,3',
+    ];
+
+    $response_body = [
+      'success' => TRUE,
+      'request_id' => '1c6f7a8a-5cf6-4be2-8e09-e64c0d636343c',
+    ];
+
+    $this->ch_client
+      ->shouldReceive('delete')
+      ->once()
+      ->with('queues/syndications', ['entity_uuids' => '1,2,3'])
+      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response_body)));
+
+    $result = $this->ch_client->deleteQueueItemsBySyndicationIds($expected_request_body);
 
     $this->assertSame($response_body, $result);
   }

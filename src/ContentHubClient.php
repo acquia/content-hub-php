@@ -1513,31 +1513,83 @@ class ContentHubClient implements ClientInterface {
   }
 
   /**
-   * Get entities from service queue.
+   * Provides an array of queue items.
    *
    * @return array
-   *   Response from backend call.
+   *   Returns array of queue items from cloud queue with count.
+   *   Format:
+   *   [
+   *    'total' => 3,
+   *    'success' => true,
+   *    'data' => [
+   *     [
+   *       'id' => '1',
+   *       'entity_uuid' => '5f71af85-cbb0-48ac-84f3-97083bf16367',
+   *       'client_uuid' => '8fb4c61c-bc0c-4451-a1aa-f576bf4eb966',
+   *       'state' => 'queued',
+   *       'payload' => [
+   *         'action' => 'entity_create'
+   *       ],
+   *     'visible_at' => '1753879023',
+   *     'created_at' => '1753879023',
+   *     'updated_at' => '1753879023'
+   *     ],
+   *    ]
+   *  ]
    *
    * @throws \Exception
    */
-  public function getAllEntitiesFromServiceQueue(): array {
+  public function getAllQueueItems(): array {
     return self::getResponseJson($this->get('queues/syndications'));
   }
 
   /**
-   * Deletes entities from service queue.
-   *
-   * @param array $options
-   *   If empty, all items will be deleted.
-   *   Otherwise comma-separated specific ids should be sent
-   *   as $options['syndication_ids'] = '1,2' for deletion.
+   * Deletes all items from service queue.
    *
    * @return array|null
-   *   Response from backend call.
+   *   Response from Pull Syndication API.
    *
    * @throws \Exception
    */
-  public function deleteEntitiesFromServiceQueue(array $options = []): ?array {
+  public function purgeQueue(): ?array {
+    return self::getResponseJson($this->delete('queues/syndications'));
+  }
+
+  /**
+   * Deletes items from service queue using the specified syndication_ids.
+   *
+   * @param array $options
+   * <code>
+   *  $options = [
+   *      "syndication_ids": [1,2,3,4,5],
+   *  ];
+   *  </code>
+   *
+   * @return array|null
+   *   Response from Pull Syndication API.
+   *
+   * @throws \Exception
+   */
+  public function deleteQueueItemsBySyndicationIds(array $options = []): ?array {
+    return self::getResponseJson($this->delete('queues/syndications', $options));
+  }
+
+  /**
+   * Deletes items from service queue using the specified entity_uuids.
+   *
+   * @param array $options
+   * <code>
+   *  $options = [
+   *      "entity_uuids": ["1c6f7a8a-5cf6-4bb2-8e09-e64c0d63629d","4c6f7a8a-5cf6-4bb2-8e09-e64c0d63629e"]
+   *  ];
+   *  </code>
+   *
+   * @return array|null
+   *   Response from Pull Syndication API.
+   *
+   * @throws \Exception
+   */
+  public function deleteQueueItemsByEntityUuids(array $options = []): ?array {
     return self::getResponseJson($this->delete('queues/syndications', $options));
   }
 
