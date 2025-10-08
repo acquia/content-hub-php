@@ -1614,16 +1614,15 @@ class ContentHubClient implements ClientInterface {
     $this->setConfigs($config);
 
     $options = [
-      'body' => json_encode([
+      'body' => [
         'max_number_of_items' => $limit,
         'visibility_timeout' => $visibility_timeout,
-      ]),
+      ],
     ];
     if (!empty($queue_filters)) {
-      $body = json_decode($options['body'], TRUE);
-      $body['queue_filters']['state'] = $queue_filters;
-      $options['body'] = json_encode($body);
+      $options['body']['queue_filters']['state'] = $queue_filters;
     }
+    $options['body'] = json_encode($options['body']);
     return self::getResponseJson($this->post('queues/syndications', $options));
   }
 
