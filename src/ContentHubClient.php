@@ -1514,7 +1514,7 @@ class ContentHubClient implements ClientInterface {
 
   /**
    * Provides an array of queue items.
-   * 
+   *
    * Format:
    * [
    *   'total' => 3,
