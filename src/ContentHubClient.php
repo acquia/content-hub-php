@@ -1519,7 +1519,7 @@ class ContentHubClient implements ClientInterface {
    *    'total' => 3,
    *    'success' => true,
    *    'data' => [
-   *      [
+   *     [
    *        'id' => '1',
    *        'entity_uuid' => '5f71af85-cbb0-48ac-84f3-97083bf16367',
    *        'client_uuid' => '8fb4c61c-bc0c-4451-a1aa-f576bf4eb966',
@@ -1531,8 +1531,8 @@ class ContentHubClient implements ClientInterface {
    *        'created_at' => '1753879023',
    *        'updated_at' => '1753879023'
    *      ],
-   *     ]
-   *   ]
+   *    ]
+   *  ]
    *
    * @return array
    *   Returns array of queue items from cloud queue with count.
@@ -1559,7 +1559,7 @@ class ContentHubClient implements ClientInterface {
    * Deletes items from service queue using the specified syndication_ids.
    *
    * @param array $syndication_ids
-   *   Array with syndication IDs of items to be removed
+   *   Array with syndication IDs of items to be removed.
    *
    * @return array|null
    *   Response from Pull Syndication API.
@@ -1574,8 +1574,8 @@ class ContentHubClient implements ClientInterface {
   /**
    * Deletes items from service queue using the specified entity_uuids.
    *
-   * @param array $options
-   *   Query options.
+   * @param array $entity_uuids
+   *   Array of entity uuids.
    *
    * @return array|null
    *   Response from Pull Syndication API.
