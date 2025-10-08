@@ -1514,26 +1514,25 @@ class ContentHubClient implements ClientInterface {
 
   /**
    * Provides an array of queue items.
-   *
-   * Format:
-   * [
-   *   'total' => 3,
-   *   'success' => true,
-   *   'data' => [
-   *     [
-   *       'id' => '1',
-   *       'entity_uuid' => '5f71af85-cbb0-48ac-84f3-97083bf16367',
-   *       'client_uuid' => '8fb4c61c-bc0c-4451-a1aa-f576bf4eb966',
-   *       'state' => 'queued',
-   *       'payload' => [
-   *       'action' => 'entity_create'
-   *     ],
-   *     'visible_at' => '1753879023',
-   *     'created_at' => '1753879023',
-   *     'updated_at' => '1753879023'
-   *     ],
-   *    ]
-   *  ]
+   *  Format:
+   *  [
+   *    'total' => 3,
+   *    'success' => true,
+   *    'data' => [
+   *      [
+   *        'id' => '1',
+   *        'entity_uuid' => '5f71af85-cbb0-48ac-84f3-97083bf16367',
+   *        'client_uuid' => '8fb4c61c-bc0c-4451-a1aa-f576bf4eb966',
+   *        'state' => 'queued',
+   *        'payload' => [
+   *          'action' => 'entity_create'
+   *         ],
+   *        'visible_at' => '1753879023',
+   *        'created_at' => '1753879023',
+   *        'updated_at' => '1753879023'
+   *      ],
+   *     ]
+   *   ]
    *
    * @return array
    *   Returns array of queue items from cloud queue with count.
@@ -1559,35 +1558,22 @@ class ContentHubClient implements ClientInterface {
   /**
    * Deletes items from service queue using the specified syndication_ids.
    *
-   * Example of how to structure the $options parameter:
-   * <code>
-   * $options = [
-   *     'syndication_ids': [1,2,3,4,5],
-   * ];
-   * </code>
-   *
-   * @param array $options
-   *   Query options.
+   * @param array $syndication_ids
+   *   Array with syndication IDs of items to be removed
    *
    * @return array|null
    *   Response from Pull Syndication API.
    *
    * @throws \Exception
    */
-  public function deleteQueueItemsBySyndicationIds(array $options = []): ?array {
+  public function deleteQueueItemsBySyndicationIds(array $syndication_ids): ?array {
+    $options['syndication_ids'] = $syndication_ids;
     return self::getResponseJson($this->delete('queues/syndications', $options));
   }
 
   /**
    * Deletes items from service queue using the specified entity_uuids.
    *
-   * Example of how to structure the $options parameter:
-   * <code>
-   * $options = [
-   *     'entity_uuids: ["1c6f7a8a-5cf6-4bb2-8e09-e64c0d63629d","4c6f7a8a-5cf6-4bb2-8e09-e64c0d63629e"]
-   * ];
-   * </code>
-   *
    * @param array $options
    *   Query options.
    *
@@ -1596,7 +1582,8 @@ class ContentHubClient implements ClientInterface {
    *
    * @throws \Exception
    */
-  public function deleteQueueItemsByEntityUuids(array $options = []): ?array {
+  public function deleteQueueItemsByEntityUuids(array $entity_uuids): ?array {
+    $options['entity_uuids'] = $entity_uuids;
     return self::getResponseJson($this->delete('queues/syndications', $options));
   }
 
