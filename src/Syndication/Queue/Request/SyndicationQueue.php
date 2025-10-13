@@ -1,11 +1,14 @@
 <?php
 
-namespace Acquia\ContentHubClient\Syndication\Queue;
+namespace Acquia\ContentHubClient\Syndication\Queue\Request;
 
+/**
+ * Provides the necessary details to fulfill the api contract.
+ */
 final class SyndicationQueue {
 
   /**
-   * The header required to specify when calling POST /queues/syndications
+   * The header required to specify when calling POST /queues/syndications.
    */
   public const HEADER = 'X-Acquia-Content-Hub-Syndication';
 

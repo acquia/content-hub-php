@@ -6,7 +6,7 @@ use Acquia\ContentHubClient\CDF\CDFObject;
 use Acquia\ContentHubClient\MetaData\ClientMetaData;
 use Acquia\ContentHubClient\SearchCriteria\SearchCriteria;
 use Acquia\ContentHubClient\SearchCriteria\SearchCriteriaBuilder;
-use Acquia\ContentHubClient\Syndication\Queue\SyndicationQueue;
+use Acquia\ContentHubClient\Syndication\Queue\Request\SyndicationQueue;
 use Acquia\Hmac\Guzzle\HmacAuthMiddleware;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\BadResponseException;

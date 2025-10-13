@@ -10,7 +10,7 @@ use Acquia\ContentHubClient\Event\GetCDFTypeEvent;
 use Acquia\ContentHubClient\LoggerMock;
 use Acquia\ContentHubClient\MetaData\ClientMetaData;
 use Acquia\ContentHubClient\StatusCodes;
-use Acquia\ContentHubClient\Syndication\Queue\SyndicationQueue;
+use Acquia\ContentHubClient\Syndication\Queue\Request\SyndicationQueue;
 use Acquia\ContentHubClient\Syndication\SyndicationStatus;
 use Acquia\ContentHubClient\ObjectFactory;
 use Acquia\ContentHubClient\SearchCriteria\SearchCriteria;
