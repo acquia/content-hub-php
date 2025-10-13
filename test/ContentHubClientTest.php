@@ -10,6 +10,7 @@ use Acquia\ContentHubClient\Event\GetCDFTypeEvent;
 use Acquia\ContentHubClient\LoggerMock;
 use Acquia\ContentHubClient\MetaData\ClientMetaData;
 use Acquia\ContentHubClient\StatusCodes;
+use Acquia\ContentHubClient\Syndication\Queue\SyndicationQueue;
 use Acquia\ContentHubClient\Syndication\SyndicationStatus;
 use Acquia\ContentHubClient\ObjectFactory;
 use Acquia\ContentHubClient\SearchCriteria\SearchCriteria;
@@ -3486,7 +3487,12 @@ class ContentHubClientTest extends TestCase {
     $this->ch_client
       ->shouldReceive('post')
       ->once()
-      ->with('queues/syndications', ['body' => json_encode($expected_request_body)])
+      ->with('queues/syndications', [
+        'body' => json_encode($expected_request_body),
+        'headers' => [
+          SyndicationQueue::HEADER => SyndicationQueue::RECEIVE_QUEUE_ITEMS,
+        ],
+      ])
       ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response_body)));
 
     $result = $this->ch_client->receiveQueueItems($limit, $visibility_timeout, $queue_filters);

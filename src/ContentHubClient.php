@@ -6,6 +6,7 @@ use Acquia\ContentHubClient\CDF\CDFObject;
 use Acquia\ContentHubClient\MetaData\ClientMetaData;
 use Acquia\ContentHubClient\SearchCriteria\SearchCriteria;
 use Acquia\ContentHubClient\SearchCriteria\SearchCriteriaBuilder;
+use Acquia\ContentHubClient\Syndication\Queue\SyndicationQueue;
 use Acquia\Hmac\Guzzle\HmacAuthMiddleware;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\BadResponseException;
@@ -1595,12 +1596,12 @@ class ContentHubClient implements ClientInterface {
    *   Maximum number of queue items to return.
    * @param string $visibility_timeout
    *   Duration for which the fetched queue items will be invisible to other
-   *   queue consumers. Must be suffixed with duration unit (m, s, h, d, etc).
+   *   queue consumers. Must be suffixed with duration unit; valid units:
+   *   "ns", "us" (or "µs"), "ms", "s", "m", "h". E.g. 3600s, 60m, 1h.
    * @param array $queue_filters
    *   An array of queue filters to apply. Supported values are:
    *   - 'failed'
    *   - 'queued'
-   *   - 'processing'
    *   If not specified, queued items will be returned.
    *
    * @return array|null
@@ -1609,14 +1610,13 @@ class ContentHubClient implements ClientInterface {
    * @throws \Exception
    */
   public function receiveQueueItems(int $limit, string $visibility_timeout, array $queue_filters = []): ?array {
-    $config = $this->getConfig();
-    $config['headers']['X-Acquia-Content-Hub-Syndication'] = 'ReceiveQueueItems';
-    $this->setConfigs($config);
-
     $options = [
       'body' => [
         'max_number_of_items' => $limit,
         'visibility_timeout' => $visibility_timeout,
+      ],
+      'headers' => [
+        SyndicationQueue::HEADER => SyndicationQueue::RECEIVE_QUEUE_ITEMS,
       ],
     ];
     if (!empty($queue_filters)) {
