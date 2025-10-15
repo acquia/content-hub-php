@@ -6,6 +6,7 @@ use Acquia\ContentHubClient\CDF\CDFObject;
 use Acquia\ContentHubClient\MetaData\ClientMetaData;
 use Acquia\ContentHubClient\SearchCriteria\SearchCriteria;
 use Acquia\ContentHubClient\SearchCriteria\SearchCriteriaBuilder;
+use Acquia\ContentHubClient\Syndication\Queue\Request\SyndicationQueue;
 use Acquia\Hmac\Guzzle\HmacAuthMiddleware;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\BadResponseException;
@@ -1586,6 +1587,43 @@ class ContentHubClient implements ClientInterface {
   public function deleteQueueItemsByEntityUuids(array $entity_uuids): ?array {
     $options['entity_uuids'] = $entity_uuids;
     return self::getResponseJson($this->delete('queues/syndications', $options));
+  }
+
+  /**
+   * Receives queue items from service queue for processing.
+   *
+   * @param int $limit
+   *   Maximum number of queue items to return.
+   * @param string $visibility_timeout
+   *   Duration for which the fetched queue items will be invisible to other
+   *   queue consumers. Must be suffixed with duration unit; valid units:
+   *   "ns", "us" (or "µs"), "ms", "s", "m", "h". E.g. 3600s, 60m, 1h.
+   * @param array $queue_filters
+   *   An array of queue filters to apply. Supported values are:
+   *   - 'failed'
+   *   - 'queued'
+   *   If not specified, queued items will be returned.
+   *
+   * @return array|null
+   *   Response from backend call, that contains array of queue items.
+   *
+   * @throws \Exception
+   */
+  public function receiveQueueItems(int $limit, string $visibility_timeout, array $queue_filters = []): ?array {
+    $options = [
+      'body' => [
+        'max_number_of_items' => $limit,
+        'visibility_timeout' => $visibility_timeout,
+      ],
+      'headers' => [
+        SyndicationQueue::HEADER => SyndicationQueue::RECEIVE_QUEUE_ITEMS,
+      ],
+    ];
+    if (!empty($queue_filters)) {
+      $options['body']['queue_filters']['state'] = $queue_filters;
+    }
+    $options['body'] = json_encode($options['body']);
+    return self::getResponseJson($this->post('queues/syndications', $options));
   }
 
 }

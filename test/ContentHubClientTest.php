@@ -10,6 +10,7 @@ use Acquia\ContentHubClient\Event\GetCDFTypeEvent;
 use Acquia\ContentHubClient\LoggerMock;
 use Acquia\ContentHubClient\MetaData\ClientMetaData;
 use Acquia\ContentHubClient\StatusCodes;
+use Acquia\ContentHubClient\Syndication\Queue\Request\SyndicationQueue;
 use Acquia\ContentHubClient\Syndication\SyndicationStatus;
 use Acquia\ContentHubClient\ObjectFactory;
 use Acquia\ContentHubClient\SearchCriteria\SearchCriteria;
@@ -3430,6 +3431,90 @@ class ContentHubClientTest extends TestCase {
     $result = $this->ch_client->deleteQueueItemsByEntityUuids($expected_request_body);
 
     $this->assertSame($response_body, $result);
+  }
+
+  /**
+   * Tests receiveQueueItems.
+   *
+   * @covers::receiveQueueItems
+   */
+  public function testReceiveQueueItems(): void {
+    $limit = 10;
+    $visibility_timeout = '1d';
+    $queue_filters = ['queued'];
+
+    $expected_request_body = [
+      'max_number_of_items' => $limit,
+      'visibility_timeout' => $visibility_timeout,
+      'queue_filters' => [
+        'state' => $queue_filters,
+      ],
+    ];
+
+    $response_body = [
+      'success' => TRUE,
+      'request_id' => 'be71af85-cbb0-48ac-84f3-97083bf16323',
+      'data' => [
+        [
+          'id' => '123',
+          'entity_uuid' => '5f71af85-cbb0-48ac-84f3-97083bf16367',
+          'client_uuid' => '8fb4c61c-bc0c-4451-a1aa-f576bf4eb966',
+          'state' => 'queued',
+          'payload' => [
+            'action' => 'entity_create',
+            'reason' => 'interest list',
+          ],
+          'visible_at' => '1753879023',
+          'created_at' => '1753879023',
+          'updated_at' => '1753879023',
+        ],
+        [
+          'id' => '124',
+          'entity_uuid' => '6f71af85-cbb0-e8ac-84f3-97083bf16366',
+          'client_uuid' => '8fb4c61c-bc0c-4451-a1aa-f576bf4eb966',
+          'state' => 'queued',
+          'payload' => [
+            'action' => 'entity_update',
+            'reason' => 'UUID_OF_THE_FILTER',
+          ],
+          'visible_at' => '1753879023',
+          'created_at' => '1753879023',
+          'updated_at' => '1753879023',
+        ],
+      ],
+    ];
+
+    $this->ch_client
+      ->shouldReceive('post')
+      ->once()
+      ->with('queues/syndications', [
+        'body' => json_encode($expected_request_body),
+        'headers' => [
+          SyndicationQueue::HEADER => SyndicationQueue::RECEIVE_QUEUE_ITEMS,
+        ],
+      ])
+      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response_body)));
+
+    $result = $this->ch_client->receiveQueueItems($limit, $visibility_timeout, $queue_filters);
+
+    $this->assertSame($response_body, $result);
+    $this->assertTrue($result['success']);
+    $this->assertSame('be71af85-cbb0-48ac-84f3-97083bf16323', $result['request_id']);
+    $this->assertCount(2, $result['data']);
+
+    $first_item = $result['data'][0];
+    $this->assertSame('123', $first_item['id']);
+    $this->assertSame('5f71af85-cbb0-48ac-84f3-97083bf16367', $first_item['entity_uuid']);
+    $this->assertSame('8fb4c61c-bc0c-4451-a1aa-f576bf4eb966', $first_item['client_uuid']);
+    $this->assertSame('queued', $first_item['state']);
+    $this->assertSame('entity_create', $first_item['payload']['action']);
+    $this->assertSame('interest list', $first_item['payload']['reason']);
+
+    $second_item = $result['data'][1];
+    $this->assertSame('124', $second_item['id']);
+    $this->assertSame('6f71af85-cbb0-e8ac-84f3-97083bf16366', $second_item['entity_uuid']);
+    $this->assertSame('entity_update', $second_item['payload']['action']);
+    $this->assertSame('UUID_OF_THE_FILTER', $second_item['payload']['reason']);
   }
 
 }
