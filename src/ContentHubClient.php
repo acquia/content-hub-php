@@ -7,6 +7,7 @@ use Acquia\ContentHubClient\MetaData\ClientMetaData;
 use Acquia\ContentHubClient\SearchCriteria\SearchCriteria;
 use Acquia\ContentHubClient\SearchCriteria\SearchCriteriaBuilder;
 use Acquia\ContentHubClient\Syndication\Queue\Request\SyndicationQueue;
+use Acquia\ContentHubClient\Webhook\WebhookStatus;
 use Acquia\Hmac\Guzzle\HmacAuthMiddleware;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\BadResponseException;
@@ -726,6 +727,19 @@ class ContentHubClient implements ClientInterface {
    */
   public function getWebhookStatus() {
     return self::getResponseJson($this->get('settings/webhooks/status'));
+  }
+
+  /**
+   * @param string $webhook_uuid
+   *
+   * @return WebhookStatus
+   *
+   * @throws \Exception
+   */
+  public function getWebhookStatusFor(string $webhook_uuid): WebhookStatus {
+    $options['query'] = ['uuid' => $webhook_uuid];
+    $resp = self::getResponseJson($this->get('settings/webhooks/status', $options));
+    return WebhookStatus::fromArray($resp['data'] ? current($resp['data']) : []);
   }
 
   /**
