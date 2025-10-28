@@ -1516,7 +1516,7 @@ class ContentHubClient implements ClientInterface {
   /**
    * Provides an array of queue items.
    *
-   * Format:
+   * Response Format:
    * [
    *   'total' => 3,
    *   'success' => true,
@@ -1536,13 +1536,17 @@ class ContentHubClient implements ClientInterface {
    *   ]
    * ]
    *
+   * @param array $params
+   *   Query params.
+   *
    * @return array
    *   Returns array of queue items from cloud queue with count.
    *
    * @throws \Exception
    */
-  public function getAllQueueItems(): array {
-    return self::getResponseJson($this->get('queues/syndications'));
+  public function getAllQueueItems(array $params = []): array {
+    $args = $params ? [RequestOptions::QUERY => $params] : [];
+    return self::getResponseJson($this->get('queues/syndications', $args));
   }
 
   /**
