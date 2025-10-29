@@ -48,7 +48,7 @@ class ContentHubClientTest extends TestCase {
   /**
    * Content Hub client.
    *
-   * @var \Acquia\ContentHubClient\ContentHubClient
+   * @var \Acquia\ContentHubClient\ContentHubClient|\Mockery\MockInterface
    */
   private $ch_client; // phpcs:ignore
 
@@ -2707,7 +2707,7 @@ class ContentHubClientTest extends TestCase {
    * @param string $api_version
    *   API version.
    *
-   * @return \Acquia\ContentHubClient\ContentHubClient
+   * @return \Acquia\ContentHubClient\ContentHubClient|MockInterface
    *   Mocked object.
    *
    * @throws \ReflectionException
@@ -3515,6 +3515,35 @@ class ContentHubClientTest extends TestCase {
     $this->assertSame('6f71af85-cbb0-e8ac-84f3-97083bf16366', $second_item['entity_uuid']);
     $this->assertSame('entity_update', $second_item['payload']['action']);
     $this->assertSame('UUID_OF_THE_FILTER', $second_item['payload']['reason']);
+  }
+
+  /**
+   * @covers ::getWebhookStatusFor
+   */
+  public function testGetWebhookStatusFor(): void {
+    $uuid = '7e2b635d-d43c-4085-a336-1edd954aacc6';
+    $response_body = [
+      'success' => TRUE,
+      'request_id' => 'ce7bc9af-7b74-4530-9783-62dc9c783974',
+      'data' => [
+        [
+          'uuid' => $uuid,
+          'url' => 'http://example.com',
+          'current_state' => 'healthy'
+        ]
+      ],
+    ];
+
+    $this->ch_client
+      ->allows('get')
+      ->once()
+      ->with('settings/webhooks/status', ['query' => ['uuid' => $uuid]])
+      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response_body)));
+
+    $webhook_status = $this->ch_client->getWebhookStatusFor($uuid);
+    $this->assertEquals($uuid, $webhook_status->getUuid());
+    $this->assertEquals('http://example.com', $webhook_status->getUrl());
+    $this->assertEquals('healthy', $webhook_status->getCurrentState());
   }
 
 }

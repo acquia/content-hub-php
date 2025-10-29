@@ -2,6 +2,9 @@
 
 namespace Acquia\ContentHubClient\Webhook;
 
+/**
+ * Records the possible webhook statuses.
+ */
 final class WebhookStatusState {
 
   public const UNREACHABLE = 'unreachable';

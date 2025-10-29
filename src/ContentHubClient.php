@@ -730,16 +730,21 @@ class ContentHubClient implements ClientInterface {
   }
 
   /**
+   * Returns the WebhookStatus for a given webhook based on the uuid.
+   *
    * @param string $webhook_uuid
+   *   The uuid of the webhook for which to query the status.
    *
    * @return WebhookStatus
+   *   A WebhookStatus object.
    *
    * @throws \Exception
    */
   public function getWebhookStatusFor(string $webhook_uuid): WebhookStatus {
     $options['query'] = ['uuid' => $webhook_uuid];
     $resp = self::getResponseJson($this->get('settings/webhooks/status', $options));
-    return WebhookStatus::fromArray($resp['data'] ? current($resp['data']) : []);
+    $data = $resp['data'] ?? [];
+    return WebhookStatus::fromArray(reset($data) ?: []);
   }
 
   /**
