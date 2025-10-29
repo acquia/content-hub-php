@@ -124,7 +124,7 @@ final class WebhookStatus {
    *   TRUE if the webhook status matches, FALSE otherwise.
    */
   public function isOfState(string $state): bool {
-    return $this->currentState === $state;
+    return strtolower($this->currentState) === strtolower($state);
   }
 
   /**

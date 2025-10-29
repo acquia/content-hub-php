@@ -83,10 +83,10 @@ class WebhookStatusTest extends TestCase {
   }
 
   /**
-   * Tests isOf() is case sensitive.
+   * Tests isOf() is case insensitive.
    */
   public function testIsOfReturnsFalseWhenStatusDiffersInCase(): void {
-    $this->assertFalse($this->webhookStatus->isOfState(strtolower(self::SAMPLE_STATUS_DATA['current_state'])));
+    $this->assertTrue($this->webhookStatus->isOfState(strtolower(self::SAMPLE_STATUS_DATA['current_state'])));
   }
 
   /**
