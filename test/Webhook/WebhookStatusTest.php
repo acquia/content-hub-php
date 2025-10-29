@@ -72,21 +72,21 @@ class WebhookStatusTest extends TestCase {
    * Tests isOf() returns true when status matches.
    */
   public function testIsOfReturnsTrueWhenStatusMatches(): void {
-    $this->assertTrue($this->webhookStatus->isOf(self::SAMPLE_STATUS_DATA['status']));
+    $this->assertTrue($this->webhookStatus->isOfState(self::SAMPLE_STATUS_DATA['current_state']));
   }
 
   /**
    * Tests isOf() returns false when status does not match.
    */
   public function testIsOfReturnsFalseWhenStatusDoesNotMatch(): void {
-    $this->assertFalse($this->webhookStatus->isOf('DISABLED'));
+    $this->assertFalse($this->webhookStatus->isOfState('DISABLED'));
   }
 
   /**
    * Tests isOf() is case sensitive.
    */
   public function testIsOfReturnsFalseWhenStatusDiffersInCase(): void {
-    $this->assertFalse($this->webhookStatus->isOf(strtolower(self::SAMPLE_STATUS_DATA['status'])));
+    $this->assertFalse($this->webhookStatus->isOfState(strtolower(self::SAMPLE_STATUS_DATA['current_state'])));
   }
 
   /**

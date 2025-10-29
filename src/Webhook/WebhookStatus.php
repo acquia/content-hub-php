@@ -117,14 +117,14 @@ final class WebhookStatus {
   /**
    * Checks if the webhook has a specific status.
    *
-   * @param string $status
+   * @param string $state
    *   The status to check against.
    *
    * @return bool
    *   TRUE if the webhook status matches, FALSE otherwise.
    */
-  public function isOf(string $status): bool {
-    return $this->status === $status;
+  public function isOfState(string $state): bool {
+    return $this->currentState === $state;
   }
 
   /**
