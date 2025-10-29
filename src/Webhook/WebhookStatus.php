@@ -20,12 +20,13 @@ final class WebhookStatus {
    * @var string
    */
   private string $url;
+
   /**
    * The current state of the webhook.
    *
    * @var string
    */
-  private string $current_state;
+  private string $currentState;
 
   /**
    * The status of the webhook.
@@ -46,7 +47,7 @@ final class WebhookStatus {
    *
    * @var int
    */
-  private int $suppressed_until;
+  private int $suppressedUntil;
 
   /**
    * Constructs a WebhookStatus object.
@@ -67,10 +68,10 @@ final class WebhookStatus {
   public function __construct(string $uuid, string $url, string $current_state, string $status, string $reason, int $suppressed_until) {
     $this->uuid = $uuid;
     $this->url = $url;
-    $this->current_state = $current_state;
+    $this->currentState = $current_state;
     $this->status = $status;
     $this->reason = $reason;
-    $this->suppressed_until = $suppressed_until;
+    $this->suppressedUntil = $suppressed_until;
   }
 
   /**
@@ -100,7 +101,7 @@ final class WebhookStatus {
    *   The current state.
    */
   public function getCurrentState(): string {
-    return $this->current_state;
+    return $this->currentState;
   }
 
   /**
@@ -143,7 +144,7 @@ final class WebhookStatus {
    *   A UNIX timestamp (0 if not suppressed).
    */
   public function getSuppressedUntil(): int {
-    return $this->suppressed_until;
+    return $this->suppressedUntil;
   }
 
   /**
@@ -156,7 +157,7 @@ final class WebhookStatus {
     $required = [
       $this->uuid,
       $this->url,
-      $this->current_state,
+      $this->currentState,
     ];
 
     return !in_array('', $required, TRUE);
@@ -192,10 +193,10 @@ final class WebhookStatus {
     return [
       'uuid' => $this->uuid,
       'url' => $this->url,
-      'current_state' => $this->current_state,
+      'current_state' => $this->currentState,
       'status' => $this->status,
       'reason' => $this->reason,
-      'suppressed_until' => $this->suppressed_until,
+      'suppressed_until' => $this->suppressedUntil,
     ];
   }
 

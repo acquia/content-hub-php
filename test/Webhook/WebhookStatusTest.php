@@ -166,9 +166,7 @@ class WebhookStatusTest extends TestCase {
   public function testFromArrayWithMissingKeysProducesInvalidStatus(): void {
     $partial = [
       'uuid' => 'partial-uuid',
-      // url missing.
       'current_state' => 'ACTIVE',
-      // status missing.
       'reason' => 'Some reason',
       'suppressed_until' => 0,
     ];
@@ -205,7 +203,6 @@ class WebhookStatusTest extends TestCase {
       'url' => 'https://example.com/2',
       'current_state' => 'INACTIVE',
       'status' => 'ENABLED',
-      // reason missing.
       'suppressed_until' => 0,
     ];
     $status = WebhookStatus::fromArray($data);

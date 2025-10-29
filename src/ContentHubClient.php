@@ -735,7 +735,7 @@ class ContentHubClient implements ClientInterface {
    * @param string $webhook_uuid
    *   The uuid of the webhook for which to query the status.
    *
-   * @return WebhookStatus
+   * @return \Acquia\ContentHubClient\Webhook\WebhookStatus
    *   A WebhookStatus object.
    *
    * @throws \Exception
