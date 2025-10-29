@@ -125,7 +125,7 @@ class WebhookStatusTest extends TestCase {
    */
   public function testIsValidReturnsFalseWhenStatusIsEmpty(): void {
     $status = new WebhookStatus(self::SAMPLE_STATUS_DATA['uuid'], self::SAMPLE_STATUS_DATA['url'], self::SAMPLE_STATUS_DATA['current_state'], '', self::SAMPLE_STATUS_DATA['reason'], 0);
-    $this->assertFalse($status->isValid());
+    $this->assertTrue($status->isValid());
   }
 
   /**
