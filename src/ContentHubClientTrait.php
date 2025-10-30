@@ -226,6 +226,21 @@ trait ContentHubClientTrait {
   }
 
   /**
+   * Performs a PATCH request.
+   *
+   * @param string $uri
+   *   The endpoint path.
+   * @param array $options
+   *   Request options to apply.
+   *
+   * @return \Psr\Http\Message\ResponseInterface
+   *   The response.
+   */
+  protected function patch(string $uri, array $options = []): ResponseInterface {
+    return $this->request('PATCH', $uri, $options);
+  }
+
+  /**
    * Sets configurations.
    *
    * @param array $config
