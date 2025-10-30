@@ -1624,7 +1624,7 @@ class ContentHubClient implements ClientInterface {
    *   'visibility_timeout' => 0,
    *   'payload' => [
    *     'reason' => 'manual',
-   *   ],
+   *   ].
    *
    * @return array
    *   The response array.
