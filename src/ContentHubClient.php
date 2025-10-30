@@ -1611,8 +1611,8 @@ class ContentHubClient implements ClientInterface {
    */
   public function deleteQueueItemsByEntityUuids(array $entity_uuids): ?array {
     $options[RequestOptions::BODY] = json_encode([
-        'entity_uuids' => $entity_uuids,
-      ]);
+      'entity_uuids' => $entity_uuids,
+    ]);
     return self::getResponseJson($this->delete('queues/syndications', $options));
   }
 
