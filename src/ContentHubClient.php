@@ -1592,7 +1592,9 @@ class ContentHubClient implements ClientInterface {
    * @throws \Exception
    */
   public function deleteQueueItemsBySyndicationIds(array $syndication_ids): ?array {
-    $options['syndication_ids'] = $syndication_ids;
+    $options[RequestOptions::BODY] = json_encode([
+      'syndication_ids' => $syndication_ids,
+    ]);
     return self::getResponseJson($this->delete('queues/syndications', $options));
   }
 
@@ -1608,7 +1610,9 @@ class ContentHubClient implements ClientInterface {
    * @throws \Exception
    */
   public function deleteQueueItemsByEntityUuids(array $entity_uuids): ?array {
-    $options['entity_uuids'] = $entity_uuids;
+    $options[RequestOptions::BODY] = json_encode([
+      'entity_uuids' => $entity_uuids,
+    ]);
     return self::getResponseJson($this->delete('queues/syndications', $options));
   }
 
