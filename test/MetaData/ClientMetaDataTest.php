@@ -22,7 +22,7 @@ class ClientMetaDataTest extends TestCase {
     'is_publisher' => TRUE,
     'is_subscriber' => FALSE,
     'webhook_version' => '2.0',
-    'syndication_mode' => 'push',
+    'syndication_strategy' => 'push',
     'config' => [
       'valid_ssl' => TRUE,
       'drupal_version' => '10.1.1',
@@ -43,7 +43,7 @@ class ClientMetaDataTest extends TestCase {
    * @covers ::toArray
    */
   public function testGetMetaData(): void {
-    $this->sut = new ClientMetaData($this->metadata['client_type'], $this->metadata['is_publisher'], $this->metadata['is_subscriber'], $this->metadata['webhook_version'], $this->metadata['syndication_mode'], $this->metadata['config']);
+    $this->sut = new ClientMetaData($this->metadata['client_type'], $this->metadata['is_publisher'], $this->metadata['is_subscriber'], $this->metadata['webhook_version'], $this->metadata['syndication_strategy'], $this->metadata['config']);
     $client_metadata = $this->sut->toArray();
     $this->assertEquals($this->metadata, $client_metadata);
   }
@@ -76,7 +76,7 @@ class ClientMetaDataTest extends TestCase {
       'is_publisher' => TRUE,
       'is_subscriber' => FALSE,
       'webhook_version' => '2.0',
-      'syndication_mode' => 'push',
+      'syndication_strategy' => 'push',
       'config' => [],
     ], $client_metadata);
   }
