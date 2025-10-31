@@ -1637,7 +1637,8 @@ class ContentHubClient implements ClientInterface {
    */
   public function updateQueueItem(string $queueItemId, array $data): array {
     $path = "/queues/syndications/{$queueItemId}";
-    return self::getResponseJson($this->patch($path, $data));
+    $options['body'] = json_encode($data);
+    return self::getResponseJson($this->patch($path, $options));
   }
 
   /**
