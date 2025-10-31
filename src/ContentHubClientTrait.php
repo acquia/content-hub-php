@@ -236,7 +236,7 @@ trait ContentHubClientTrait {
    * @return \Psr\Http\Message\ResponseInterface
    *   The response.
    */
-  protected function patch(string $uri, array $options = []): ResponseInterface {
+  public function patch(string $uri, array $options = []): ResponseInterface {
     return $this->request('PATCH', $uri, $options);
   }
 
