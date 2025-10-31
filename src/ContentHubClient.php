@@ -1617,6 +1617,31 @@ class ContentHubClient implements ClientInterface {
   }
 
   /**
+   * Updates a queue item.
+   *
+   * @param string $queueItemId
+   *   The queue item ID.
+   * @param array $data
+   *   The data to update.
+   *   Eg: [
+   *   'state' => 'failed',
+   *   'visibility_timeout' => 0,
+   *   'payload' => [
+   *     'reason' => 'manual',
+   *   ].
+   *
+   * @return array
+   *   The response array.
+   *
+   * @throws \Exception
+   */
+  public function updateQueueItem(string $queueItemId, array $data): array {
+    $path = "queues/syndications/{$queueItemId}";
+    $options[RequestOptions::BODY] = json_encode($data);
+    return self::getResponseJson($this->patch($path, $options));
+  }
+
+  /**
    * Receives queue items from service queue for processing.
    *
    * @param int $limit

@@ -3440,6 +3440,34 @@ class ContentHubClientTest extends TestCase {
   }
 
   /**
+   * Tests updateQueueItem.
+   *
+   * @covers::updateQueueItem
+   */
+  public function testUpdateQueueItem() {
+    $syndication_id = '12345';
+    $data = [
+      'state' => 'failed',
+      'visibility_timeout' => 0,
+    ];
+
+    $response_body = [
+      'success' => TRUE,
+      'request_id' => '2d7f8b9c-6df7-5cf3-9f1a-f75d1e74734d',
+    ];
+
+    $this->ch_client
+      ->shouldReceive('patch')
+      ->once()
+      ->with("queues/syndications/{$syndication_id}", [RequestOptions::BODY => json_encode($data)])
+      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response_body)));
+
+    $result = $this->ch_client->updateQueueItem($syndication_id, $data);
+
+    $this->assertSame($response_body, $result);
+  }
+
+  /**
    * Tests receiveQueueItems.
    *
    * @covers::receiveQueueItems
