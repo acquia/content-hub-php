@@ -3459,7 +3459,7 @@ class ContentHubClientTest extends TestCase {
     $this->ch_client
       ->shouldReceive('patch')
       ->once()
-      ->with("queues/syndications/{$syndication_id}", ['body' => json_encode($data)])
+      ->with("queues/syndications/{$syndication_id}", [RequestOptions::BODY => json_encode($data)])
       ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response_body)));
 
     $result = $this->ch_client->updateQueueItem($syndication_id, $data);
