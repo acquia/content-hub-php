@@ -7,6 +7,7 @@ use Acquia\ContentHubClient\MetaData\ClientMetaData;
 use Acquia\ContentHubClient\SearchCriteria\SearchCriteria;
 use Acquia\ContentHubClient\SearchCriteria\SearchCriteriaBuilder;
 use Acquia\ContentHubClient\Syndication\Queue\Request\SyndicationQueue;
+use Acquia\ContentHubClient\Syndication\SyndicationState;
 use Acquia\ContentHubClient\Webhook\WebhookStatus;
 use Acquia\Hmac\Guzzle\HmacAuthMiddleware;
 use GuzzleHttp\ClientInterface;
@@ -1565,6 +1566,43 @@ class ContentHubClient implements ClientInterface {
    */
   public function getAllQueueItems(array $params = []): array {
     $args = $params ? [RequestOptions::QUERY => $params] : [];
+    return self::getResponseJson($this->get('queues/syndications', $args));
+  }
+
+  /**
+   * Provides an array of queued syndication items.
+   *
+   * Response Format:
+   * [
+   *   'total' => 3,
+   *   'success' => true,
+   *   'data' => [
+   *    [
+   *       'id' => '1',
+   *       'entity_uuid' => '5f71af85-cbb0-48ac-84f3-97083bf16367',
+   *       'client_uuid' => '8fb4c61c-bc0c-4451-a1aa-f576bf4eb966',
+   *       'state' => 'queued',
+   *       'payload' => [
+   *         'action' => 'entity_create'
+   *        ],
+   *       'visible_at' => '1753879023',
+   *       'created_at' => '1753879023',
+   *       'updated_at' => '1753879023'
+   *     ],
+   *   ]
+   * ]
+   *
+   * @param array $params
+   *   Query params (optional).
+   *
+   * @return array
+   *   Returns array of queued syndication items.
+   *
+   * @throws \Exception
+   */
+  public function getQueuedItems(array $params = []): array {
+    $params['state'] = SyndicationState::QUEUED;
+    $args = [RequestOptions::QUERY => $params];
     return self::getResponseJson($this->get('queues/syndications', $args));
   }
 

@@ -11,6 +11,7 @@ use Acquia\ContentHubClient\LoggerMock;
 use Acquia\ContentHubClient\MetaData\ClientMetaData;
 use Acquia\ContentHubClient\StatusCodes;
 use Acquia\ContentHubClient\Syndication\Queue\Request\SyndicationQueue;
+use Acquia\ContentHubClient\Syndication\SyndicationState;
 use Acquia\ContentHubClient\Syndication\SyndicationStatus;
 use Acquia\ContentHubClient\ObjectFactory;
 use Acquia\ContentHubClient\SearchCriteria\SearchCriteria;
@@ -3578,6 +3579,45 @@ class ContentHubClientTest extends TestCase {
     $this->assertEquals($uuid, $webhook_status->getUuid());
     $this->assertEquals('http://example.com', $webhook_status->getUrl());
     $this->assertEquals('healthy', $webhook_status->getCurrentState());
+  }
+
+  /**
+   * Tests getQueuedItems with additional parameters.
+   *
+   * @covers::getQueuedItems
+   */
+  public function testGetQueuedItemsWithParams() {
+    $params = ['limit' => 5];
+    $expected_params = ['state' => SyndicationState::QUEUED, 'limit' => 5];
+
+    $response_body = [
+      "total" => 1,
+      "success" => TRUE,
+      "data" => [
+        [
+          "id" => "1",
+          "entity_uuid" => "5f71af85-cbb0-48ac-84f3-97083bf16367",
+          "client_uuid" => "8fb4c61c-bc0c-4451-a1aa-f576bf4eb966",
+          "state" => SyndicationState::QUEUED,
+          "payload" => [
+            "action" => "entity_create"
+          ],
+          "visible_at" => "1753879023",
+          "created_at" => "1753879023",
+          "updated_at" => "1753879023"
+        ]
+      ]
+    ];
+
+    $this->ch_client
+      ->shouldReceive('get')
+      ->once()
+      ->with('queues/syndications', [RequestOptions::QUERY => $expected_params])
+      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response_body)));
+
+    $result = $this->ch_client->getQueuedItems($params);
+
+    $this->assertSame($response_body, $result);
   }
 
 }
