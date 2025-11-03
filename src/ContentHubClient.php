@@ -6,6 +6,9 @@ use Acquia\ContentHubClient\CDF\CDFObject;
 use Acquia\ContentHubClient\MetaData\ClientMetaData;
 use Acquia\ContentHubClient\SearchCriteria\SearchCriteria;
 use Acquia\ContentHubClient\SearchCriteria\SearchCriteriaBuilder;
+use Acquia\ContentHubClient\Syndication\Queue\Request\SyndicationQueue;
+use Acquia\ContentHubClient\Syndication\SyndicationState;
+use Acquia\ContentHubClient\Webhook\WebhookStatus;
 use Acquia\Hmac\Guzzle\HmacAuthMiddleware;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\BadResponseException;
@@ -725,6 +728,24 @@ class ContentHubClient implements ClientInterface {
    */
   public function getWebhookStatus() {
     return self::getResponseJson($this->get('settings/webhooks/status'));
+  }
+
+  /**
+   * Returns the WebhookStatus for a given webhook based on the uuid.
+   *
+   * @param string $webhook_uuid
+   *   The uuid of the webhook for which to query the status.
+   *
+   * @return \Acquia\ContentHubClient\Webhook\WebhookStatus
+   *   A WebhookStatus object.
+   *
+   * @throws \Exception
+   */
+  public function getWebhookStatusFor(string $webhook_uuid): WebhookStatus {
+    $options['query'] = ['uuid' => $webhook_uuid];
+    $resp = self::getResponseJson($this->get('settings/webhooks/status', $options));
+    $data = $resp['data'] ?? [];
+    return WebhookStatus::fromArray(reset($data) ?: []);
   }
 
   /**
@@ -1510,6 +1531,189 @@ class ContentHubClient implements ClientInterface {
   public function isFeatured(): bool {
     $remote = $this->getRemoteSettings();
     return $remote['featured'] ?? FALSE;
+  }
+
+  /**
+   * Provides an array of queue items.
+   *
+   * Response Format:
+   * [
+   *   'total' => 3,
+   *   'success' => true,
+   *   'data' => [
+   *    [
+   *       'id' => '1',
+   *       'entity_uuid' => '5f71af85-cbb0-48ac-84f3-97083bf16367',
+   *       'client_uuid' => '8fb4c61c-bc0c-4451-a1aa-f576bf4eb966',
+   *       'state' => 'queued',
+   *       'payload' => [
+   *         'action' => 'entity_create'
+   *        ],
+   *       'visible_at' => '1753879023',
+   *       'created_at' => '1753879023',
+   *       'updated_at' => '1753879023'
+   *     ],
+   *   ]
+   * ]
+   *
+   * @param array $params
+   *   Query params.
+   *
+   * @return array
+   *   Returns array of queue items from cloud queue with count.
+   *
+   * @throws \Exception
+   */
+  public function getAllQueueItems(array $params = []): array {
+    $args = $params ? [RequestOptions::QUERY => $params] : [];
+    return self::getResponseJson($this->get('queues/syndications', $args));
+  }
+
+  /**
+   * Provides an array of queued syndication items.
+   *
+   * Response Format:
+   * [
+   *   'total' => 3,
+   *   'success' => true,
+   *   'data' => [
+   *    [
+   *       'id' => '1',
+   *       'entity_uuid' => '5f71af85-cbb0-48ac-84f3-97083bf16367',
+   *       'client_uuid' => '8fb4c61c-bc0c-4451-a1aa-f576bf4eb966',
+   *       'state' => 'queued',
+   *       'payload' => [
+   *         'action' => 'entity_create'
+   *        ],
+   *       'visible_at' => '1753879023',
+   *       'created_at' => '1753879023',
+   *       'updated_at' => '1753879023'
+   *     ],
+   *   ]
+   * ]
+   *
+   * @param array $params
+   *   Query params (optional).
+   *
+   * @return array
+   *   Returns array of queued syndication items.
+   *
+   * @throws \Exception
+   */
+  public function getQueuedItems(array $params = []): array {
+    $params['state'] = SyndicationState::QUEUED;
+    $args = [RequestOptions::QUERY => $params];
+    return self::getResponseJson($this->get('queues/syndications', $args));
+  }
+
+  /**
+   * Deletes all items from service queue.
+   *
+   * @return array|null
+   *   Response from Syndication Queue API.
+   *
+   * @throws \Exception
+   */
+  public function purgeQueue(): ?array {
+    return self::getResponseJson($this->delete('queues/syndications'));
+  }
+
+  /**
+   * Deletes items from service queue using the specified syndication_ids.
+   *
+   * @param array $syndication_ids
+   *   Array with syndication IDs of items to be removed.
+   *
+   * @return array|null
+   *   Response from Syndication Queue API.
+   *
+   * @throws \Exception
+   */
+  public function deleteQueueItemsBySyndicationIds(array $syndication_ids): ?array {
+    $options[RequestOptions::BODY] = json_encode([
+      'syndication_ids' => $syndication_ids,
+    ]);
+    return self::getResponseJson($this->delete('queues/syndications', $options));
+  }
+
+  /**
+   * Deletes items from service queue using the specified entity_uuids.
+   *
+   * @param array $entity_uuids
+   *   Array of entity uuids.
+   *
+   * @return array|null
+   *   Response from Syndication Queue API.
+   *
+   * @throws \Exception
+   */
+  public function deleteQueueItemsByEntityUuids(array $entity_uuids): ?array {
+    $options[RequestOptions::BODY] = json_encode([
+      'entity_uuids' => $entity_uuids,
+    ]);
+    return self::getResponseJson($this->delete('queues/syndications', $options));
+  }
+
+  /**
+   * Updates a queue item.
+   *
+   * @param string $queueItemId
+   *   The queue item ID.
+   * @param array $data
+   *   The data to update.
+   *   Eg: [
+   *   'state' => 'failed',
+   *   'visibility_timeout' => 0,
+   *   'payload' => [
+   *     'reason' => 'manual',
+   *   ].
+   *
+   * @return array
+   *   The response array.
+   *
+   * @throws \Exception
+   */
+  public function updateQueueItem(string $queueItemId, array $data): array {
+    $path = "queues/syndications/{$queueItemId}";
+    $options[RequestOptions::BODY] = json_encode($data);
+    return self::getResponseJson($this->patch($path, $options));
+  }
+
+  /**
+   * Receives queue items from service queue for processing.
+   *
+   * @param int $limit
+   *   Maximum number of queue items to return.
+   * @param string $visibility_timeout
+   *   Duration for which the fetched queue items will be invisible to other
+   *   queue consumers. Must be suffixed with duration unit; valid units:
+   *   "ns", "us" (or "µs"), "ms", "s", "m", "h". E.g. 3600s, 60m, 1h.
+   * @param array $queue_filters
+   *   An array of queue filters to apply. Supported values are:
+   *   - 'failed'
+   *   - 'queued'
+   *   If not specified, queued items will be returned.
+   *
+   * @return array|null
+   *   Response from backend call, that contains array of queue items.
+   *
+   * @throws \Exception
+   */
+  public function receiveQueueItems(int $limit, string $visibility_timeout, array $queue_filters = []): ?array {
+    $options = [
+      'body' => [
+        'max_number_of_items' => $limit,
+        'visibility_timeout' => $visibility_timeout,
+      ],
+      'headers' => [
+        SyndicationQueue::HEADER => SyndicationQueue::RECEIVE_QUEUE_ITEMS,
+      ],
+    ];
+    if (!empty($queue_filters)) {
+      $options['body']['queue_filters']['state'] = $queue_filters;
+    }
+    $options['body'] = json_encode($options['body']);
+    return self::getResponseJson($this->post('queues/syndications', $options));
   }
 
 }

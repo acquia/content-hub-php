@@ -10,6 +10,8 @@ use Acquia\ContentHubClient\Event\GetCDFTypeEvent;
 use Acquia\ContentHubClient\LoggerMock;
 use Acquia\ContentHubClient\MetaData\ClientMetaData;
 use Acquia\ContentHubClient\StatusCodes;
+use Acquia\ContentHubClient\Syndication\Queue\Request\SyndicationQueue;
+use Acquia\ContentHubClient\Syndication\SyndicationState;
 use Acquia\ContentHubClient\Syndication\SyndicationStatus;
 use Acquia\ContentHubClient\ObjectFactory;
 use Acquia\ContentHubClient\SearchCriteria\SearchCriteria;
@@ -47,7 +49,7 @@ class ContentHubClientTest extends TestCase {
   /**
    * Content Hub client.
    *
-   * @var \Acquia\ContentHubClient\ContentHubClient
+   * @var \Acquia\ContentHubClient\ContentHubClient|\Mockery\MockInterface
    */
   private $ch_client; // phpcs:ignore
 
@@ -126,6 +128,7 @@ class ContentHubClientTest extends TestCase {
         'is_publisher' => TRUE,
         'is_subscriber' => FALSE,
         'webhook_version' => '2.0',
+        'syndication_mode' => 'push',
         'config' => [
           'valid_ssl' => TRUE,
           'drupal_version' => '10.1.1',
@@ -2705,7 +2708,7 @@ class ContentHubClientTest extends TestCase {
    * @param string $api_version
    *   API version.
    *
-   * @return \Acquia\ContentHubClient\ContentHubClient
+   * @return \Acquia\ContentHubClient\ContentHubClient|MockInterface
    *   Mocked object.
    *
    * @throws \ReflectionException
@@ -3298,6 +3301,323 @@ class ContentHubClientTest extends TestCase {
 
     $actual = $this->ch_client->ping();
     $this->assertSame($resp, $actual, 'Subsequent call returns the new response object.');
+  }
+
+  /**
+   * Tests getAllQueueItems.
+   *
+   * @covers::getAllQueueItems
+   */
+  public function testGetAllQueueItems() {
+    $response_body = [
+      "total" => 3,
+      "success" => TRUE,
+      "data" => [
+        [
+          "id" => "1",
+          "entity_uuid" => "5f71af85-cbb0-48ac-84f3-97083bf16367",
+          "client_uuid" => "8fb4c61c-bc0c-4451-a1aa-f576bf4eb966",
+          "state" => "queued",
+          "payload" => [
+            "action" => "entity_create"
+          ],
+          "visible_at" => "1753879023",
+          "created_at" => "1753879023",
+          "updated_at" => "1753879023"
+        ],
+        [
+          "id" => "2",
+          "entity_uuid" => "6f71af85-cbb0-48ac-84f3-97083bf16367",
+          "client_uuid" => "8fb4c61c-bc0c-4451-a1aa-f576bf4eb966",
+          "state" => "processing",
+          "payload" => [
+            "action" => "entity_update"
+          ],
+          "visible_at" => "1753879023",
+          "created_at" => "1753879023",
+          "updated_at" => "1753879023"
+        ],
+        [
+          "id" => "3",
+          "entity_uuid" => "7f71af85-cbb0-48ac-84f3-97083bf16367",
+          "client_uuid" => "8fb4c61c-bc0c-4451-a1aa-f576bf4eb966",
+          "state" => "processed",
+          "payload" => [
+            "action" => "entity_delete"
+          ],
+          "visible_at" => "1753879023",
+          "created_at" => "1753879023",
+          "updated_at" => "1753879023"
+        ]
+      ]
+    ];
+
+    $this->ch_client
+      ->shouldReceive('get')
+      ->once()
+      ->with('queues/syndications', [])
+      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response_body)));
+
+    $result = $this->ch_client->getAllQueueItems();
+
+    $this->assertSame($response_body, $result);
+    $this->assertSame($response_body['total'], $result['total']);
+  }
+
+  /**
+   * Tests purgeQueue.
+   *
+   * @covers::purgeQueue
+   */
+  public function testPurgeQueue() {
+    $response_body = [
+      'success' => TRUE,
+      'request_id' => '1c6f7a8a-5cf6-4be2-8e09-e64c0d63629c',
+    ];
+
+    $this->ch_client
+      ->shouldReceive('delete')
+      ->once()
+      ->with('queues/syndications')
+      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response_body)));
+
+    $result = $this->ch_client->purgeQueue();
+
+    $this->assertSame($response_body, $result);
+  }
+
+  /**
+   * Tests deleteQueueItemsBySyndicationIds.
+   *
+   * @covers::deleteQueueItemsBySyndicationIds
+   */
+  public function testDeleteQueueItemsBySyndicationIds() {
+    $ids = ['1,2,3'];
+    $expected_request_body[RequestOptions::BODY] = json_encode([
+      'syndication_ids' => $ids,
+    ]);
+
+    $response_body = [
+      'success' => TRUE,
+      'request_id' => '1c6f7a8a-5cf6-4be2-8e09-e64c0d636343c',
+    ];
+
+    $this->ch_client
+      ->shouldReceive('delete')
+      ->once()
+      ->with('queues/syndications', $expected_request_body)
+      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response_body)));
+
+    $result = $this->ch_client->deleteQueueItemsBySyndicationIds($ids);
+
+    $this->assertSame($response_body, $result);
+  }
+
+  /**
+   * Tests deleteQueueItemsByEntityUuids.
+   *
+   * @covers::deleteQueueItemsByEntityUuids
+   */
+  public function testDeleteQueueItemsByEntityUuids() {
+    $uuids = ['uuid-1', 'uuid-2'];
+    $expected_request_body[RequestOptions::BODY] = json_encode([
+      'entity_uuids' => $uuids,
+    ]);
+
+    $response_body = [
+      'success' => TRUE,
+      'request_id' => '1c6f7a8a-5cf6-4be2-8e09-e64c0d636343c',
+    ];
+
+    $this->ch_client
+      ->shouldReceive('delete')
+      ->once()
+      ->with('queues/syndications', $expected_request_body)
+      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response_body)));
+
+    $result = $this->ch_client->deleteQueueItemsByEntityUuids($uuids);
+
+    $this->assertSame($response_body, $result);
+  }
+
+  /**
+   * Tests updateQueueItem.
+   *
+   * @covers::updateQueueItem
+   */
+  public function testUpdateQueueItem() {
+    $syndication_id = '12345';
+    $data = [
+      'state' => 'failed',
+      'visibility_timeout' => 0,
+    ];
+
+    $response_body = [
+      'success' => TRUE,
+      'request_id' => '2d7f8b9c-6df7-5cf3-9f1a-f75d1e74734d',
+    ];
+
+    $this->ch_client
+      ->shouldReceive('patch')
+      ->once()
+      ->with("queues/syndications/{$syndication_id}", [RequestOptions::BODY => json_encode($data)])
+      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response_body)));
+
+    $result = $this->ch_client->updateQueueItem($syndication_id, $data);
+
+    $this->assertSame($response_body, $result);
+  }
+
+  /**
+   * Tests receiveQueueItems.
+   *
+   * @covers::receiveQueueItems
+   */
+  public function testReceiveQueueItems(): void {
+    $limit = 10;
+    $visibility_timeout = '1d';
+    $queue_filters = ['queued'];
+
+    $expected_request_body = [
+      'max_number_of_items' => $limit,
+      'visibility_timeout' => $visibility_timeout,
+      'queue_filters' => [
+        'state' => $queue_filters,
+      ],
+    ];
+
+    $response_body = [
+      'success' => TRUE,
+      'request_id' => 'be71af85-cbb0-48ac-84f3-97083bf16323',
+      'data' => [
+        [
+          'id' => '123',
+          'entity_uuid' => '5f71af85-cbb0-48ac-84f3-97083bf16367',
+          'client_uuid' => '8fb4c61c-bc0c-4451-a1aa-f576bf4eb966',
+          'state' => 'queued',
+          'payload' => [
+            'action' => 'entity_create',
+            'reason' => 'interest list',
+          ],
+          'visible_at' => '1753879023',
+          'created_at' => '1753879023',
+          'updated_at' => '1753879023',
+        ],
+        [
+          'id' => '124',
+          'entity_uuid' => '6f71af85-cbb0-e8ac-84f3-97083bf16366',
+          'client_uuid' => '8fb4c61c-bc0c-4451-a1aa-f576bf4eb966',
+          'state' => 'queued',
+          'payload' => [
+            'action' => 'entity_update',
+            'reason' => 'UUID_OF_THE_FILTER',
+          ],
+          'visible_at' => '1753879023',
+          'created_at' => '1753879023',
+          'updated_at' => '1753879023',
+        ],
+      ],
+    ];
+
+    $this->ch_client
+      ->shouldReceive('post')
+      ->once()
+      ->with('queues/syndications', [
+        'body' => json_encode($expected_request_body),
+        'headers' => [
+          SyndicationQueue::HEADER => SyndicationQueue::RECEIVE_QUEUE_ITEMS,
+        ],
+      ])
+      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response_body)));
+
+    $result = $this->ch_client->receiveQueueItems($limit, $visibility_timeout, $queue_filters);
+
+    $this->assertSame($response_body, $result);
+    $this->assertTrue($result['success']);
+    $this->assertSame('be71af85-cbb0-48ac-84f3-97083bf16323', $result['request_id']);
+    $this->assertCount(2, $result['data']);
+
+    $first_item = $result['data'][0];
+    $this->assertSame('123', $first_item['id']);
+    $this->assertSame('5f71af85-cbb0-48ac-84f3-97083bf16367', $first_item['entity_uuid']);
+    $this->assertSame('8fb4c61c-bc0c-4451-a1aa-f576bf4eb966', $first_item['client_uuid']);
+    $this->assertSame('queued', $first_item['state']);
+    $this->assertSame('entity_create', $first_item['payload']['action']);
+    $this->assertSame('interest list', $first_item['payload']['reason']);
+
+    $second_item = $result['data'][1];
+    $this->assertSame('124', $second_item['id']);
+    $this->assertSame('6f71af85-cbb0-e8ac-84f3-97083bf16366', $second_item['entity_uuid']);
+    $this->assertSame('entity_update', $second_item['payload']['action']);
+    $this->assertSame('UUID_OF_THE_FILTER', $second_item['payload']['reason']);
+  }
+
+  /**
+   * @covers ::getWebhookStatusFor
+   */
+  public function testGetWebhookStatusFor(): void {
+    $uuid = '7e2b635d-d43c-4085-a336-1edd954aacc6';
+    $response_body = [
+      'success' => TRUE,
+      'request_id' => 'ce7bc9af-7b74-4530-9783-62dc9c783974',
+      'data' => [
+        [
+          'uuid' => $uuid,
+          'url' => 'http://example.com',
+          'current_state' => 'healthy'
+        ]
+      ],
+    ];
+
+    $this->ch_client
+      ->allows('get')
+      ->once()
+      ->with('settings/webhooks/status', ['query' => ['uuid' => $uuid]])
+      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response_body)));
+
+    $webhook_status = $this->ch_client->getWebhookStatusFor($uuid);
+    $this->assertEquals($uuid, $webhook_status->getUuid());
+    $this->assertEquals('http://example.com', $webhook_status->getUrl());
+    $this->assertEquals('healthy', $webhook_status->getCurrentState());
+  }
+
+  /**
+   * Tests getQueuedItems with additional parameters.
+   *
+   * @covers::getQueuedItems
+   */
+  public function testGetQueuedItemsWithParams() {
+    $params = ['limit' => 5];
+    $expected_params = ['state' => SyndicationState::QUEUED, 'limit' => 5];
+
+    $response_body = [
+      "total" => 1,
+      "success" => TRUE,
+      "data" => [
+        [
+          "id" => "1",
+          "entity_uuid" => "5f71af85-cbb0-48ac-84f3-97083bf16367",
+          "client_uuid" => "8fb4c61c-bc0c-4451-a1aa-f576bf4eb966",
+          "state" => SyndicationState::QUEUED,
+          "payload" => [
+            "action" => "entity_create"
+          ],
+          "visible_at" => "1753879023",
+          "created_at" => "1753879023",
+          "updated_at" => "1753879023"
+        ]
+      ]
+    ];
+
+    $this->ch_client
+      ->shouldReceive('get')
+      ->once()
+      ->with('queues/syndications', [RequestOptions::QUERY => $expected_params])
+      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response_body)));
+
+    $result = $this->ch_client->getQueuedItems($params);
+
+    $this->assertSame($response_body, $result);
   }
 
 }
