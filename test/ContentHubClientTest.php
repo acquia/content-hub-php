@@ -3449,7 +3449,7 @@ class ContentHubClientTest extends TestCase {
     $syndication_id = '12345';
     $data = [
       'state' => 'failed',
-      'visibility_timeout' => 0,
+      'visibility_timeout' => '0s',
     ];
 
     $response_body = [

@@ -1663,7 +1663,7 @@ class ContentHubClient implements ClientInterface {
    *   The data to update.
    *   Eg: [
    *   'state' => 'failed',
-   *   'visibility_timeout' => 0,
+   *   'visibility_timeout' => '0s',
    *   'payload' => [
    *     'reason' => 'manual',
    *   ].
