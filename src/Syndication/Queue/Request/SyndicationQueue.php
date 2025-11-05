@@ -17,4 +17,6 @@ final class SyndicationQueue {
    */
   public const RECEIVE_QUEUE_ITEMS = 'ReceiveQueueItems';
 
+  public const CONFIRM_PROCESSED_QUEUE_ITEMS = 'ConfirmProcessedQueueItems';
+
 }
