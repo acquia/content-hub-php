@@ -24,12 +24,9 @@ final class SyndicationState {
    * @return bool
    *   TRUE if state is valid, FALSE otherwise.
    */
-  public function isValidState(string $state): bool {
-    $states = $this->getAllSydicationStates();
-    if (!in_array($state, $states, TRUE)) {
-      return FALSE;
-    }
-    return TRUE;
+  public static function isValidState(string $state): bool {
+    $states = SyndicationState::getAllSyndicationStates();
+    return in_array($state, $states, TRUE);
   }
 
   /**
@@ -38,7 +35,7 @@ final class SyndicationState {
    * @return array
    *   Returns array of valid syndication states.
    */
-  public function getAllSydicationStates(): array {
+  public static function getAllSyndicationStates(): array {
     return [
       self::PROCESSING,
       self::FAILED,
