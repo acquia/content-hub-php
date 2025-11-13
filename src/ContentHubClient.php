@@ -1725,7 +1725,7 @@ class ContentHubClient implements ClientInterface {
    *   An array of entity UUIDs that failed processing.
    *
    * @return array|null
-   *   The response array
+   *   The response array.
    *
    * @throws \Exception
    */
