@@ -7,6 +7,7 @@ jobs:
       matrix:
         os: [ ubuntu-latest ]
         php-version: [ '7.4', '8.1', '8.2', '8.3', '8.4' ]
+        tools: composer:v2.8.0
     steps:
       # This step checks out a copy of your repository.
       - name: Checkout
