@@ -3553,6 +3553,8 @@ class ContentHubClientTest extends TestCase {
   }
 
   /**
+   * Tests confirmProcessedQueueItems.
+   *
    * @covers::confirmProcessedQueueItems
    */
   public function testConfirmProcessedQueueItems(): void {
