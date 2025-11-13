@@ -1716,6 +1716,19 @@ class ContentHubClient implements ClientInterface {
     return self::getResponseJson($this->post('queues/syndications', $options));
   }
 
+  /**
+   * Confirms processed queue items.
+   *
+   * @param array $processed
+   *   An array of entity UUIDs that were processed successfully.
+   * @param array $failed
+   *   An array of entity UUIDs that failed processing.
+   *
+   * @return array|null
+   *   The response array
+   *
+   * @throws \Exception
+   */
   public function confirmProcessedQueueItems(array $processed = [], array $failed = []): ?array {
     $options = [
       'headers' => [

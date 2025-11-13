@@ -17,6 +17,9 @@ final class SyndicationQueue {
    */
   public const RECEIVE_QUEUE_ITEMS = 'ReceiveQueueItems';
 
+  /**
+   * The header value required to confirm processed queue items.
+   */
   public const CONFIRM_PROCESSED_QUEUE_ITEMS = 'ConfirmProcessedQueueItems';
 
 }
