@@ -17,7 +17,6 @@ jobs:
         with:
           php-version: ${{ matrix.php-version }}
           coverage: xdebug
-          tools: composer:v2.8.0
 
       - name: Install composer dependencies
         run: composer install
