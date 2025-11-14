@@ -3553,6 +3553,45 @@ class ContentHubClientTest extends TestCase {
   }
 
   /**
+   * Tests confirmProcessedQueueItems.
+   *
+   * @covers::confirmProcessedQueueItems
+   */
+  public function testConfirmProcessedQueueItems(): void {
+    $processed = ['uuid-1', 'uuid-2', 'uuid-3'];
+    $failed = ['uuid-4', 'uuid-5'];
+
+    $expected_request_body = [
+      'entity_uuids' => [
+        'processed' => $processed,
+        'failed' => $failed,
+      ],
+    ];
+
+    $response_body = [
+      'success' => TRUE,
+      'request_id' => '9c3d4e5f-7a8b-4c2d-9e1f-2a3b4c5d6e7f',
+    ];
+
+    $this->ch_client
+      ->shouldReceive('post')
+      ->once()
+      ->with('queues/syndications', [
+        'body' => json_encode($expected_request_body),
+        'headers' => [
+          SyndicationQueue::HEADER => SyndicationQueue::CONFIRM_PROCESSED_QUEUE_ITEMS,
+        ],
+      ])
+      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response_body)));
+
+    $result = $this->ch_client->confirmProcessedQueueItems($processed, $failed);
+
+    $this->assertSame($response_body, $result);
+    $this->assertTrue($result['success']);
+    $this->assertSame('9c3d4e5f-7a8b-4c2d-9e1f-2a3b4c5d6e7f', $result['request_id']);
+  }
+
+  /**
    * @covers ::getWebhookStatusFor
    */
   public function testGetWebhookStatusFor(): void {
