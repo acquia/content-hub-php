@@ -3365,6 +3365,36 @@ class ContentHubClientTest extends TestCase {
   }
 
   /**
+   * Tests getQueueItemById.
+   *
+   * @covers::getQueueItemById
+   */
+  public function testGetQueueItemById() {
+    $response_body = [
+      "id" => "1",
+      "entity_uuid" => "7f71af85-cbb0-48ac-84f3-97083bf16367",
+      "client_uuid" => "8fb4c61c-bc0c-4451-a1aa-f576bf4eb966",
+      "state" => "processed",
+      "payload" => [
+        "action" => "entity_delete"
+      ],
+      "visible_at" => "1753879023",
+      "created_at" => "1753879023",
+      "updated_at" => "1753879023"
+    ];
+
+    $this->ch_client
+      ->shouldReceive('get')
+      ->once()
+      ->with('queues/syndications/1')
+      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response_body)));
+
+    $result = $this->ch_client->getQueueItemById(1);
+
+    $this->assertSame($response_body, $result);
+  }
+
+  /**
    * Tests purgeQueue.
    *
    * @covers::purgeQueue
