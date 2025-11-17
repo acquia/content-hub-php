@@ -22,4 +22,9 @@ final class SyndicationQueue {
    */
   public const CONFIRM_PROCESSED_QUEUE_ITEMS = 'ConfirmProcessedQueueItems';
 
+  /**
+   * The header value required to create queue item.
+   */
+  public const CREATE_QUEUE_ITEM = 'CreateQueueItem';
+
 }

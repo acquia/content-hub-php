@@ -1775,4 +1775,31 @@ class ContentHubClient implements ClientInterface {
     return self::getResponseJson($this->post('queues/syndications', $options));
   }
 
+  /**
+   * Creates a new syndication queue item.
+   *
+   * @param array $data
+   *   Eg: [
+   *   'client_uuid' => '1c6f7a8a-5cf6-4bb2-8e09-e64c0d63629f',
+   *   'entity_uuid' => '0c6f7a8a-5cf6-4bb2-8e09-e64c0d63629f',
+   *   'payload' => [
+   *     'reason' => 'interest list',
+   *     'action' => 'entity_update'
+   *   ].
+   *
+   * @return array
+   *   The response array.
+   *
+   * @throws \Exception
+   */
+  public function createQueueItem(array $data): ?array {
+    $options = [
+      RequestOptions::HEADERS => [
+        SyndicationQueue::HEADER => SyndicationQueue::CREATE_QUEUE_ITEM,
+      ],
+      RequestOptions::BODY => json_encode($data),
+    ];
+    return self::getResponseJson($this->post('queues/syndications', $options));
+  }
+
 }
