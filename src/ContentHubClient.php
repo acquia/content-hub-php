@@ -1570,6 +1570,35 @@ class ContentHubClient implements ClientInterface {
   }
 
   /**
+   * Provides single queue item details.
+   *
+   * Response Format:
+   * [
+   *   'id' => '1',
+   *   'entity_uuid' => '5f71af85-cbb0-48ac-84f3-97083bf16367',
+   *   'client_uuid' => '8fb4c61c-bc0c-4451-a1aa-f576bf4eb966',
+   *   'state' => 'queued',
+   *   'payload' => [
+   *     'action' => 'entity_create'
+   *   ],
+   *   'visible_at' => '1753879023',
+   *   'created_at' => '1753879023',
+   *   'updated_at' => '1753879023'
+   * ]
+   *
+   * @param int $id
+   *   Queue item ID.
+   *
+   * @return array
+   *   Returns array of queue item details from service.
+   *
+   * @throws \Exception
+   */
+  public function getQueueItemById(int $id): array {
+    return self::getResponseJson($this->get("queues/syndications/$id"));
+  }
+
+  /**
    * Provides an array of queued syndication items.
    *
    * Response Format:
