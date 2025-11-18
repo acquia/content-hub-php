@@ -1785,7 +1785,8 @@ class ContentHubClient implements ClientInterface {
    *   'payload' => [
    *     'reason' => 'interest list',
    *     'action' => 'entity_update'
-   *   ].
+   *   ]
+   * ]
    *
    * @return array
    *   The response array.
