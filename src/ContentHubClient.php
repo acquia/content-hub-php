@@ -1779,7 +1779,7 @@ class ContentHubClient implements ClientInterface {
    * Creates a new syndication queue item.
    *
    * @param array $data
-   *   [
+   *   Eg : [
    *     'client_uuid' => '1c6f7a8a-5cf6-4bb2-8e09-e64c0d63629f',
    *     'entity_uuid' => '0c6f7a8a-5cf6-4bb2-8e09-e64c0d63629f',
    *     'payload' => [
