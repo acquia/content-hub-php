@@ -1802,7 +1802,7 @@ class ContentHubClient implements ClientInterface {
    *     ]
    *   ].
    *
-   * @return array
+   * @return array|null
    *   The response array.
    *
    * @throws \Exception
