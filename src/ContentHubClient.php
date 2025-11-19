@@ -1776,15 +1776,29 @@ class ContentHubClient implements ClientInterface {
   }
 
   /**
-   * Creates a new syndication queue item.
+   * Creates new syndication queue items.
    *
    * @param array $data
    *   Eg : [
-   *     'client_uuid' => '1c6f7a8a-5cf6-4bb2-8e09-e64c0d63629f',
-   *     'entity_uuid' => '0c6f7a8a-5cf6-4bb2-8e09-e64c0d63629f',
-   *     'payload' => [
-   *       'reason' => 'interest list',
-   *       'action' => 'entity_update'
+   *     [
+   *       'client_uuid' => '1c6f7a8a-5cf6-4bb2-8e09-e64c0d63629d',
+   *       'entity_uuid' => '0c6f7a8a-5cf6-4bb2-8e09-e64c0d63629f',
+   *       'payload' => [
+   *         'action' => 'entity_update',
+   *         'reason' => 'interest list'
+   *         'type' => 'client',
+   *         'initiator' => "1c6f7a8a-5cf6-4bb2-8e09-e64c0d63629f"
+   *       ]
+   *     ],
+   *     [
+   *       'client_uuid' => '2d7f8b9b-6df7-5cc3-9f1a-f75d1e74740e',
+   *       'entity_uuid' => '1d7f8b9b-6df7-5cc3-9f1a-f75d1e74740f',
+   *       'payload' => [
+   *         'action' => 'entity_create',
+   *         'reason' => 'manual sync'
+   *         'type' => 'client',
+   *         'initiator' => "1c6f7a8a-5cf6-4bb2-8e09-e64c0d63629f"
+   *       ]
    *     ]
    *   ].
    *

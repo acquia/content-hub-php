@@ -3622,17 +3622,19 @@ class ContentHubClientTest extends TestCase {
   }
 
   /**
-   * Tests createQueueItem.
+   * Tests createQueueItems.
    *
-   * @covers::createQueueItem
+   * @covers::createQueueItems
    */
-  public function testCreateQueueItem(): void {
+  public function testCreateQueueItems(): void {
     $request_body = [
       'client_uuid' => '1c6f7a8a-5cf6-4bb2-8e09-e64c0d63629f',
       'entity_uuid' => '0c6f7a8a-5cf6-4bb2-8e09-e64c0d63629f',
       'payload' => [
         'reason' => 'interest list',
-        'action' => 'entity_update'
+        'action' => 'entity_update',
+        'type' => 'client',
+        'initiator' => "1c6f7a8a-5cf6-4bb2-8e09-e64c0d63629f"
       ]
     ];
 
@@ -3647,12 +3649,12 @@ class ContentHubClientTest extends TestCase {
       ->with('queues/syndications', [
         'body' => json_encode($request_body),
         'headers' => [
-          SyndicationQueue::HEADER => SyndicationQueue::CREATE_QUEUE_ITEM,
+          SyndicationQueue::HEADER => SyndicationQueue::CREATE_QUEUE_ITEMS,
         ],
       ])
       ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response_body)));
 
-    $result = $this->ch_client->createQueueItem($request_body);
+    $result = $this->ch_client->createQueueItems($request_body);
 
     $this->assertSame($response_body, $result);
     $this->assertTrue($result['success']);
