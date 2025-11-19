@@ -1287,7 +1287,7 @@ class ContentHubClientTest extends TestCase {
       'success' => FALSE,
       'error' => [
         'code' => 4005,
-        'message' => 'The requested client name was not found.',
+        'message' => 'The requested client was not found.',
       ],
       'request_id' => 'some-request-uuid',
     ];
