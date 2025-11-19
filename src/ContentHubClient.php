@@ -649,6 +649,8 @@ class ContentHubClient implements ClientInterface {
   /**
    * Returns the Client, given its uuid.
    *
+   * This method uses settings endpoint.
+   *
    * @param string $uuid
    *   Client uuid.
    *
@@ -665,6 +667,21 @@ class ContentHubClient implements ClientInterface {
       }
     }
     return [];
+  }
+
+  /**
+   * Returns the Client, given the client uuid.
+   *
+   * @param string $uuid
+   *   Client uuid.
+   *
+   * @return mixed
+   *   The client array.
+   *
+   * @throws \Exception
+   */
+  public function getClientByUuidProperly(string $uuid): array {
+    return self::getResponseJson($this->get("settings/client/uuid/$uuid"));
   }
 
   /**

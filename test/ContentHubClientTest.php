@@ -1260,6 +1260,48 @@ class ContentHubClientTest extends TestCase {
   }
 
   /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::getClientByUuidProperly
+   * @throws \Exception
+   */
+  public function testGetClientByUuidProperlyReturnsClientInfoIfSuccessful(): void {
+    $response = [
+      'name' => $this->test_data['name'],
+      'uuid' => $this->test_data['client-uuid'],
+    ];
+    $this->ch_client
+      ->shouldReceive('get')
+      ->once()
+      ->with('settings/client/uuid/' . $this->test_data['uuid'])
+      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response)));
+
+    $api_response = $this->ch_client->getClientByUuidProperly($this->test_data['uuid']);
+    $this->assertSame($api_response, $response);
+  }
+
+  /**
+   * @covers \Acquia\ContentHubClient\ContentHubClient::getClientByUuidProperly
+   * @throws \Exception
+   */
+  public function testGetClientByUuidProperlyReturnsUnsuccessfulIfClientIsNotFound(): void {
+    $response = [
+      'success' => FALSE,
+      'error' => [
+        'code' => 4005,
+        'message' => 'The requested client name was not found.',
+      ],
+      'request_id' => 'some-request-uuid',
+    ];
+
+    $this->ch_client
+      ->shouldReceive('get')
+      ->once()
+      ->with('settings/client/uuid/' . $this->test_data['uuid'])
+      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_NOT_FOUND, [], json_encode($response)));
+
+    $this->assertSame($this->ch_client->getClientByUuidProperly($this->test_data['uuid']), $response);
+  }
+
+  /**
    * @covers \Acquia\ContentHubClient\ContentHubClient::getClientByName
    * @throws \Exception
    */
