@@ -25,6 +25,6 @@ final class SyndicationQueue {
   /**
    * The header value required to create queue item.
    */
-  public const CREATE_QUEUE_ITEM = 'CreateQueueItem';
+  public const CREATE_QUEUE_ITEMS = 'CreateQueueItems';
 
 }

@@ -1793,10 +1793,10 @@ class ContentHubClient implements ClientInterface {
    *
    * @throws \Exception
    */
-  public function createQueueItem(array $data): ?array {
+  public function createQueueItems(array $data): ?array {
     $options = [
       RequestOptions::HEADERS => [
-        SyndicationQueue::HEADER => SyndicationQueue::CREATE_QUEUE_ITEM,
+        SyndicationQueue::HEADER => SyndicationQueue::CREATE_QUEUE_ITEMS,
       ],
       RequestOptions::BODY => json_encode($data),
     ];
