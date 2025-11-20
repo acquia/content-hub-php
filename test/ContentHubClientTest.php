@@ -128,12 +128,12 @@ class ContentHubClientTest extends TestCase {
         'is_publisher' => TRUE,
         'is_subscriber' => FALSE,
         'webhook_version' => '2.0',
-        'syndication_mode' => 'push',
         'config' => [
           'valid_ssl' => TRUE,
           'drupal_version' => '10.1.1',
           'ch_version' => '3.3.0',
         ],
+        'syndication_mode' => 'push',
       ]),
       'host-name' => 'some-host-name',
       'shared-secret' => 'some-shared-secret',
