@@ -133,7 +133,7 @@ class ContentHubClientTest extends TestCase {
           'drupal_version' => '10.1.1',
           'ch_version' => '3.3.0',
         ],
-        'syndication_mode' => 'push',
+        'syndication_strategy' => 'push',
       ]),
       'host-name' => 'some-host-name',
       'shared-secret' => 'some-shared-secret',
