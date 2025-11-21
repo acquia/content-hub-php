@@ -1795,4 +1795,46 @@ class ContentHubClient implements ClientInterface {
     return self::getResponseJson($this->post('queues/syndications', $options));
   }
 
+  /**
+   * Creates new syndication queue items.
+   *
+   * @param array $data
+   *   Eg : [
+   *     [
+   *       'client_uuid' => '1c6f7a8a-5cf6-4bb2-8e09-e64c0d63629d',
+   *       'entity_uuid' => '0c6f7a8a-5cf6-4bb2-8e09-e64c0d63629f',
+   *       'payload' => [
+   *         'action' => 'entity_update',
+   *         'reason' => 'interest list'
+   *         'type' => 'client',
+   *         'initiator' => "1c6f7a8a-5cf6-4bb2-8e09-e64c0d63629f"
+   *       ]
+   *     ],
+   *     [
+   *       'client_uuid' => '2d7f8b9b-6df7-5cc3-9f1a-f75d1e74740e',
+   *       'entity_uuid' => '1d7f8b9b-6df7-5cc3-9f1a-f75d1e74740f',
+   *       'payload' => [
+   *         'action' => 'entity_create',
+   *         'reason' => 'manual sync'
+   *         'type' => 'client',
+   *         'initiator' => "1c6f7a8a-5cf6-4bb2-8e09-e64c0d63629f"
+   *       ]
+   *     ]
+   *   ].
+   *
+   * @return array|null
+   *   The response array.
+   *
+   * @throws \Exception
+   */
+  public function createQueueItems(array $data): ?array {
+    $options = [
+      RequestOptions::HEADERS => [
+        SyndicationQueue::HEADER => SyndicationQueue::CREATE_QUEUE_ITEMS,
+      ],
+      RequestOptions::BODY => json_encode($data),
+    ];
+    return self::getResponseJson($this->post('queues/syndications', $options));
+  }
+
 }

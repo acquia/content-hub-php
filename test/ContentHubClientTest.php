@@ -3664,6 +3664,46 @@ class ContentHubClientTest extends TestCase {
   }
 
   /**
+   * Tests createQueueItems.
+   *
+   * @covers::createQueueItems
+   */
+  public function testCreateQueueItems(): void {
+    $request_body = [
+      'client_uuid' => '1c6f7a8a-5cf6-4bb2-8e09-e64c0d63629f',
+      'entity_uuid' => '0c6f7a8a-5cf6-4bb2-8e09-e64c0d63629f',
+      'payload' => [
+        'reason' => 'interest list',
+        'action' => 'entity_update',
+        'type' => 'client',
+        'initiator' => "1c6f7a8a-5cf6-4bb2-8e09-e64c0d63629f"
+      ]
+    ];
+
+    $response_body = [
+      'success' => TRUE,
+      'request_id' => '9c3d4e5f-7a8b-4c2d-9e1f-2a3b4c5d6e7f',
+    ];
+
+    $this->ch_client
+      ->shouldReceive('post')
+      ->once()
+      ->with('queues/syndications', [
+        'body' => json_encode($request_body),
+        'headers' => [
+          SyndicationQueue::HEADER => SyndicationQueue::CREATE_QUEUE_ITEMS,
+        ],
+      ])
+      ->andReturn($this->makeMockResponse(SymfonyResponse::HTTP_OK, [], json_encode($response_body)));
+
+    $result = $this->ch_client->createQueueItems($request_body);
+
+    $this->assertSame($response_body, $result);
+    $this->assertTrue($result['success']);
+    $this->assertSame('9c3d4e5f-7a8b-4c2d-9e1f-2a3b4c5d6e7f', $result['request_id']);
+  }
+
+  /**
    * @covers ::getWebhookStatusFor
    */
   public function testGetWebhookStatusFor(): void {
