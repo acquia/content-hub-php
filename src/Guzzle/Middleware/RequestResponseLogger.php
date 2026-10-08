@@ -5,7 +5,6 @@ namespace Acquia\ContentHubClient\Guzzle\Middleware;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class RequestResponseLogger.
@@ -13,6 +12,9 @@ use Symfony\Component\HttpFoundation\Response;
  * @package Acquia\ContentHubClient\Guzzle\Middleware
  */
 class RequestResponseLogger {
+
+  const HTTP_BAD_REQUEST = 400;
+  const HTTP_INTERNAL_SERVER_ERROR = 500;
 
   /**
    * Request object instance.
@@ -122,13 +124,13 @@ class RequestResponseLogger {
    *   Response status code.
    */
   protected function logMessage(string $message, int $responseStatusCode): void {
-    if ($responseStatusCode >= Response::HTTP_INTERNAL_SERVER_ERROR) {
+    if ($responseStatusCode >= self::HTTP_INTERNAL_SERVER_ERROR) {
       $this->logger->error($message);
 
       return;
     }
 
-    if ($responseStatusCode >= Response::HTTP_BAD_REQUEST) {
+    if ($responseStatusCode >= self::HTTP_BAD_REQUEST) {
       $this->logger->warning($message);
 
       return;

@@ -16,7 +16,6 @@ use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\RequestOptions;
-use Symfony\Component\HttpFoundation\Response as HttpResponse;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -30,12 +29,15 @@ class ContentHubClient implements ClientInterface {
 
   use ContentHubClientTrait;
 
+  const HTTP_NOT_FOUND = 404;
+  const HTTP_GONE = 410;
+
   const OPTION_NAME_LANGUAGES = 'client-languages';
 
   const FEATURE_DEPRECATED_RESPONSE = [
     'success' => FALSE,
     'error' => [
-      'code' => HttpResponse::HTTP_GONE,
+      'code' => self::HTTP_GONE,
       'message' => 'This feature is deprecated',
     ],
   ];
@@ -292,7 +294,7 @@ class ContentHubClient implements ClientInterface {
       return TRUE;
     }
     catch (ClientException $error) {
-      return $error->getResponse()->getStatusCode() !== HttpResponse::HTTP_NOT_FOUND;
+      return $error->getResponse()->getStatusCode() !== self::HTTP_NOT_FOUND;
     }
   }
 
