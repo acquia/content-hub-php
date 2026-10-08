@@ -2,6 +2,8 @@
 
 namespace Acquia\ContentHubClient;
 
+use GuzzleHttp\Utils;
+
 /**
  * Content Hub Descriptor provides Version and user agent string.
  */
@@ -26,7 +28,7 @@ final class ContentHubDescriptor {
   public static function userAgent(): string {
     // GuzzleHttp\default_user_agent() was removed in Guzzle 7; use Utils::defaultUserAgent() instead.
     $guzzleAgent = class_exists('GuzzleHttp\Utils')
-      ? \GuzzleHttp\Utils::defaultUserAgent()
+      ? Utils::defaultUserAgent()
       : \GuzzleHttp\default_user_agent();
     return self::LIBRARYNAME . '/' . self::LIB_VERSION . ' ' . $guzzleAgent;
   }
