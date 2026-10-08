@@ -13,6 +13,9 @@ use Psr\Log\LoggerInterface;
  */
 class RequestResponseLogger {
 
+  const HTTP_BAD_REQUEST = 400;
+  const HTTP_INTERNAL_SERVER_ERROR = 500;
+
   /**
    * Request object instance.
    *
@@ -121,13 +124,13 @@ class RequestResponseLogger {
    *   Response status code.
    */
   protected function logMessage(string $message, int $responseStatusCode): void {
-    if ($responseStatusCode >= 500) {
+    if ($responseStatusCode >= self::HTTP_INTERNAL_SERVER_ERROR) {
       $this->logger->error($message);
 
       return;
     }
 
-    if ($responseStatusCode >= 400) {
+    if ($responseStatusCode >= self::HTTP_BAD_REQUEST) {
       $this->logger->warning($message);
 
       return;

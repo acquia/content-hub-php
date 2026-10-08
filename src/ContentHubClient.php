@@ -29,12 +29,15 @@ class ContentHubClient implements ClientInterface {
 
   use ContentHubClientTrait;
 
+  const HTTP_NOT_FOUND = 404;
+  const HTTP_GONE = 410;
+
   const OPTION_NAME_LANGUAGES = 'client-languages';
 
   const FEATURE_DEPRECATED_RESPONSE = [
     'success' => FALSE,
     'error' => [
-      'code' => 410,
+      'code' => self::HTTP_GONE,
       'message' => 'This feature is deprecated',
     ],
   ];
@@ -291,7 +294,7 @@ class ContentHubClient implements ClientInterface {
       return TRUE;
     }
     catch (ClientException $error) {
-      return $error->getResponse()->getStatusCode() !== 404;
+      return $error->getResponse()->getStatusCode() !== self::HTTP_NOT_FOUND;
     }
   }
 
