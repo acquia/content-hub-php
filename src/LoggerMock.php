@@ -4,7 +4,6 @@ namespace Acquia\ContentHubClient;
 
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
-use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Mock Logger created for fetching log messages.

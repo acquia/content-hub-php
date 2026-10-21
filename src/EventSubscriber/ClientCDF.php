@@ -17,7 +17,7 @@ class ClientCDF implements EventSubscriberInterface {
   /**
    * {@inheritdoc}
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     $events[ContentHubLibraryEvents::GET_CDF_CLASS][] = ['onGetCDFType', 100];
 
     return $events;
