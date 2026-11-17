@@ -157,7 +157,7 @@ trait ContentHubClientTrait {
    * @since 0.2.0
    */
   public function ping(): ResponseInterface {
-    $makeBaseURL = self::makeBaseURL($this->getConfig()['base_url']);
+    $makeBaseURL = self::makeBaseURL($this->getSettings()->getUrl());
     $client = ObjectFactory::getGuzzleClient([
       'base_uri' => $makeBaseURL,
     ]);
