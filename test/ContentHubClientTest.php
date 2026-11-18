@@ -2852,7 +2852,7 @@ class ContentHubClientTest extends TestCase {
   private function assertResponseItems(ContentHubClient $response): void {
     $settings = $response->getSettings();
 
-    $this->assertSame($response->getConfig()['base_url'], $settings->getUrl());
+    $this->assertSame($response->getConfig()['base_uri'], $settings->getUrl());
     $this->assertSame($settings->getUrl(), $this->test_data['url']);
     $this->assertSame($settings->getName(), $this->test_data['name']);
     $this->assertSame($settings->getUuid(), $this->test_data['client-uuid']);

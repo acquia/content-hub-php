@@ -26,10 +26,7 @@ final class ContentHubDescriptor {
    *   User agent string.
    */
   public static function userAgent(): string {
-    // GuzzleHttp\default_user_agent() was removed in Guzzle 7; use Utils::defaultUserAgent() instead.
-    $guzzleAgent = class_exists('GuzzleHttp\Utils')
-      ? Utils::defaultUserAgent()
-      : \GuzzleHttp\default_user_agent();
+    $guzzleAgent = Utils::defaultUserAgent();
     return self::LIBRARYNAME . '/' . self::LIB_VERSION . ' ' . $guzzleAgent;
   }
 

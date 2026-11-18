@@ -46,14 +46,7 @@ class ContentHubLoggingClient implements ContentHubLoggingClientInterface {
     $this->settings = $settings;
     $this->dispatcher = $dispatcher;
 
-    // "base_url" parameter changed to "base_uri" in Guzzle6, so the following line
-    // is there to make sure it does not disrupt previous configuration.
-    if (!isset($config['base_uri']) && isset($config['base_url'])) {
-      $config['base_uri'] = self::makeBaseURL($config['base_url']);
-    }
-    else {
-      $config['base_uri'] = self::makeBaseURL($config['base_uri']);
-    }
+    $config['base_uri'] = self::makeBaseURL($config['base_uri']);
 
     // Setting up the User Header string.
     $user_agent_string = ContentHubDescriptor::userAgent();

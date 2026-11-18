@@ -16,9 +16,9 @@
     "require": {
         "acquia/http-hmac-php": ">=3.4",
         "ext-json": "*",
-        "php": ">=7.4",
+        "php": ">=8.1.6",
         "psr/log": ">=1.0",
-        "guzzlehttp/guzzle": ">=6.5",
+        "guzzlehttp/guzzle": ">=7.0",
         "symfony/event-dispatcher": ">=4.4",
         "symfony/http-foundation": ">=4.4",
         "symfony/serializer": ">=4.4"

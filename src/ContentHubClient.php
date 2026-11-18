@@ -89,16 +89,7 @@ class ContentHubClient implements ClientInterface {
     $this->settings = $settings;
     $this->dispatcher = $dispatcher;
 
-    // "base_url" parameter changed to "base_uri" in Guzzle6, so the following line
-    // is there to make sure it does not disrupt previous configuration.
-    if (!isset($config['base_uri']) && isset($config['base_url'])) {
-      $config['base_uri'] = self::makeBaseURL($config['base_url'],
-        $api_version);
-    }
-    else {
-      $config['base_uri'] = self::makeBaseURL($config['base_uri'],
-        $api_version);
-    }
+    $config['base_uri'] = self::makeBaseURL($config['base_uri'], $api_version);
 
     // Setting up the User Header string.
     $user_agent_string = ContentHubDescriptor::userAgent();
@@ -204,7 +195,7 @@ class ContentHubClient implements ClientInterface {
       $settings = ObjectFactory::instantiateSettings($values['name'],
         $values['uuid'], $api_key, $secret, $url);
       $config = [
-        'base_url' => $settings->getUrl(),
+        'base_uri' => $settings->getUrl(),
       ];
       $client = ObjectFactory::getCHClient($logger, $settings,
         $settings->getMiddleware(), $dispatcher, $config);

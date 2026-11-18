@@ -128,9 +128,6 @@ class CDFObject implements CDFObjectInterface {
         $attribute = $object->getAttribute($attribute_name);
       }
       $value_property = (new \ReflectionClass($attribute))->getProperty('value');
-      if (PHP_VERSION_ID < 80100) {
-        $value_property->setAccessible(TRUE);
-      }
       $value_property->setValue($attribute, $values['value']);
     }
     return $object;
